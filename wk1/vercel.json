@@ -1,0 +1,7 @@
+{
+  "cleanUrls": false,
+  "rewrites": [
+    { "source": "/", "destination": "/Vibe%20Coding.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" }
+  ]
+}

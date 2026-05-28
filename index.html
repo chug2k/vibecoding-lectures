@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vibe Coding — Lectures</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root {
+    --bg: #0b0b0f;
+    --panel: #14141b;
+    --panel-hi: #1d1d27;
+    --border: #2a2a36;
+    --text: #e8e8ee;
+    --muted: #8a8a97;
+    --accent: #7c5cff;
+    --accent-hi: #9a82ff;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font: 14px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: 100%;
+  }
+
+  aside {
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 18px 14px;
+  }
+  .brand {
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.2px;
+    margin: 4px 6px 18px;
+  }
+  .brand small {
+    display: block;
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  .week {
+    margin-bottom: 14px;
+  }
+  .week-label {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 4px 6px;
+  }
+  .deck {
+    display: block;
+    padding: 9px 10px;
+    border-radius: 7px;
+    color: var(--text);
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 13px;
+    border: 1px solid transparent;
+    margin-top: 4px;
+  }
+  .deck:hover { background: var(--panel-hi); }
+  .deck.active {
+    background: var(--panel-hi);
+    border-color: var(--accent);
+    color: var(--accent-hi);
+  }
+  .deck .sub {
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  main {
+    position: relative;
+    background: #000;
+    overflow: hidden;
+  }
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+  .placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 13px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  [hidden] { display: none !important; }
+  .placeholder kbd {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 11px;
+  }
+
+  .topbar {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .topbar:hover { opacity: 1; }
+  .topbar a, .topbar button {
+    background: rgba(20,20,27,0.85);
+    backdrop-filter: blur(8px);
+    color: var(--text);
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .topbar a:hover, .topbar button:hover { background: var(--panel-hi); }
+  .topbar button.has-notes { border-color: var(--accent); color: var(--accent-hi); }
+
+  .notes {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 420px;
+    max-width: 60vw;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 50px 22px 22px;
+    z-index: 5;
+    transform: translateX(100%);
+    transition: transform 0.2s ease;
+    box-shadow: -8px 0 24px rgba(0,0,0,0.4);
+  }
+  .notes.open { transform: translateX(0); }
+  .notes h2 {
+    margin: 0 0 4px;
+    font-size: 16px;
+  }
+  .notes h3 {
+    margin: 20px 0 6px;
+    font-size: 13px;
+    color: var(--accent-hi);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .notes p { margin: 6px 0; color: var(--text); line-height: 1.5; }
+  .notes a { color: var(--accent-hi); word-break: break-all; }
+  .notes ul { margin: 4px 0; padding-left: 20px; }
+  .notes li { margin: 4px 0; line-height: 1.5; }
+  .notes pre {
+    background: #0a0a10;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    overflow-x: auto;
+    font-size: 12px;
+    margin: 8px 0;
+    color: #d5d5e0;
+  }
+  .notes code {
+    background: #0a0a10;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 12px;
+  }
+  .notes pre code { background: transparent; border: 0; padding: 0; }
+  .notes .empty { color: var(--muted); font-style: italic; }
+</style>
+</head>
+<body>
+  <aside>
+    <div class="brand">
+      Vibe Coding
+      <small>Lecture viewer</small>
+    </div>
+    <div id="weeks"></div>
+  </aside>
+
+  <main>
+    <div class="topbar" id="topbar" hidden>
+      <button id="notesToggle" type="button">Notes</button>
+      <a id="openNew" target="_blank" rel="noopener">Open in new tab ↗</a>
+    </div>
+    <div class="placeholder" id="placeholder">
+      <div>Pick a lecture from the sidebar.</div>
+      <div><kbd>←</kbd> <kbd>→</kbd> navigate slides once a deck is loaded</div>
+    </div>
+    <iframe id="viewer" hidden allowfullscreen></iframe>
+    <aside class="notes" id="notes"></aside>
+  </main>
+
+<script>
+  // Edit this list to add weeks / decks.
+  const WEEKS = [
+    {
+      label: "Week 1",
+      decks: [
+        { title: "Vibe Coding — Day 1", sub: "main deck", path: "wk1/Vibe Coding.html" },
+        { title: "Dashboard demo", sub: "supplemental", path: "wk1/dashboard.html" },
+      ],
+    },
+    {
+      label: "Week 2",
+      decks: [
+        {
+          title: "Databases & Deployment — Day 2",
+          sub: "main deck",
+          path: "wk2/Databases and Deployment.html",
+          notes: `
+            <h2>Databases &amp; Deployment</h2>
+            <p class="empty">Resources from the live session.</p>
+
+            <h3>Prereqs</h3>
+            <ul>
+              <li>Node.js — <a href="https://nodejs.org/en/download/current" target="_blank" rel="noopener">nodejs.org/en/download/current</a></li>
+              <li>Supabase account — <a href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a></li>
+            </ul>
+
+            <h3>Supabase MCP setup</h3>
+            <ol>
+              <li>Generate a personal access token: <a href="https://supabase.com/dashboard/account/tokens" target="_blank" rel="noopener">supabase.com/dashboard/account/tokens</a><br>
+                <em>(profile pic upper-right → Account Settings → Tokens)</em>
+              </li>
+              <li>When prompted: choose <strong>“this project”</strong> (not global), and <strong>“token”</strong> (not keys).</li>
+              <li>Add the MCP server to Claude Code (replace the token):
+                <pre><code>claude mcp add --transport http supabase -s project \\
+  "https://mcp.supabase.com/mcp" \\
+  --header "Authorization: Bearer $SUPABASE_PAT"</code></pre>
+              </li>
+              <li>Restart Claude (<code>/exit</code>, then <code>claude</code>) and run <code>/mcp</code> to verify.</li>
+              <li>If it complains the server already exists:
+                <pre><code>claude mcp remove supabase -s project</code></pre>
+              </li>
+            </ol>
+
+            <h3>The build prompt</h3>
+            <pre><code>build me a shared deal tracker. it should run
+in a web browser. each deal has a company name,
+a value, a stage, an owner, created_date,
+updated_date. use supabase mcp to store the
+data. build in typescript and react. no auth
+for now.</code></pre>
+          `,
+        },
+        {
+          title: "Deal Tracker demo",
+          sub: "supplemental — live app",
+          path: "https://deal-tracker-nu-bice.vercel.app/",
+          external: true,
+        },
+      ],
+    },
+  ];
+
+  const weeksEl = document.getElementById("weeks");
+  const viewer = document.getElementById("viewer");
+  const placeholder = document.getElementById("placeholder");
+  const topbar = document.getElementById("topbar");
+  const openNew = document.getElementById("openNew");
+  const notesEl = document.getElementById("notes");
+  const notesToggle = document.getElementById("notesToggle");
+
+  const deckByPath = {};
+  WEEKS.forEach((w) => w.decks.forEach((d) => { deckByPath[d.path] = d; }));
+
+  notesToggle.addEventListener("click", () => {
+    notesEl.classList.toggle("open");
+  });
+
+  function render() {
+    weeksEl.innerHTML = "";
+    WEEKS.forEach((wk) => {
+      const wrap = document.createElement("div");
+      wrap.className = "week";
+      const label = document.createElement("div");
+      label.className = "week-label";
+      label.textContent = wk.label;
+      wrap.appendChild(label);
+      wk.decks.forEach((d) => {
+        const a = document.createElement("a");
+        a.className = "deck";
+        a.dataset.path = d.path;
+        const externalBadge = d.external ? ' <span class="sub" style="display:inline">↗</span>' : '';
+        a.innerHTML = `<div>${d.title}${externalBadge}</div><div class="sub">${d.sub}</div>`;
+        if (d.external) {
+          a.href = d.path;
+          a.target = "_blank";
+          a.rel = "noopener";
+        } else {
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            load(d.path);
+          });
+        }
+        wrap.appendChild(a);
+      });
+      weeksEl.appendChild(wrap);
+    });
+  }
+
+  function load(path) {
+    document.querySelectorAll(".deck").forEach((el) => {
+      el.classList.toggle("active", el.dataset.path === path);
+    });
+    placeholder.hidden = true;
+    viewer.hidden = false;
+    topbar.hidden = false;
+    const url = encodeURI(path);
+    viewer.src = url;
+    openNew.href = url;
+
+    const deck = deckByPath[path];
+    const hasNotes = !!(deck && deck.notes && deck.notes.trim());
+    notesEl.innerHTML = hasNotes ? deck.notes : "";
+    notesToggle.hidden = !hasNotes;
+    notesToggle.classList.toggle("has-notes", hasNotes);
+    notesEl.classList.remove("open");
+    // Refocus iframe so arrow-key navigation in the deck works immediately.
+    viewer.addEventListener("load", () => {
+      try { viewer.contentWindow.focus(); } catch (_) {}
+      // Sync deck hash to our URL so deep links work.
+      try {
+        const innerLoc = viewer.contentWindow.location;
+        history.replaceState(null, "", "#" + path);
+      } catch (_) {
+        history.replaceState(null, "", "#" + path);
+      }
+    }, { once: true });
+  }
+
+  render();
+
+  // Deep-link support: open whatever's in the URL hash (local decks only).
+  const initial = decodeURIComponent(location.hash.slice(1));
+  const localPaths = WEEKS.flatMap((w) => w.decks.filter((d) => !d.external).map((d) => d.path));
+  if (initial && localPaths.includes(initial)) {
+    load(initial);
+  } else if (localPaths.length) {
+    load(localPaths[0]);
+  }
+</script>
+</body>
+</html>

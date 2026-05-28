@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Financial Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #1a1f2e;
+    --panel-2: #232938;
+    --border: #2d3548;
+    --text: #e6e9ef;
+    --muted: #8b93a7;
+    --accent: #4f9cf9;
+    --green: #34d399;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --purple: #a78bfa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+  }
+  header {
+    margin-bottom: 24px;
+  }
+  h1 { margin: 0 0 4px; font-size: 24px; font-weight: 600; }
+  .subtitle { color: var(--muted); font-size: 14px; }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .kpi-label {
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .kpi-sub { color: var(--muted); font-size: 12px; }
+  .charts {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .charts-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .card h2 {
+    margin: 0 0 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .chart-wrap { position: relative; height: 280px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  th { color: var(--muted); font-weight: 500; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .loading, .error {
+    padding: 40px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .error { color: var(--red); }
+  .file-picker {
+    background: var(--panel);
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+  }
+  .file-picker input { margin-top: 12px; color: var(--text); }
+  @media (max-width: 900px) {
+    .charts, .charts-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Financial Dashboard</h1>
+  <div class="subtitle" id="subtitle">Loading Financial Sample.xlsx…</div>
+</header>
+<main id="main">
+  <div class="loading">Loading…</div>
+</main>
+
+<script>
+const FILE = "Financial Sample.xlsx";
+const fmtCurrency = n => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+const fmtNum = n => new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(n);
+const fmtPct = n => (n * 100).toFixed(1) + "%";
+
+const PALETTE = ["#4f9cf9", "#34d399", "#fbbf24", "#a78bfa", "#f87171", "#22d3ee", "#fb923c", "#f472b6"];
+
+async function loadFile() {
+  try {
+    const resp = await fetch(FILE);
+    if (!resp.ok) throw new Error("Fetch failed: " + resp.status);
+    const buf = await resp.arrayBuffer();
+    parseAndRender(buf);
+  } catch (err) {
+    showPicker(err.message);
+  }
+}
+
+function showPicker(msg) {
+  document.getElementById("main").innerHTML = `
+    <div class="file-picker">
+      <div>Couldn't auto-load <code>${FILE}</code> (${msg}).</div>
+      <div style="margin-top:8px;color:var(--muted);font-size:13px;">Open this page via a local server, or pick the file manually:</div>
+      <input type="file" id="filein" accept=".xlsx,.xls" />
+    </div>`;
+  document.getElementById("filein").addEventListener("change", e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = ev => parseAndRender(ev.target.result);
+    r.readAsArrayBuffer(f);
+  });
+}
+
+function parseAndRender(buf) {
+  const wb = XLSX.read(buf, { type: "array", cellDates: true });
+  const ws = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, { defval: null });
+  const data = rows.map(r => {
+    const out = {};
+    for (const k in r) out[k.trim()] = r[k];
+    return out;
+  });
+  render(data);
+}
+
+function groupBy(data, key, valueKey) {
+  const m = new Map();
+  for (const row of data) {
+    const k = row[key];
+    m.set(k, (m.get(k) || 0) + (Number(row[valueKey]) || 0));
+  }
+  return [...m.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+function groupByMulti(data, key, fields) {
+  const m = new Map();
+  for (const row of data) {
+    const k = row[key];
+    if (!m.has(k)) m.set(k, Object.fromEntries(fields.map(f => [f, 0])));
+    const o = m.get(k);
+    for (const f of fields) o[f] += Number(row[f]) || 0;
+  }
+  return m;
+}
+
+function render(data) {
+  const sum = (k) => data.reduce((a, r) => a + (Number(r[k]) || 0), 0);
+  const totalSales = sum("Sales");
+  const totalGross = sum("Gross Sales");
+  const totalProfit = sum("Profit");
+  const totalUnits = sum("Units Sold");
+  const totalDiscount = sum("Discounts");
+  const totalCOGS = sum("COGS");
+  const margin = totalSales > 0 ? totalProfit / totalSales : 0;
+
+  const segments = groupBy(data, "Segment", "Sales");
+  const countries = groupBy(data, "Country", "Sales");
+  const products = groupBy(data, "Product", "Sales");
+  const productProfit = groupBy(data, "Product", "Profit");
+  const profitByProduct = new Map(productProfit);
+
+  // Time series: year-month sales & profit
+  const monthOrder = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const timeKeyOf = r => {
+    const d = r.Date instanceof Date ? r.Date : new Date(r.Date);
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+  };
+  const timeMap = new Map();
+  for (const r of data) {
+    const k = timeKeyOf(r);
+    if (!timeMap.has(k)) timeMap.set(k, { sales: 0, profit: 0 });
+    const o = timeMap.get(k);
+    o.sales += Number(r.Sales) || 0;
+    o.profit += Number(r.Profit) || 0;
+  }
+  const timeLabels = [...timeMap.keys()].sort();
+  const timeSales = timeLabels.map(k => timeMap.get(k).sales);
+  const timeProfit = timeLabels.map(k => timeMap.get(k).profit);
+
+  // Discount band breakdown
+  const discountBands = groupByMulti(data, "Discount Band", ["Sales", "Profit", "Units Sold"]);
+
+  document.getElementById("subtitle").textContent =
+    `${fmtNum(data.length)} transactions · ${new Set(data.map(r => r.Country)).size} countries · ${new Set(data.map(r => r.Product)).size} products`;
+
+  document.getElementById("main").innerHTML = `
+    <section class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-label">Net Sales</div>
+        <div class="kpi-value">${fmtCurrency(totalSales)}</div>
+        <div class="kpi-sub">Gross: ${fmtCurrency(totalGross)}</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Profit</div>
+        <div class="kpi-value" style="color:var(--green)">${fmtCurrency(totalProfit)}</div>
+        <div class="kpi-sub">Margin: ${fmtPct(margin)}</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Units Sold</div>
+        <div class="kpi-value">${fmtNum(totalUnits)}</div>
+        <div class="kpi-sub">Avg: ${fmtNum(totalUnits / data.length)} / order</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Discounts Given</div>
+        <div class="kpi-value" style="color:var(--yellow)">${fmtCurrency(totalDiscount)}</div>
+        <div class="kpi-sub">${fmtPct(totalDiscount / totalGross)} of gross</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">COGS</div>
+        <div class="kpi-value" style="color:var(--red)">${fmtCurrency(totalCOGS)}</div>
+        <div class="kpi-sub">${fmtPct(totalCOGS / totalSales)} of net sales</div>
+      </div>
+    </section>
+
+    <section class="charts">
+      <div class="card">
+        <h2>Sales & Profit Over Time</h2>
+        <div class="chart-wrap"><canvas id="ts"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>Sales by Segment</h2>
+        <div class="chart-wrap"><canvas id="seg"></canvas></div>
+      </div>
+    </section>
+
+    <section class="charts-2">
+      <div class="card">
+        <h2>Sales by Product</h2>
+        <div class="chart-wrap"><canvas id="prod"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>Sales by Country</h2>
+        <div class="chart-wrap"><canvas id="ctry"></canvas></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Performance by Discount Band</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Discount Band</th>
+            <th class="num">Units Sold</th>
+            <th class="num">Net Sales</th>
+            <th class="num">Profit</th>
+            <th class="num">Margin</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${[...discountBands.entries()]
+            .sort((a, b) => b[1].Sales - a[1].Sales)
+            .map(([band, o]) => `
+              <tr>
+                <td>${band || "—"}</td>
+                <td class="num">${fmtNum(o["Units Sold"])}</td>
+                <td class="num">${fmtCurrency(o.Sales)}</td>
+                <td class="num" style="color:${o.Profit >= 0 ? "var(--green)" : "var(--red)"}">${fmtCurrency(o.Profit)}</td>
+                <td class="num">${fmtPct(o.Profit / o.Sales)}</td>
+              </tr>`).join("")}
+        </tbody>
+      </table>
+    </section>
+  `;
+
+  Chart.defaults.color = "#8b93a7";
+  Chart.defaults.borderColor = "#2d3548";
+  Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
+  const tsCtx = document.getElementById("ts");
+  new Chart(tsCtx, {
+    type: "line",
+    data: {
+      labels: timeLabels,
+      datasets: [
+        { label: "Sales", data: timeSales, borderColor: "#4f9cf9", backgroundColor: "rgba(79,156,249,0.15)", fill: true, tension: 0.3, pointRadius: 2 },
+        { label: "Profit", data: timeProfit, borderColor: "#34d399", backgroundColor: "rgba(52,211,153,0.15)", fill: true, tension: 0.3, pointRadius: 2 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: "bottom" }, tooltip: { callbacks: { label: c => c.dataset.label + ": " + fmtCurrency(c.parsed.y) } } },
+      scales: { y: { ticks: { callback: v => fmtCurrency(v) } } }
+    }
+  });
+
+  new Chart(document.getElementById("seg"), {
+    type: "doughnut",
+    data: {
+      labels: segments.map(s => s[0]),
+      datasets: [{ data: segments.map(s => s[1]), backgroundColor: PALETTE, borderColor: "#1a1f2e", borderWidth: 2 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: "bottom" }, tooltip: { callbacks: { label: c => c.label + ": " + fmtCurrency(c.parsed) } } }
+    }
+  });
+
+  new Chart(document.getElementById("prod"), {
+    type: "bar",
+    data: {
+      labels: products.map(p => p[0]),
+      datasets: [
+        { label: "Sales", data: products.map(p => p[1]), backgroundColor: "#4f9cf9" },
+        { label: "Profit", data: products.map(p => profitByProduct.get(p[0]) || 0), backgroundColor: "#34d399" }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: "bottom" }, tooltip: { callbacks: { label: c => c.dataset.label + ": " + fmtCurrency(c.parsed.y) } } },
+      scales: { y: { ticks: { callback: v => fmtCurrency(v) } } }
+    }
+  });
+
+  new Chart(document.getElementById("ctry"), {
+    type: "bar",
+    data: {
+      labels: countries.map(c => c[0]),
+      datasets: [{ label: "Sales", data: countries.map(c => c[1]), backgroundColor: "#a78bfa" }]
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => fmtCurrency(c.parsed.x) } } },
+      scales: { x: { ticks: { callback: v => fmtCurrency(v) } } }
+    }
+  });
+}
+
+loadFile();
+</script>
+</body>
+</html>

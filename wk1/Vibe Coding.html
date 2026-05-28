@@ -1,0 +1,1459 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vibe Coding — Day 1</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="deck-stage.js"></script>
+<style>
+  :root {
+    /* Type scale — projection-appropriate at 1920×1080 */
+    --type-hero: 156px;
+    --type-title: 84px;
+    --type-section: 64px;
+    --type-subtitle: 40px;
+    --type-lead: 36px;
+    --type-body: 30px;
+    --type-small: 26px;
+    --type-eyebrow: 24px;
+    --type-mono-big: 52px;
+    --type-mono: 36px;
+
+    /* Spacing */
+    --pad-top: 110px;
+    --pad-bottom: 100px;
+    --pad-x: 140px;
+    --gap-title: 56px;
+    --gap-item: 32px;
+
+    /* Colors (workshop accent — use design-system tokens) */
+    --ink: var(--color-gray-9);
+    --ink-soft: var(--color-gray-8);
+    --muted: var(--color-gray-6);
+    --hairline: var(--color-gray-3);
+    --paper: var(--color-gray-1);
+    --accent: #48AFF0;
+    --accent-deep: var(--color-primary-4);
+    --terminal-bg: #0d1117;
+    --terminal-fg: #e6edf3;
+    --terminal-green: #7ee787;
+    --terminal-blue: #79c0ff;
+    --terminal-dim: #8b949e;
+  }
+
+  html, body { margin: 0; background: #000; }
+
+  deck-stage > section {
+    background: #fff;
+    color: var(--ink);
+    font-family: var(--font-display);
+    line-height: 1.4;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── persistent Anduin Fast Track brand mark ────────────────────── */
+  .brand-mark {
+    position: absolute; top: 64px; right: 80px;
+    display: flex; align-items: center; gap: 18px;
+    z-index: 5;
+  }
+  .brand-mark img {
+    height: 28px; width: auto; display: block;
+  }
+  .brand-mark .program {
+    padding-left: 18px;
+    border-left: 1px solid var(--hairline);
+    font-size: 18px; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  /* dark-slide variant */
+  .s-game .brand-mark .program,
+  .s-game .brand-mark .program-line {
+    color: rgba(255,255,255,0.65);
+  }
+  .s-game .brand-mark .program {
+    border-left-color: rgba(255,255,255,0.18);
+  }
+
+  /* ── shared slide chrome ───────────────────────────────────────────── */
+  .slide-num {
+    position: absolute; right: 56px; bottom: 48px;
+    font-size: var(--type-small); color: var(--muted);
+    font-variant-numeric: tabular-nums; letter-spacing: 0.04em;
+  }
+  .slide-eyebrow {
+    position: absolute; left: var(--pad-x); top: 72px;
+    font-size: var(--type-eyebrow); font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+  .footer-meta {
+    position: absolute; left: 56px; bottom: 48px;
+    font-size: var(--type-small); color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── frames ────────────────────────────────────────────────────────── */
+  .frame {
+    width: 100%; height: 100%;
+    padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
+    box-sizing: border-box;
+    display: flex; flex-direction: column;
+  }
+
+  .frame.center { justify-content: center; align-items: center; text-align: center; }
+  .frame.center-left { justify-content: center; align-items: flex-start; }
+
+  /* ── type helpers ──────────────────────────────────────────────────── */
+  h1.hero {
+    margin: 0; font-size: var(--type-hero);
+    line-height: 0.96; letter-spacing: -0.045em;
+    font-weight: 600; color: var(--ink);
+  }
+  h2.title {
+    margin: 0 0 var(--gap-title);
+    font-size: var(--type-title); line-height: 1.02;
+    letter-spacing: -0.03em; font-weight: 600; color: var(--ink);
+  }
+  h2.section {
+    margin: 0; font-size: var(--type-section); line-height: 1.08;
+    letter-spacing: -0.025em; font-weight: 600; color: var(--ink);
+  }
+  .lead {
+    font-size: var(--type-lead); line-height: 1.35;
+    color: var(--ink-soft); font-weight: 400;
+    letter-spacing: -0.005em; margin: 0;
+  }
+  .body {
+    font-size: var(--type-body); line-height: 1.45;
+    color: var(--ink-soft); font-weight: 400; margin: 0;
+  }
+  .small {
+    font-size: var(--type-small); line-height: 1.45;
+    color: var(--muted); margin: 0;
+  }
+  .eyebrow {
+    font-size: var(--type-eyebrow); font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+
+  /* ── slide 1: title ────────────────────────────────────────────────── */
+  .s-title {
+    background: url('assets/cover-gradient.png') center/cover no-repeat, #eaf6ff;
+  }
+  .s-title .frame { justify-content: flex-end; padding-bottom: 140px; }
+  .s-title .hero-brand {
+    display: inline-flex; align-items: center; gap: 22px;
+    padding: 14px 26px;
+    background: #fff;
+    border-radius: 999px;
+    box-shadow: 0 4px 18px -6px rgba(31,49,69,0.18),
+                0 1px 0 rgba(31,49,69,0.06) inset;
+    align-self: flex-start;
+  }
+  .s-title .hero-logo {
+    height: 32px; width: auto; display: block;
+  }
+  .s-title .hero-program {
+    padding-left: 22px;
+    border-left: 1px solid var(--hairline);
+    font-size: 20px; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+  .s-title .kicker {
+    font-size: var(--type-eyebrow); font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 36px;
+  }
+  .s-title .sub {
+    margin-top: 40px; font-size: var(--type-subtitle);
+    color: var(--ink-soft); max-width: 1200px; font-weight: 400;
+    line-height: 1.3; letter-spacing: -0.005em;
+  }
+  .s-title .byline {
+    position: absolute; bottom: 80px; left: 140px; right: 140px;
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: var(--type-small); color: var(--ink-soft);
+  }
+  .s-title .byline b { font-weight: 600; color: var(--ink); }
+  .s-title .pill {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 12px 24px; border-radius: 999px;
+    background: rgba(255,255,255,0.7); border: 1px solid rgba(72,175,240,0.3);
+    backdrop-filter: blur(8px);
+    font-size: var(--type-small); color: var(--accent-deep);
+    font-weight: 500;
+  }
+  .s-title .pill .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 0 4px rgba(72,175,240,0.2);
+  }
+
+  /* ── slide 2: about me ─────────────────────────────────────────────── */
+  .s-about .grid {
+    flex: 1; display: grid; grid-template-columns: 580px 1fr;
+    gap: 100px; align-items: center;
+  }
+  .s-about .photo {
+    width: 580px; height: 720px;
+    border-radius: 16px; overflow: hidden;
+    background: #d6ecfa;
+    position: relative;
+    border: 1px solid var(--hairline);
+  }
+  .s-about .photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: 55% 35%;
+    display: block;
+  }
+  .s-about ul {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 40px;
+  }
+  .s-about li {
+    font-size: var(--type-lead); line-height: 1.32;
+    color: var(--ink); font-weight: 400; letter-spacing: -0.005em;
+    padding-left: 44px; position: relative;
+  }
+  .s-about li::before {
+    content: ""; position: absolute; left: 0; top: 22px;
+    width: 24px; height: 3px; background: var(--accent);
+    border-radius: 2px;
+  }
+
+  /* ── slide 3 / 10 / 14: install + terminal blocks ──────────────────── */
+  .terminal {
+    background: var(--terminal-bg); color: var(--terminal-fg);
+    border-radius: 14px; padding: 28px 36px 32px;
+    font-family: var(--font-mono);
+    box-shadow: 0 24px 60px -20px rgba(13,17,23,0.4),
+                0 2px 0 rgba(255,255,255,0.04) inset;
+    border: 1px solid #1c232c;
+  }
+  .terminal-bar {
+    display: flex; align-items: center; gap: 8px;
+    margin: -8px -16px 20px; padding-bottom: 16px;
+    border-bottom: 1px solid #1c232c;
+  }
+  .terminal-bar .dot {
+    width: 14px; height: 14px; border-radius: 50%;
+  }
+  .terminal-bar .dot.r { background: #ff5f57; }
+  .terminal-bar .dot.y { background: #febc2e; }
+  .terminal-bar .dot.g { background: #28c840; }
+  .terminal-bar .label {
+    margin-left: 16px; color: var(--terminal-dim);
+    font-size: 24px; letter-spacing: 0.04em;
+  }
+  .terminal .prompt { color: var(--terminal-green); }
+  .terminal .path { color: var(--terminal-blue); }
+  .terminal .cmd { color: var(--terminal-fg); }
+  .terminal .comment { color: var(--terminal-dim); }
+  .terminal .cursor {
+    display: inline-block; width: 0.55em; height: 1em;
+    background: var(--terminal-fg); vertical-align: text-bottom;
+    margin-left: 4px; animation: blink 1s steps(2) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ── slide 3: self-service (IT prereq) ─────────────────────────────── */
+  .s-it { background: var(--paper); }
+  .s-it .grid {
+    flex: 1; display: grid; grid-template-columns: 1fr 1fr;
+    gap: 64px; margin-top: 32px; align-items: stretch;
+    min-height: 0;
+  }
+  .s-it .left {
+    display: flex; flex-direction: column; gap: 32px;
+    justify-content: flex-start;
+  }
+  .s-it .lead {
+    font-size: 34px; line-height: 1.38;
+    color: var(--ink-soft); margin: 0;
+    max-width: 720px;
+  }
+  .s-it .lead b { color: var(--ink); font-weight: 600; }
+  .s-it .lead .pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 4px 16px; border-radius: 999px;
+    background: #fff; border: 1px solid var(--hairline);
+    font-weight: 600; color: var(--accent-deep);
+    font-size: 30px;
+  }
+  .s-it .steps {
+    display: flex; flex-direction: column; gap: 18px;
+    counter-reset: it-step;
+  }
+  .s-it .steps .step {
+    counter-increment: it-step;
+    display: grid; grid-template-columns: 56px 1fr;
+    gap: 22px; align-items: baseline;
+    font-size: 28px; line-height: 1.4; color: var(--ink);
+  }
+  .s-it .steps .step::before {
+    content: counter(it-step);
+    width: 44px; height: 44px; border-radius: 10px;
+    background: rgba(72,175,240,0.15);
+    border: 1px solid rgba(72,175,240,0.4);
+    display: grid; place-items: center;
+    color: var(--accent-deep); font-weight: 600;
+    font-size: 24px;
+  }
+  .s-it .steps .step b { color: var(--ink); font-weight: 600; }
+  .s-it .repeat {
+    margin-top: 8px; padding: 24px 28px;
+    border-left: 4px solid var(--accent);
+    background: #fff; border-radius: 0 12px 12px 0;
+    font-size: 26px; line-height: 1.4; color: var(--ink-soft);
+  }
+  .s-it .repeat b { color: var(--ink); font-weight: 600; }
+  .s-it .right {
+    display: flex; flex-direction: column; gap: 16px;
+    min-height: 0; justify-content: center;
+  }
+  .s-it .shot {
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid var(--hairline);
+    background: #fff;
+    box-shadow: 0 24px 60px -28px rgba(13,17,23,0.25);
+  }
+  .s-it .shot img { width: 100%; height: auto; display: block; }
+  .s-it .caption {
+    font-size: 22px; color: var(--muted); text-align: center;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── shared callout (admin reminder on install slide) ──────────────── */
+  .admin-reminder {
+    margin-top: 40px;
+    padding: 22px 28px;
+    background: #fff7e0; border: 1px solid #f4d971;
+    border-radius: 12px;
+    font-size: 26px; line-height: 1.4; color: #6a4f08;
+    display: flex; align-items: flex-start; gap: 18px;
+  }
+  .admin-reminder .tag {
+    font-weight: 700; color: #8a5a00;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    font-size: 22px; flex-shrink: 0; padding-top: 2px;
+  }
+  .admin-reminder b { color: #4a3905; font-weight: 700; }
+
+  /* ── slide 4: install (now AFTER admin) ────────────────────────────── */
+  .s-install .terminal {
+    margin-top: 40px; font-size: var(--type-mono-big); line-height: 1.45;
+  }
+  .s-install .reassure {
+    margin-top: 56px; display: flex; gap: 40px;
+    font-size: var(--type-body); color: var(--ink-soft);
+  }
+  .s-install .reassure .note {
+    flex: 1; padding-left: 28px; position: relative;
+    border-left: 3px solid var(--accent);
+  }
+  .s-install .reassure .note b { color: var(--ink); font-weight: 600; }
+
+  /* ── slide 4: introductions ────────────────────────────────────────── */
+  .s-intro .prompts {
+    display: flex; flex-direction: column; gap: 48px;
+    margin-top: var(--gap-title);
+  }
+  .s-intro .row {
+    display: grid; grid-template-columns: 100px 1fr;
+    gap: 40px; align-items: baseline;
+  }
+  .s-intro .num {
+    font-size: 96px; line-height: 1;
+    font-weight: 700; color: var(--accent);
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .s-intro .q {
+    font-size: 56px; line-height: 1.15;
+    font-weight: 500; color: var(--ink);
+    letter-spacing: -0.02em; margin: 0;
+  }
+  .s-intro .qhint {
+    display: block; margin-top: 14px;
+    font-size: 26px; line-height: 1.35; font-weight: 400;
+    color: var(--muted); font-style: italic;
+    letter-spacing: -0.005em;
+  }
+  .s-intro .timer {
+    position: absolute; bottom: 80px; right: 140px;
+    font-size: var(--type-small); color: var(--muted);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .s-intro .timer::before {
+    content: ""; width: 10px; height: 10px;
+    background: var(--accent); border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(72,175,240,0.2);
+  }
+
+  /* ── slide 5: install check ────────────────────────────────────────── */
+  .s-check .grid {
+    flex: 1; display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+  }
+  .s-check .terminal {
+    font-size: var(--type-mono); line-height: 1.5;
+  }
+  .s-check .terminal .ok { color: var(--terminal-green); }
+  .s-check .terminal .arrow { color: var(--accent); }
+  .s-check .ask {
+    display: flex; flex-direction: column; gap: 32px;
+  }
+  .s-check .ask h2 {
+    font-size: var(--type-title); line-height: 1.02;
+    margin: 0; letter-spacing: -0.03em; font-weight: 600;
+  }
+  .s-check .ask .hand {
+    font-size: 96px; line-height: 1;
+  }
+  .s-check .ask .sub {
+    font-size: var(--type-lead); line-height: 1.35;
+    color: var(--ink-soft); margin: 0;
+  }
+
+  /* ── slide 6: the joke ─────────────────────────────────────────────── */
+  .s-joke { background: var(--paper); }
+  .s-joke .frame {
+    display: grid; grid-template-columns: 1.15fr 1fr;
+    gap: 96px; align-items: center;
+    padding-top: 110px; padding-bottom: 110px;
+  }
+  .s-joke .left h2 {
+    font-size: 80px; line-height: 1.06;
+    letter-spacing: -0.035em; font-weight: 500;
+    color: var(--ink); margin: 0;
+  }
+  .s-joke .left h2 em {
+    font-style: normal; color: var(--accent-deep); font-weight: 600;
+  }
+  .s-joke .left h2 .strike {
+    text-decoration: line-through;
+    text-decoration-thickness: 5px;
+    text-decoration-color: var(--accent);
+    color: var(--muted);
+  }
+  .s-joke .joke {
+    margin-top: 56px;
+    padding: 36px 40px;
+    background: #fff; border-radius: 16px;
+    border: 1px solid var(--hairline);
+    box-shadow: 0 12px 32px -16px rgba(13,17,23,0.12);
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .s-joke .joke .line {
+    font-size: 28px; line-height: 1.4; color: var(--ink);
+    display: grid; grid-template-columns: 160px 1fr; gap: 24px;
+    align-items: baseline;
+  }
+  .s-joke .joke .who {
+    font-size: 24px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent-deep);
+    padding-top: 6px;
+  }
+  .s-joke .joke .punchline {
+    color: var(--ink); font-weight: 500;
+  }
+  .s-joke .right {
+    display: flex; flex-direction: column; gap: 28px;
+  }
+  .s-joke .nasa {
+    padding: 36px 40px; background: var(--ink);
+    color: #e6edf3; border-radius: 16px;
+    position: relative; overflow: hidden;
+  }
+  .s-joke .nasa .tag {
+    font-size: 24px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 18px;
+  }
+  .s-joke .nasa h3 {
+    margin: 0 0 18px; font-size: 38px; line-height: 1.18;
+    font-weight: 500; letter-spacing: -0.015em; color: #fff;
+  }
+  .s-joke .nasa p {
+    margin: 0; font-size: 24px; line-height: 1.45;
+    color: #c2cdd9;
+  }
+  .s-joke .nasa p b { color: #fff; font-weight: 600; }
+  .s-joke .nasa .cost {
+    margin-top: 22px; padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    display: flex; gap: 28px; font-size: 24px; color: #8b949e;
+  }
+  .s-joke .nasa .cost b { color: var(--accent); font-weight: 600; }
+
+  /* ── slide 7: before / now ─────────────────────────────────────────── */
+  .s-shift .lede {
+    font-size: 52px; line-height: 1.15; max-width: 1640px;
+    font-weight: 500; letter-spacing: -0.02em; color: var(--ink);
+    margin: 0 0 56px;
+  }
+  .s-shift .lede em {
+    font-style: normal; color: var(--accent-deep); font-weight: 600;
+  }
+  .s-shift .compare {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 36px; flex: 1; min-height: 0;
+  }
+  .s-shift .col {
+    display: flex; flex-direction: column; gap: 16px; min-height: 0;
+  }
+  .s-shift .col .tag {
+    font-size: 24px; font-weight: 600; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--muted);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .s-shift .col.now .tag { color: var(--accent-deep); }
+  .s-shift .col .tag .dash {
+    width: 32px; height: 3px; background: currentColor; border-radius: 2px;
+  }
+  .s-shift .col .caption {
+    font-size: 30px; line-height: 1.3;
+    font-weight: 500; color: var(--ink);
+    letter-spacing: -0.015em;
+  }
+  .s-shift .code {
+    background: var(--terminal-bg); color: #c9d1d9;
+    border-radius: 14px; padding: 24px 28px;
+    font-family: var(--font-mono); font-size: 24px; line-height: 1.4;
+    border: 1px solid #1c232c; overflow: hidden;
+    position: relative;
+    flex: 1; min-height: 0;
+    box-shadow: 0 20px 50px -22px rgba(13,17,23,0.45);
+  }
+  .s-shift .code pre {
+    margin: 0; white-space: pre; overflow: hidden;
+    color: #c9d1d9;
+  }
+  .s-shift .code::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+    height: 140px;
+    background: linear-gradient(180deg, rgba(13,17,23,0) 0%, var(--terminal-bg) 100%);
+    pointer-events: none;
+  }
+  .s-shift .code .k { color: #ff7b72; }
+  .s-shift .code .s { color: #a5d6ff; }
+  .s-shift .code .n { color: #79c0ff; }
+  .s-shift .code .c { color: #8b949e; font-style: italic; }
+  .s-shift .code .f { color: #d2a8ff; }
+  .s-shift .code .v { color: #ffa657; }
+
+  .s-shift .prompt-card {
+    background: #fff; border: 1px solid var(--hairline);
+    border-radius: 14px; padding: 40px 44px;
+    flex: 1; min-height: 0;
+    display: flex; flex-direction: column; gap: 22px;
+    justify-content: center;
+    box-shadow: 0 12px 32px -18px rgba(13,17,23,0.12);
+    position: relative;
+  }
+  .s-shift .prompt-card .pre {
+    color: var(--muted); font-size: 24px;
+    font-family: var(--font-mono); letter-spacing: 0.04em;
+  }
+  .s-shift .prompt-card .pre .arrow { color: var(--accent); }
+  .s-shift .prompt-card .text {
+    font-family: var(--font-mono);
+    font-size: 44px; line-height: 1.35;
+    color: var(--ink); letter-spacing: -0.005em;
+  }
+  .s-shift .prompt-card .stamp {
+    margin-top: 10px;
+    align-self: flex-start;
+    padding: 8px 18px; border-radius: 999px;
+    background: rgba(72,175,240,0.12);
+    color: var(--accent-deep); font-weight: 600;
+    font-size: 24px; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  /* ── slide 8: build a game ─────────────────────────────────────────── */
+  .s-game { background: #0d1117; color: #fff; }
+  .s-game h2.title { color: #fff; }
+  .s-game .slide-eyebrow { color: var(--accent); }
+  .s-game .lead { color: #c2cdd9; }
+  .s-game .grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 32px; margin-top: 48px;
+  }
+  .s-game .card {
+    border: 1px solid #1f2731; border-radius: 16px;
+    background: linear-gradient(180deg, #161c25, #11161d);
+    padding: 36px 40px 40px;
+    position: relative;
+  }
+  .s-game .card .group {
+    display: inline-flex; align-items: center; gap: 14px;
+    font-size: 24px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 22px;
+  }
+  .s-game .card .group .num {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: rgba(72,175,240,0.15);
+    border: 1px solid rgba(72,175,240,0.4);
+    display: grid; place-items: center;
+    font-size: 24px; color: #fff;
+  }
+  .s-game .card .prompt {
+    font-family: var(--font-mono);
+    font-size: 32px; line-height: 1.4;
+    color: #e6edf3; margin: 0;
+  }
+  .s-game .card .prompt::before { content: "› "; color: var(--accent); }
+  .s-game .footer {
+    position: absolute; bottom: 70px; left: 140px;
+    font-size: var(--type-small); color: #8b949e;
+    font-style: italic;
+  }
+
+  /* ── slide 9: terminal ref ─────────────────────────────────────────── */
+  .s-terminal .lead { margin-bottom: 56px; max-width: 1400px; }
+  .s-terminal .cmds {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 28px;
+  }
+  .s-terminal .cmd-card {
+    padding: 36px 32px 38px;
+    border: 1px solid var(--hairline); border-radius: 14px;
+    background: #fff;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .s-terminal .cmd-card .name {
+    font-family: var(--font-mono);
+    font-size: 56px; line-height: 1; font-weight: 500;
+    color: var(--accent-deep); letter-spacing: -0.01em;
+  }
+  .s-terminal .cmd-card .desc {
+    font-size: var(--type-body); line-height: 1.35; color: var(--ink);
+    font-weight: 500; letter-spacing: -0.005em;
+  }
+  .s-terminal .cmd-card .ex {
+    margin-top: auto;
+    font-family: var(--font-mono); font-size: 24px;
+    color: var(--muted); padding-top: 16px;
+    border-top: 1px solid var(--hairline);
+  }
+  .s-terminal .one-rule {
+    margin-top: 56px; padding: 28px 36px;
+    background: var(--paper); border-left: 4px solid var(--accent);
+    border-radius: 0 12px 12px 0;
+    font-size: var(--type-body); color: var(--ink);
+  }
+  .s-terminal .one-rule b { color: var(--accent-deep); font-weight: 600; }
+  .s-terminal .one-rule code {
+    font-family: var(--font-mono); background: #fff;
+    padding: 2px 10px; border-radius: 6px;
+    border: 1px solid var(--hairline);
+    font-size: 28px;
+  }
+
+  /* ── slide 10: runbook ─────────────────────────────────────────────── */
+  .s-runbook .body-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; margin-top: 32px; flex: 1; align-items: start;
+  }
+  .s-runbook .runbook {
+    background: var(--terminal-bg); border-radius: 14px;
+    padding: 40px 44px; font-family: var(--font-mono);
+    box-shadow: 0 24px 60px -20px rgba(13,17,23,0.4);
+    border: 1px solid #1c232c;
+  }
+  .s-runbook .runbook ol {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 20px;
+    counter-reset: step;
+  }
+  .s-runbook .runbook li {
+    counter-increment: step;
+    display: grid; grid-template-columns: 56px 1fr;
+    gap: 20px; align-items: center;
+    font-size: 38px; line-height: 1.15; color: var(--terminal-fg);
+  }
+  .s-runbook .runbook li::before {
+    content: counter(step);
+    width: 44px; height: 44px; border-radius: 10px;
+    background: rgba(72,175,240,0.15);
+    border: 1px solid rgba(72,175,240,0.4);
+    display: grid; place-items: center;
+    color: var(--accent); font-size: 22px; font-weight: 600;
+    font-family: var(--font-display);
+  }
+  .s-runbook .runbook .cmd-text { color: var(--terminal-blue); }
+  .s-runbook .runbook .step-final {
+    margin-top: 12px; padding-top: 24px;
+    border-top: 1px solid #1c232c;
+  }
+  .s-runbook .runbook .step-final .cmd-text { color: var(--terminal-green); font-weight: 500; }
+  .s-runbook .paste {
+    background: rgba(72,175,240,0.12); border: 1px solid rgba(72,175,240,0.35);
+    border-radius: 12px; padding: 24px 28px;
+    color: #cae6fb; font-family: var(--font-display);
+    font-size: 32px; line-height: 1.35; margin-top: 28px;
+    font-style: italic;
+  }
+  .s-runbook .annotation {
+    display: flex; flex-direction: column; gap: 36px;
+  }
+  .s-runbook .annotation h3 {
+    margin: 0; font-size: 44px; line-height: 1.1;
+    font-weight: 500; letter-spacing: -0.02em; color: var(--ink);
+  }
+  .s-runbook .annotation .item {
+    display: grid; grid-template-columns: 80px 1fr;
+    gap: 24px; align-items: start;
+  }
+  .s-runbook .annotation .item .marker {
+    font-family: var(--font-mono); font-size: 26px;
+    color: var(--accent-deep); font-weight: 600;
+    padding-top: 6px;
+  }
+  .s-runbook .annotation .item .text {
+    font-size: 28px; line-height: 1.4; color: var(--ink-soft);
+  }
+  .s-runbook .annotation .item .text b { color: var(--ink); font-weight: 600; }
+
+  /* ── slide 11: show & tell ─────────────────────────────────────────── */
+  .s-demo {
+    background: linear-gradient(180deg, #eaf6ff 0%, #ffffff 80%);
+  }
+  .s-demo .frame { justify-content: center; align-items: center; text-align: center; }
+  .s-demo .kicker {
+    font-size: var(--type-eyebrow); font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent-deep); margin-bottom: 40px;
+  }
+  .s-demo h2 {
+    margin: 0; font-size: 168px; line-height: 0.95;
+    letter-spacing: -0.045em; font-weight: 600; color: var(--ink);
+  }
+  .s-demo .sub {
+    margin-top: 56px; font-size: var(--type-subtitle);
+    color: var(--ink-soft); max-width: 1200px;
+    line-height: 1.3; letter-spacing: -0.005em;
+  }
+  .s-demo .badges {
+    margin-top: 64px; display: flex; gap: 16px; justify-content: center;
+  }
+  .s-demo .badge {
+    padding: 12px 24px; border-radius: 999px;
+    background: rgba(255,255,255,0.8); border: 1px solid var(--hairline);
+    font-size: var(--type-small); color: var(--ink-soft);
+    font-weight: 500;
+  }
+  .s-demo .badge b { color: var(--accent-deep); font-weight: 600; }
+
+  /* ── slide 12: celebration breath ──────────────────────────────────── */
+  .s-next .frame { justify-content: center; }
+  .s-next .title {
+    font-size: 132px; line-height: 0.98;
+    letter-spacing: -0.04em; margin-bottom: 48px;
+    max-width: 1500px;
+  }
+  .s-next .lead { max-width: 1300px; font-size: 40px; }
+
+  /* ── slide 13: section divider ─────────────────────────────────────── */
+  .s-bridge {
+    background: url('assets/cover-gradient.png') center/cover no-repeat, #eaf6ff;
+  }
+  .s-bridge .frame { justify-content: center; }
+  .s-bridge .part {
+    font-size: 24px; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent-deep); margin-bottom: 40px;
+  }
+  .s-bridge h1 {
+    margin: 0; font-size: 124px; line-height: 1;
+    letter-spacing: -0.04em; font-weight: 600; color: var(--ink);
+    max-width: 1500px;
+  }
+  .s-bridge .sub {
+    margin-top: 48px; font-size: var(--type-subtitle);
+    color: var(--ink-soft); max-width: 1200px;
+    line-height: 1.3; letter-spacing: -0.005em;
+  }
+
+  /* ── slide 14: build it (business) ─────────────────────────────────── */
+  .s-business .biz-grid {
+    display: grid; grid-template-columns: 1fr 1.15fr;
+    gap: 56px; margin-top: 40px; flex: 1; min-height: 0;
+    align-items: stretch;
+  }
+  .s-business .biz-left {
+    display: flex; flex-direction: column; gap: 36px;
+    justify-content: flex-start;
+  }
+  .s-business .biz-left .title { margin-bottom: 8px; }
+  .s-business .terminal-prompt {
+    background: var(--terminal-bg); border-radius: 16px;
+    padding: 40px 44px; font-family: var(--font-mono);
+    box-shadow: 0 28px 70px -28px rgba(13,17,23,0.5);
+    border: 1px solid #1c232c;
+    margin-top: 0;
+  }
+  .s-business .terminal-prompt .pre {
+    color: var(--terminal-dim); font-size: 26px;
+    letter-spacing: 0.04em; margin-bottom: 22px;
+  }
+  .s-business .terminal-prompt .pre .arrow { color: var(--accent); }
+  .s-business .terminal-prompt .body-prompt {
+    color: var(--terminal-fg); font-size: 36px;
+    line-height: 1.35; font-weight: 400;
+  }
+  .s-business .runbook-mini {
+    margin-top: 0; display: flex; gap: 14px; align-items: center;
+    flex-wrap: wrap;
+    font-family: var(--font-mono); font-size: 24px;
+    color: var(--muted);
+  }
+  .s-business .runbook-mini b { color: var(--ink); font-weight: 500; }
+  .s-business .runbook-mini .sep { color: var(--accent); }
+  .s-business .biz-right {
+    display: flex; flex-direction: column; gap: 18px; min-height: 0;
+  }
+  .s-business .stage-label {
+    font-size: 20px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent-deep);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .s-business .stage-label .tag {
+    color: var(--muted); font-weight: 500;
+    letter-spacing: 0.04em; text-transform: none;
+    font-size: 18px;
+  }
+  .s-business .stage-frame {
+    flex: 1; min-height: 0;
+    border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--hairline);
+    background: #fff;
+    box-shadow: 0 18px 40px -20px rgba(13,17,23,0.25);
+  }
+  .s-business .stage-frame.dark {
+    border-color: #1c232c; background: #0d1117;
+    box-shadow: 0 28px 70px -28px rgba(13,17,23,0.45);
+  }
+  .s-business .stage-img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: top center;
+    display: block;
+  }
+  .s-business .arrow-down {
+    align-self: center; color: var(--accent);
+    font-size: 28px; line-height: 1;
+    margin: -4px 0;
+  }
+  .s-business .download-card {
+    display: flex; align-items: center; gap: 18px;
+    padding: 18px 22px;
+    background: #eef6fd;
+    border: 1px solid #cfe5f7;
+    border-radius: 12px;
+    color: var(--ink);
+    text-decoration: none;
+    transition: background 150ms;
+  }
+  .s-business .download-card:hover { background: #e3eefc; }
+  .s-business .download-card .icon {
+    width: 44px; height: 44px; flex-shrink: 0;
+    background: var(--accent); color: #fff;
+    border-radius: 10px; font-weight: 700; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    letter-spacing: 0.04em;
+  }
+  .s-business .download-card .copy { display: flex; flex-direction: column; gap: 2px; }
+  .s-business .download-card .copy-top {
+    font-size: 22px; font-weight: 600; color: var(--ink);
+  }
+  .s-business .download-card .copy-sub {
+    font-size: 18px; color: var(--muted);
+    font-family: var(--font-mono);
+  }
+  .s-business .download-card .chev {
+    margin-left: auto; color: var(--accent); font-size: 26px;
+  }
+
+  /* ── slide 16: what's next (preview) ───────────────────────────────── */
+  .s-roadmap .lead { max-width: 1400px; margin-bottom: 56px; }
+  .s-roadmap .grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 28px; flex: 1; min-height: 0;
+  }
+  .s-roadmap .card {
+    padding: 36px 36px 38px;
+    border: 1px solid var(--hairline); border-radius: 16px;
+    background: #fff;
+    display: flex; flex-direction: column; gap: 14px;
+    position: relative;
+  }
+  .s-roadmap .card .idx {
+    position: absolute; top: 28px; right: 32px;
+    font-family: var(--font-mono);
+    font-size: 24px; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .s-roadmap .card h3 {
+    margin: 0; font-size: 36px; line-height: 1.1;
+    font-weight: 600; letter-spacing: -0.02em; color: var(--ink);
+  }
+  .s-roadmap .card .topic {
+    font-size: 22px; font-weight: 600;
+    color: var(--accent-deep); letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .s-roadmap .card p {
+    margin: 6px 0 0; font-size: 24px;
+    line-height: 1.4; color: var(--ink-soft);
+  }
+  .s-roadmap .footnote {
+    margin-top: 40px; font-size: 26px; color: var(--muted);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .s-roadmap .footnote .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+  }
+  .s-roadmap .footnote b { color: var(--ink); font-weight: 600; }
+
+  /* ── slide 17: wrap ────────────────────────────────────────────────── */
+  .s-wrap { background: var(--paper); }
+  .s-wrap .frame { justify-content: center; align-items: flex-start; }
+  .s-wrap h1 {
+    margin: 0; font-size: 124px; line-height: 1.02;
+    letter-spacing: -0.04em; font-weight: 600; color: var(--ink);
+    max-width: 1600px;
+  }
+  .s-wrap h1 em {
+    font-style: normal; color: var(--accent-deep);
+  }
+  .s-wrap .sub {
+    margin-top: 64px; font-size: var(--type-subtitle);
+    color: var(--ink-soft); max-width: 1400px;
+    line-height: 1.3; letter-spacing: -0.005em;
+  }
+  .s-wrap .signoff {
+    margin-top: 88px; display: flex; align-items: center; gap: 24px;
+    font-size: var(--type-body); color: var(--ink);
+  }
+  .s-wrap .signoff b { font-weight: 600; }
+  .s-wrap .signoff .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  }
+
+</style>
+
+<script type="application/json" id="speaker-notes">
+[
+  "Quick energy-setting open. By the end of today, you will have built a real, working program — a game — without writing a single line of code yourself. You'll just describe what you want, and it'll exist. I'm not going to oversell it. I just want to plant that hook so when we get there in about thirty minutes, it lands. Let's go.",
+
+  "Hi, I'm Charles. Three things, fast. I founded CoderSchool — for about a decade I taught people to code the slow, painful, traditional way. So when I tell you the world has changed, I've earned that opinion. Second, I genuinely think coding is like magic, and turning people from muggles into wizards is the most fun thing in the world. Third — fair warning — I talk too fast when I get excited, which is basically always. If I lose you, raise a hand and tell me to slow the fuck down. I will not be offended. Anyone in the room I already know? Cool. Let's go.",
+
+  "Okay, real quick — one Anduin thing before we touch anything. Our laptops run locked down by default. To install software, or to do anything that needs sudo, you have to temporarily give yourself admin via Self-Service. The app is already on your machine — Cmd+Space, type Self-Service. Click Admin On-demand in the sidebar. Hit Request Admin Now — you get five minutes of admin. Wait for the little notification that says 'converted to admin' and then we move on. And just so you know: every time today something asks you for sudo or for an admin password, you do this again. Five-minute windows, they expire by themselves, it's not a big deal. Everyone do that now — I'll wait.",
+
+  "Okay. Most important moment of the day. Open Terminal — Cmd+Space, type terminal, hit enter. Then copy this exact line and paste it. Quick reminder: if you skipped the last slide, you need admin first — Self-Service, Admin On-demand, Request Admin Now. Once you've got admin, paste the install command. A big black window is going to fill with text. That is normal. Do not try to read it. Do not try to understand it. We are going to explain everything in about twenty minutes. For now: paste, hit enter, watch it go. Takes a couple minutes. While that runs, we are going to do introductions. Anyone whose machine looks broken — wave at me, we'll deal with it on the next install-check slide. Everyone else: paste it now.",
+
+  "While installs cook in the background. Quick lap around the room. Name. What you do. And the third one — the fun one — what was the last thing you actually asked Claude or ChatGPT? Anything. Mine, this morning, was how to make soy milk — I just bought one of those soy milk machines from Emart and the instructions are in Korean. There are no wrong answers. Whether it was 'write me a birthday card' or 'explain my kid's math homework' or 'is this rash bad' — I want to hear it. Who wants to start.",
+
+  "Buffer slide. While we wait for the slowest install. If you see something like this — Claude Code installed, version such-and-such, command available — you're good. If you see a wall of red, raise your hand. If you're stuck, scoot over and watch your neighbor's screen — nobody's getting left behind here. I'll come around. We are not moving on until everyone has a working setup. The whole rest of the day depends on it. So take a sip of water. We're fine.",
+
+  "Okay. Classic programmer joke. Wife sends husband to the store — dozen eggs, and if they have apples, get six. He comes home with six cartons of eggs. 'Why six?' 'They had apples.' That's the slide — land the joke, don't dissect it. The point is, that's what coding has felt like for fifty years. The computer does exactly what you say. Not what you mean. And it's not just a joke. Real example: NASA, 1999, lost a three-hundred-million-dollar Mars orbiter because Lockheed wrote the thrust in pound-force seconds and NASA expected newton-seconds. The code worked. The intent was clear. The computer did precisely what it was told — and flew the satellite straight into Mars. I spent years of my life translating human intent into a language that would not forgive a missing comma. It was, I cannot stress this enough, deeply frustrating.",
+
+  "Here's the shift. Left side of the slide — that's roughly what building Tetris used to look like. Six hundred lines, more or less. Piece shapes, rotation matrices, collision detection, line clears. You don't need to be able to read it. The fact that it looks hard to read is the entire point. Right side — same game, one sentence. 'Build me a tetris game to run in the web browser.' That's the whole input. For decades the burden was on us — the humans — to translate intent into rigid code. Large language models flipped that. Now the computer tries to understand you. It can handle ambiguity, ask clarifying questions, fill gaps. That is the entire reason today is possible. I'm not going to take you down a rabbit hole on how it works — just sit with this: the interface to a computer is now plain English.",
+
+  "Okay. We are building games. Four groups, four games. Split up — two or three to a group, find your people. Group one, Tetris. Group two, Flappy Bird. Group three, Breakout. Group four, Chess, against a simple CPU opponent. Quick aside — any gamers in here? ... yeah, honestly I'm not really a gamer either, but these are the canonical 'first projects' for a reason. Don't type anything yet. The exact steps are on the next slide. And heads up — at the end, each group is going to demo what they built. So make it good. Group four — chess is the hardest of these. You've got this, but I'll be hovering.",
+
+  "Alright. The mystery from twenty minutes ago, paid off. That black window is called the terminal. It is exactly Finder — same folders, same files, same everything — except you type instead of click. That's it. You look cooler, you feel smarter, and honestly it's faster. Four commands today, that's the whole vocabulary. pwd — where am I. cd — go somewhere. mkdir — make a folder. And these two squiggles — tilde is your home folder, dot-dot is up one level. You will have these memorized by Friday. One rule: no spaces in folder names. Ever. Don't be overwhelmed. Next slide is the exact sequence of keystrokes.",
+
+  "This slide stays up the entire time you're building. Don't take your eyes off it. Line by line. Open Terminal — Cmd+Space, type terminal. Then: cd tilde slash Documents, that puts you in your Documents folder. mkdir ai-class — we're making a folder for this whole class series, we'll reuse it every week. cd into it. mkdir week1. cd into week1. Then just type 'claude' and hit enter — that launches Claude Code. When it's ready, paste your group's prompt and watch what happens. I am going to be circling the room hard. This is where the magic happens, and also where people get stuck. Yell for me if anything looks weird.",
+
+  "Demo time. Each group, come up, show us what you built. Even if it's broken — especially if it's broken, because that is a totally normal state and a great teaching moment about how you fix things by just telling the AI what's wrong. Celebrate everything. Remember at the start of the session, you each told me one thing you wished a computer would do for you? Look at what you just made in twenty minutes. You can build those things. That was the whole point of today.",
+
+  "Pause here. Take a breath. Look at what you just did. You just built real software. Not a tutorial — not 'hello world' on slide 17 of a six-month bootcamp — actual, working, running-in-your-browser software. In the time it took to drink a coffee. Just sit with that for a second. … Okay. Because once it sinks in that you can build a game, the next question is the obvious one — what else.",
+
+  "And here's the answer. Games are real software, and games are fun, but I know what some of you have been thinking — cool, but what about my actual job. Same skill. Same exact move. Different prompt. You can build a thing that saves you hours every week, this week, with what you just learned. Let me show you.",
+
+  "Here's the prompt. Big and readable on the left. 'Build a web app that lets me upload an Excel spreadsheet of business data and turns it into clean interactive charts.' That's the whole input. On the right you can see the story: the messy input on top — 700 rows of segment, country, product, sales — and on the bottom, roughly what you'll see come out the other end. Net sales up top, trends, segments, products, countries, a discount band table at the bottom. Charts you'd normally pay a BI consultant to build. Same runbook as before — new folder, cd in, run claude, paste. It will ask you clarifying questions — 'what kind of charts, do you want filters, is this monthly or quarterly' — just answer in plain English. The sample spreadsheet is linked right there on the slide — click 'Download the sample spreadsheet' to grab it from Google Drive, or I'll drop the link in Slack. Go.",
+
+  "Quick preview before we wrap. Today was the on-ramp — getting you over the hump that coding is something you can do. Going forward we'll go one concept at a time. Frontend and backend — the two halves of any real app. React, which is how 90% of modern interfaces are built. Supabase and SQL — that's how you store real data, not just stuff in a file. Google login, so people can actually sign in. GitHub, so your code lives somewhere safe and you can collaborate. And testing, which is how you make Claude double-check its own work. Don't try to memorize this list. Each week unlocks one of these, and each one unlocks a whole new category of things you can build. You'll get there.",
+
+  "That is the takeaway. Today wasn't really about games. Games are the on-ramp. The thing you actually learned is that you can now build software — for your reports, your trackers, your busywork, your weird side ideas, the thing your spouse keeps asking you about. The cost of building has gone to roughly zero. The only question left is what you want to build. Thanks for trusting me with your afternoon. Go make something."
+]
+</script>
+
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- ── 01 · Title ────────────────────────────────────────────────── -->
+  <section data-label="01 Title" class="s-title">
+    <div class="frame">
+      <div class="hero-brand">
+        <img class="hero-logo" src="assets/anduin-full.svg" alt="Anduin">
+        <span class="hero-program">Fast Track</span>
+      </div>
+      <div style="flex:1"></div>
+      <div class="kicker">Day 1 · Vibe Coding Workshop</div>
+      <h1 class="hero">Vibe Coding.</h1>
+      <p class="sub">Build real software by describing what you want.<br>No syntax. No semicolons. Just sentences.</p>
+    </div>
+    <div class="byline">
+      <span><b>Charles Lee</b> · CoderSchool</span>
+      <span>May 21, 2026</span>
+    </div>
+  </section>
+
+  <!-- ── 02 · About ────────────────────────────────────────────────── -->
+  <section data-label="02 About me" class="s-about">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Hi, I'm Charles</div>
+      <div class="grid">
+        <div class="photo">
+          <img src="assets/charles.jpg" alt="Charles Lee">
+        </div>
+        <ul>
+          <li>Founded <b>CoderSchool</b> — taught people to code the hard way for a decade.</li>
+          <li>Genuinely think coding is like magic. Love turning muggles into wizards.</li>
+          <li>I talk too fast when I get excited. Raise a hand and tell me to slow down.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-num">02 / 17</div>
+  </section>
+
+  <!-- ── 03 · Self-Service (admin prereq) ──────────────────────────── -->
+  <section data-label="03 Get admin access first" class="s-it">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Before we install anything · IT prereq</div>
+      <h2 class="title">Grab admin access first.</h2>
+      <div class="grid">
+        <div class="left">
+          <p class="lead">Anduin laptops run locked down. To install software — or do anything that needs <b>sudo</b> — you temporarily elevate your user via <span class="pill">Self-Service</span> on your Mac.</p>
+          <div class="steps">
+            <div class="step"><div>Open <b>Self-Service</b> (it's already installed — Spotlight: <b>Self-Service</b>).</div></div>
+            <div class="step"><div>Click <b>Admin On-demand</b> in the sidebar.</div></div>
+            <div class="step"><div>Hit <b>Request Admin Now</b> — you get <b>5 minutes</b> of admin.</div></div>
+            <div class="step"><div>Wait for the &ldquo;converted to admin&rdquo; notification, then move to the next slide.</div></div>
+          </div>
+          <div class="repeat"><b>Heads up:</b> every time something asks for sudo or your admin password today — do this again. 5-minute windows expire on their own.</div>
+        </div>
+        <div class="right">
+          <div class="shot"><img src="assets/self-service-2.png" alt="Self-Service — Admin On-demand screen"></div>
+          <div class="caption">Anduin Transactions Self-Service → Admin On-demand</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">03 / 17</div>
+  </section>
+
+  <!-- ── 04 · Install Claude Code ─────────────────────────────────── -->
+  <section data-label="03 Install Claude Code" class="s-install">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Step 2 · The actual install</div>
+      <h2 class="title">Install Claude Code.</h2>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="label">Terminal — bash</span>
+        </div>
+        <div><span class="comment"># paste this, press enter, walk away for ~2 minutes</span></div>
+        <div><span class="prompt">$</span> <span class="cmd">curl -fsSL https://claude.ai/install.sh | bash</span><span class="cursor"></span></div>
+      </div>
+      <div class="reassure">
+        <div class="note"><b>A big black window will open.</b> That's normal. Don't try to read it. We'll explain it in 20 minutes.</div>
+        <div class="note"><b>Takes about 2 minutes.</b> I'll keep talking while it runs. Move to the next slide with me.</div>
+      </div>
+      <div class="admin-reminder">
+        <div class="tag">Reminder</div>
+        <div>You need admin for this. If you skipped slide 3 — pop open <b>Self-Service → Admin On-demand → Request Admin Now</b>, then come back and paste.</div>
+      </div>
+    </div>
+    <div class="slide-num">04 / 17</div>
+  </section>
+
+  <!-- ── 04 · Introductions ───────────────────────────────────────── -->
+  <section data-label="04 Introduce yourselves" class="s-intro">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">While that installs · Round the room</div>
+      <h2 class="title">Tell us three things.</h2>
+      <div class="prompts">
+        <div class="row"><div class="num">1</div><p class="q">Your name.</p></div>
+        <div class="row"><div class="num">2</div><p class="q">What you do.</p></div>
+        <div class="row"><div class="num">3</div><p class="q">The last thing you asked Claude or ChatGPT.<span class="qhint">Mine was &ldquo;how to make soy milk&rdquo; — new machine from Emart.</span></p></div>
+      </div>
+    </div>
+    <div class="timer">~5 minutes · roughly your install window</div>
+    <div class="slide-num">05 / 17</div>
+  </section>
+
+  <!-- ── 05 · Install check ───────────────────────────────────────── -->
+  <section data-label="05 Install check" class="s-check">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Sanity check</div>
+      <div class="grid">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="label">Terminal — bash</span>
+          </div>
+          <div><span class="prompt">$</span> <span class="cmd">claude --version</span></div>
+          <div><span class="arrow">↳</span> <span class="ok">2.1.144 (Claude Code)</span></div>
+          <div style="margin-top:18px"><span class="prompt">$</span> <span class="cmd">claude</span></div>
+          <div><span class="arrow">↳</span> <span class="ok">Welcome to Claude Code</span></div>
+          <div style="margin-top:14px"><span class="comment"># if you see this, you're done. </span></div>
+        </div>
+        <div class="ask">
+          <div class="hand">🖐️</div>
+          <h2>Errors?<br>Raise a hand.</h2>
+          <p class="sub">We're not moving on until every person in this room is ready. Take a sip of water — we'll get you there.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">06 / 17</div>
+  </section>
+
+  <!-- ── 06 · Why coding has been frustrating ─────────────────────── -->
+  <section data-label="06 Why coding has been frustrating" class="s-joke">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="left">
+        <h2>Computers do exactly<br>what you <span class="strike">mean</span><br><em>say.</em></h2>
+        <div class="joke">
+          <div class="line"><div class="who">Wife</div><div>"Go to the store. Buy a dozen eggs. And if they have apples, get six."</div></div>
+          <div class="line"><div class="who">Husband</div><div class="punchline">comes home with six cartons of eggs.</div></div>
+          <div class="line"><div class="who">Wife</div><div>"Why six?"</div></div>
+          <div class="line"><div class="who">Husband</div><div class="punchline">"They had apples."</div></div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="nasa">
+          <div class="tag">A real example · 1999</div>
+          <h3>NASA lost a $327M Mars orbiter because two teams used different units.</h3>
+          <p>Lockheed wrote thrust in <b>pound-force seconds</b>. NASA expected <b>newton-seconds</b>. The math was correct. The intent was clear. The computer did exactly what it was told — and flew the satellite into Mars.</p>
+          <div class="cost"><span><b>$327M</b> burned</span><span>0 lines of buggy code</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">07 / 17</div>
+  </section>
+
+  <!-- ── 07 · What changed ────────────────────────────────────────── -->
+  <section data-label="07 What changed" class="s-shift">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">What changed</div>
+      <p class="lede">For 50 years, building Tetris looked like the left.<br>Now it looks like the right.</p>
+      <div class="compare">
+        <div class="col">
+          <div class="tag"><span class="dash"></span>Before · 600+ lines</div>
+          <div class="code">
+<pre><span class="c">// tetris.js — 600+ lines</span>
+<span class="k">const</span> <span class="v">COLS</span>=<span class="n">10</span>,<span class="v">ROWS</span>=<span class="n">20</span>;
+<span class="k">const</span> <span class="v">SHAPES</span> = {
+  I:[[<span class="n">1</span>,<span class="n">1</span>,<span class="n">1</span>,<span class="n">1</span>]],
+  O:[[<span class="n">1</span>,<span class="n">1</span>],[<span class="n">1</span>,<span class="n">1</span>]],
+  T:[[<span class="n">0</span>,<span class="n">1</span>,<span class="n">0</span>],[<span class="n">1</span>,<span class="n">1</span>,<span class="n">1</span>]],
+};
+<span class="k">function</span> <span class="f">rotate</span>(m) {
+  <span class="k">const</span> n=m.length;
+  <span class="k">const</span> r=Array.from(
+    {length:n}, ()=&gt;[]);
+  <span class="k">for</span>(<span class="k">let</span> y=<span class="n">0</span>;y&lt;n;y++)
+    <span class="k">for</span>(<span class="k">let</span> x=<span class="n">0</span>;x&lt;n;x++)
+      r[x][n-<span class="n">1</span>-y]=m[y][x];</pre>
+          </div>
+        </div>
+        <div class="col now">
+          <div class="tag"><span class="dash"></span>Now · 1 sentence</div>
+          <div class="prompt-card">
+            <div class="pre"><span class="arrow">›</span> claude</div>
+            <div class="text">build me a tetris game<br>to run in the web browser</div>
+            <div class="stamp">That's the whole file.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">08 / 17</div>
+  </section>
+
+  <!-- ── 08 · Let's build a game ──────────────────────────────────── -->
+  <section data-label="08 Let's build a game" class="s-game">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Now you · Don't type yet</div>
+      <h2 class="title">Four groups. Four games.<br>Built from scratch, in your browser, in minutes.</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="group"><span class="num">1</span>Group One</div>
+          <p class="prompt">build a tetris game to run in the web browser</p>
+        </div>
+        <div class="card">
+          <div class="group"><span class="num">2</span>Group Two</div>
+          <p class="prompt">build a flappy bird game to run in the web browser</p>
+        </div>
+        <div class="card">
+          <div class="group"><span class="num">3</span>Group Three</div>
+          <p class="prompt">build a breakout game to run in the web browser</p>
+        </div>
+        <div class="card">
+          <div class="group"><span class="num">4</span>Group Four</div>
+          <p class="prompt">build a chess game with a simple cpu opponent in the web browser</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num" style="color:#5d6b7a">09 / 17</div>
+  </section>
+
+  <!-- ── 09 · The terminal ────────────────────────────────────────── -->
+  <section data-label="09 The terminal" class="s-terminal">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">That black window, explained</div>
+      <h2 class="title">The terminal is Finder —<br>but typed.</h2>
+      <p class="lead">Same folders, same files. You type instead of click. Faster, and you look cooler.</p>
+      <div class="cmds">
+        <div class="cmd-card">
+          <div class="name">pwd</div>
+          <div class="desc">Where am I?</div>
+          <div class="ex">/Users/charles/Documents</div>
+        </div>
+        <div class="cmd-card">
+          <div class="name">cd</div>
+          <div class="desc">Go somewhere.</div>
+          <div class="ex">cd Documents</div>
+        </div>
+        <div class="cmd-card">
+          <div class="name">mkdir</div>
+          <div class="desc">Make a folder.</div>
+          <div class="ex">mkdir ai-class</div>
+        </div>
+        <div class="cmd-card">
+          <div class="name">~  ..</div>
+          <div class="desc">Home, and up one.</div>
+          <div class="ex">cd ~  ·  cd ..</div>
+        </div>
+      </div>
+      <div class="one-rule">
+        <b>One rule: </b>no spaces in folder names. Ever. Use <code>ai-class</code>, not <code>ai class</code>.
+      </div>
+    </div>
+    <div class="slide-num">10 / 17</div>
+  </section>
+
+  <!-- ── 10 · Your runbook ────────────────────────────────────────── -->
+  <section data-label="10 Your runbook" class="s-runbook">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Type these in order · Leave this slide up</div>
+      <h2 class="title">Your runbook.</h2>
+      <div class="body-grid">
+        <div>
+          <div class="runbook">
+            <ol>
+              <li><span class="cmd-text">cd ~/Documents</span></li>
+              <li><span class="cmd-text">mkdir ai-class</span></li>
+              <li><span class="cmd-text">cd ai-class</span></li>
+              <li><span class="cmd-text">mkdir week1</span></li>
+              <li><span class="cmd-text">cd week1</span></li>
+              <li class="step-final"><span class="cmd-text">claude</span></li>
+            </ol>
+          </div>
+          <div class="paste">↳ Then paste your group's prompt and hit enter.</div>
+        </div>
+        <div class="annotation">
+          <h3>What this does, in plain English.</h3>
+          <div class="item">
+            <div class="marker">1–2</div>
+            <div class="text">Go to <b>Documents</b>, make a folder for the whole class. We'll reuse it every week.</div>
+          </div>
+          <div class="item">
+            <div class="marker">3–5</div>
+            <div class="text">Step inside it, make a folder for today's session, step inside that one.</div>
+          </div>
+          <div class="item">
+            <div class="marker">6</div>
+            <div class="text"><b>Launch Claude.</b> The window changes. Now it's listening.</div>
+          </div>
+          <div class="item">
+            <div class="marker">›</div>
+            <div class="text">Paste your prompt. Watch. Ask follow-up questions in plain English.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">11 / 17</div>
+  </section>
+
+  <!-- ── 11 · Show & tell ─────────────────────────────────────────── -->
+  <section data-label="11 Show and tell" class="s-demo">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="kicker">The payoff</div>
+      <h2>Show &amp; tell.</h2>
+      <p class="sub">Each group, get up and show us what you built.<br>Broken counts. Broken is the most interesting kind.</p>
+      <div class="badges">
+        <div class="badge"><b>Group 1</b> · Tetris</div>
+        <div class="badge"><b>Group 2</b> · Flappy</div>
+        <div class="badge"><b>Group 3</b> · Breakout</div>
+        <div class="badge"><b>Group 4</b> · Chess</div>
+      </div>
+    </div>
+    <div class="slide-num">12 / 17</div>
+  </section>
+
+  <!-- ── 12 · You just built real software ─────────────────────────── -->
+  <section data-label="12 You just built real software" class="s-next">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Take a breath</div>
+      <h2 class="title">You just built<br>real software.</h2>
+      <p class="lead">Not a tutorial. Not a toy. Real, working software that ran in your browser — in the time it took to drink a coffee.</p>
+    </div>
+    <div class="slide-num">13 / 17</div>
+  </section>
+
+  <!-- ── 13 · Bridge to part 2 ────────────────────────────────────── -->
+  <section data-label="13 From games to real work" class="s-bridge">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="part">Part 2</div>
+      <h1>From games to<br>real work.</h1>
+      <p class="sub">Same skill. Same move. Different prompt.<br>Let's build a tool that actually saves you hours.</p>
+    </div>
+    <div class="slide-num">14 / 17</div>
+  </section>
+
+  <!-- ── 14 · Build it for real ───────────────────────────────────── -->
+  <section data-label="14 Build it for real" class="s-business">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Same runbook · Different prompt</div>
+      <div class="biz-grid">
+        <div class="biz-left">
+          <h2 class="title">Build a business tool.</h2>
+          <div class="terminal-prompt">
+            <div class="pre"><span class="arrow">›</span> claude</div>
+            <div class="body-prompt">Build a web app that lets me upload an Excel spreadsheet of business data and turns it into clear, interactive charts.</div>
+          </div>
+          <div class="runbook-mini">
+            <b>cd ~/Documents/ai-class</b><span class="sep">·</span>
+            <b>mkdir week1-business</b><span class="sep">·</span>
+            <b>claude</b>
+          </div>
+          <a class="download-card" href="https://docs.google.com/spreadsheets/d/1lAxyVzc0-V9id-EcxbYCYxtRlX2y0qtr/edit?usp=sharing&amp;ouid=114870292364047605354&amp;rtpof=true&amp;sd=true" target="_blank" rel="noopener">
+            <div class="icon">XL</div>
+            <div class="copy">
+              <span class="copy-top">Download the sample spreadsheet</span>
+              <span class="copy-sub">docs.google.com · Financial Sample.xlsx</span>
+            </div>
+            <span class="chev">↗</span>
+          </a>
+        </div>
+        <div class="biz-right">
+          <div class="stage-label">
+            Input <span class="tag">· sample data</span>
+          </div>
+          <div class="stage-frame">
+            <img src="assets/spreadsheet-preview.png" alt="Financial Sample spreadsheet — Segment, Country, Product, Sales columns" class="stage-img">
+          </div>
+          <div class="arrow-down">↓</div>
+          <div class="stage-label">
+            Output <span class="tag">· what you'll build</span>
+          </div>
+          <div class="stage-frame dark">
+            <img src="assets/dashboard.png" alt="Sample business dashboard built by Claude" class="stage-img">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">15 / 17</div>
+  </section>
+
+  <!-- ── 16 · What's next (preview) ───────────────────────────────── -->
+  <section data-label="16 What's coming next" class="s-roadmap">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Coming up · Weeks 2 onward</div>
+      <h2 class="title">A peek at what's next.</h2>
+      <p class="lead">Today was the on-ramp. Here's where we'll go from here — bigger ideas, real apps, slowly.</p>
+      <div class="grid">
+        <div class="card">
+          <div class="idx">01</div>
+          <div class="topic">Architecture</div>
+          <h3>Frontend &amp; Backend</h3>
+          <p>The two halves of every app — what users see, and what runs behind the scenes.</p>
+        </div>
+        <div class="card">
+          <div class="idx">02</div>
+          <div class="topic">UI Library</div>
+          <h3>React</h3>
+          <p>The most popular way to build modern interfaces. Lego blocks, but for screens.</p>
+        </div>
+        <div class="card">
+          <div class="idx">03</div>
+          <div class="topic">Data</div>
+          <h3>Supabase + SQL</h3>
+          <p>A real database in the cloud, plus the language you use to ask it questions.</p>
+        </div>
+        <div class="card">
+          <div class="idx">04</div>
+          <div class="topic">Auth</div>
+          <h3>Google Login</h3>
+          <p>"Sign in with Google" — adding real authentication without writing a password system.</p>
+        </div>
+        <div class="card">
+          <div class="idx">05</div>
+          <div class="topic">Collaboration</div>
+          <h3>GitHub</h3>
+          <p>Where your code lives, gets backed up, and is shared with teammates (or the world).</p>
+        </div>
+        <div class="card">
+          <div class="idx">06</div>
+          <div class="topic">Quality</div>
+          <h3>Testing</h3>
+          <p>How you tell Claude to verify its own work — and how to actually trust the answer.</p>
+        </div>
+      </div>
+      <div class="footnote">
+        <span class="dot"></span>
+        <span><b>One concept per week.</b> Each one unlocks a whole new category of things you can build.</span>
+      </div>
+    </div>
+    <div class="slide-num">16 / 17</div>
+  </section>
+
+  <!-- ── 17 · Wrap ────────────────────────────────────────────────── -->
+  <section data-label="15 Wrap" class="s-wrap">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The takeaway</div>
+      <h1>Today wasn't about games.<br>It was about the fact that<br>you can <em>build software now.</em></h1>
+      <p class="sub">Your reports. Your trackers. Your busywork. Your weird side ideas.<br>The cost of building has gone to roughly zero. The only question left is what.</p>
+      <div class="signoff">
+        <span><b>Thanks.</b></span>
+        <span class="dot"></span>
+        <span>Go make something.</span>
+        <span class="dot"></span>
+        <span>Charles · Anduin Slack</span>
+      </div>
+    </div>
+    <div class="slide-num">17 / 17</div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>

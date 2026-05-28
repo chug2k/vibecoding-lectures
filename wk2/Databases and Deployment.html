@@ -1,0 +1,2116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Databases &amp; Deployment — Day 2</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="deck-stage.js"></script>
+<script src="image-slot.js"></script>
+<style>
+  :root {
+    /* Type scale — projection-appropriate at 1920×1080 */
+    --type-hero: 156px;
+    --type-title: 84px;
+    --type-section: 64px;
+    --type-subtitle: 40px;
+    --type-lead: 36px;
+    --type-body: 30px;
+    --type-small: 26px;
+    --type-eyebrow: 24px;
+    --type-mono-big: 56px;
+    --type-mono: 36px;
+
+    /* Spacing */
+    --pad-top: 110px;
+    --pad-bottom: 100px;
+    --pad-x: 140px;
+    --gap-title: 56px;
+
+    /* Colors */
+    --ink: var(--color-gray-9);
+    --ink-soft: var(--color-gray-8);
+    --muted: var(--color-gray-6);
+    --hairline: var(--color-gray-3);
+    --paper: var(--color-gray-1);
+    --accent: #48AFF0;
+    --accent-deep: var(--color-primary-4);
+    --terminal-bg: #0d1117;
+    --terminal-fg: #e6edf3;
+    --terminal-green: #7ee787;
+    --terminal-blue: #79c0ff;
+    --terminal-dim: #8b949e;
+
+    /* Caution sticky-note (used on slides 8 + 13) */
+    --note-bg: #fff7e0;
+    --note-edge: #f4d971;
+    --note-tag: #8a5a00;
+    --note-ink: #6a4f08;
+  }
+
+  html, body { margin: 0; background: #000; }
+
+  deck-stage > section {
+    background: #fff;
+    color: var(--ink);
+    font-family: var(--font-display);
+    line-height: 1.4;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── persistent Anduin Fast Track brand mark ────────────────────── */
+  .brand-mark {
+    position: absolute; top: 64px; right: 80px;
+    display: flex; align-items: center; gap: 18px;
+    z-index: 5;
+  }
+  .brand-mark img { height: 28px; width: auto; display: block; }
+  .brand-mark .program {
+    padding-left: 18px;
+    border-left: 1px solid var(--hairline);
+    font-size: 18px; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  /* dark-slide variant */
+  .s-mystery .brand-mark .program,
+  .s-reveal .brand-mark .program,
+  .s-live .brand-mark .program {
+    color: rgba(255,255,255,0.6);
+  }
+  .s-mystery .brand-mark .program,
+  .s-reveal .brand-mark .program,
+  .s-live .brand-mark .program {
+    border-left-color: rgba(255,255,255,0.18);
+  }
+
+  /* ── shared slide chrome ───────────────────────────────────────────── */
+  .slide-num {
+    position: absolute; right: 56px; bottom: 48px;
+    font-size: var(--type-small); color: var(--muted);
+    font-variant-numeric: tabular-nums; letter-spacing: 0.04em;
+  }
+  .slide-eyebrow {
+    position: absolute; left: var(--pad-x); top: 72px;
+    font-size: var(--type-eyebrow); font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+
+  /* ── frames ────────────────────────────────────────────────────────── */
+  .frame {
+    width: 100%; height: 100%;
+    padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
+    box-sizing: border-box;
+    display: flex; flex-direction: column;
+  }
+  .frame.center { justify-content: center; align-items: center; text-align: center; }
+
+  /* ── type helpers ──────────────────────────────────────────────────── */
+  h1.hero {
+    margin: 0; font-size: var(--type-hero);
+    line-height: 0.96; letter-spacing: -0.045em;
+    font-weight: 600; color: var(--ink);
+  }
+  h2.title {
+    margin: 0 0 var(--gap-title);
+    font-size: var(--type-title); line-height: 1.02;
+    letter-spacing: -0.03em; font-weight: 600; color: var(--ink);
+  }
+  .lead {
+    font-size: var(--type-lead); line-height: 1.35;
+    color: var(--ink-soft); font-weight: 400;
+    letter-spacing: -0.005em; margin: 0;
+  }
+  .small { font-size: var(--type-small); line-height: 1.45; color: var(--muted); margin: 0; }
+
+  /* ────────────────────────────────────────────────────────────────────
+     01 — Title
+     ──────────────────────────────────────────────────────────────────── */
+  .s-title {
+    background: url('assets/cover-gradient.png') center/cover no-repeat, #eaf6ff;
+  }
+  .s-title .frame { justify-content: flex-end; padding-bottom: 140px; }
+  .s-title .hero-brand {
+    display: inline-flex; align-items: center; gap: 22px;
+    padding: 14px 26px; background: #fff; border-radius: 999px;
+    box-shadow: 0 4px 18px -6px rgba(31,49,69,0.18),
+                0 1px 0 rgba(31,49,69,0.06) inset;
+    align-self: flex-start;
+  }
+  .s-title .hero-logo { height: 32px; width: auto; display: block; }
+  .s-title .hero-program {
+    padding-left: 22px; border-left: 1px solid var(--hairline);
+    font-size: 20px; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+  .s-title .kicker {
+    font-size: var(--type-eyebrow); font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 36px;
+  }
+  .s-title h1.hero { max-width: 1500px; }
+  .s-title .sub {
+    margin-top: 40px; font-size: var(--type-subtitle);
+    color: var(--ink-soft); max-width: 1200px; font-weight: 400;
+    line-height: 1.3; letter-spacing: -0.005em;
+  }
+  .s-title .byline {
+    position: absolute; bottom: 80px; left: 140px; right: 140px;
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: var(--type-small); color: var(--ink-soft);
+  }
+  .s-title .byline b { font-weight: 600; color: var(--ink); }
+  /* Faint background motif: grid → cloud */
+  .s-title .motif {
+    position: absolute; right: -40px; top: 200px;
+    width: 920px; height: 620px;
+    opacity: 0.12; pointer-events: none;
+    color: var(--accent-deep);
+  }
+
+  /* ────────────────────────────────────────────────────────────────────
+     02 — Today is …  (2-col, echoes slide 3 tools layout)
+     ──────────────────────────────────────────────────────────────────── */
+  .s-today .frame { padding-top: 130px; }
+  .s-today h2.title { margin-bottom: 56px; }
+  .s-today h2.title em { font-style: normal; color: var(--accent-deep); font-weight: 600; }
+  .s-today .cols {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 48px; flex: 1; min-height: 0;
+  }
+  .s-today .col {
+    padding: 56px 56px;
+    background: #fff; border: 1px solid var(--hairline);
+    border-radius: 16px;
+    display: flex; flex-direction: column; gap: 28px;
+  }
+  .s-today .col .icon {
+    width: 120px; height: 120px;
+    display: grid; place-items: center;
+    color: var(--accent-deep);
+    background: rgba(72,175,240,0.10);
+    border: 1px solid rgba(72,175,240,0.28);
+    border-radius: 24px;
+  }
+  .s-today .col .icon svg { width: 64px; height: 64px; }
+  .s-today .col h3 {
+    margin: 0; font-size: 64px; line-height: 1.0;
+    font-weight: 600; letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  .s-today .col p {
+    margin: 0; font-size: 30px; line-height: 1.35;
+    color: var(--ink-soft); font-weight: 400;
+    letter-spacing: -0.005em; max-width: 600px;
+  }
+  .s-today .col p b { color: var(--ink); font-weight: 600; }
+
+  /* ────────────────────────────────────────────────────────────────────
+     03 — The two tools (Supabase + Vercel) — mirrors slide 2
+     ──────────────────────────────────────────────────────────────────── */
+  .s-tools .frame { padding-top: 130px; }
+  .s-tools h2.title { margin-bottom: 56px; }
+  .s-tools h2.title em { font-style: normal; color: var(--accent-deep); font-weight: 600; }
+  .s-tools .cols {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 48px; flex: 1; min-height: 0;
+  }
+  .s-tools .col {
+    padding: 56px 56px;
+    background: #fff; border: 1px solid var(--hairline);
+    border-radius: 16px;
+    display: flex; flex-direction: column; gap: 28px;
+    position: relative;
+  }
+  .s-tools .col .logo-row {
+    display: flex; align-items: center; gap: 26px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .s-tools .col .logo-mark {
+    width: 96px; height: 96px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .s-tools .col .logo-mark svg { width: 100%; height: 100%; display: block; }
+  .s-tools .col .wordmark {
+    font-size: 64px; line-height: 1; font-weight: 600;
+    letter-spacing: -0.025em; color: var(--ink);
+  }
+  .s-tools .col .wordmark.supabase { color: #1a1a1a; }
+  .s-tools .col h3 {
+    margin: 0; font-size: 56px; line-height: 1.0;
+    font-weight: 500; letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  .s-tools .col h3 em { font-style: normal; color: var(--accent-deep); font-weight: 600; }
+  .s-tools .col p {
+    margin: 0; font-size: 30px; line-height: 1.35;
+    color: var(--ink-soft); font-weight: 400;
+    letter-spacing: -0.005em; max-width: 600px;
+  }
+  .s-tools .col .role-tag {
+    position: absolute; top: 28px; right: 28px;
+    padding: 8px 16px; border-radius: 999px;
+    font-size: 24px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent-deep);
+    background: rgba(72,175,240,0.10);
+    border: 1px solid rgba(72,175,240,0.28);
+  }
+  .s-tools .setup-strip {
+    margin-top: 40px;
+    padding: 22px 32px;
+    background: var(--paper); border: 1px solid var(--hairline);
+    border-radius: 12px;
+    font-size: 24px; line-height: 1.4;
+    color: var(--ink-soft);
+  }
+  .s-tools .setup-strip .lbl {
+    font-weight: 700; color: var(--ink);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    font-size: 24px; margin-right: 12px;
+  }
+  .s-tools .setup-strip b { color: var(--ink); font-weight: 600; }
+
+  /* ────────────────────────────────────────────────────────────────────
+     04 — Mystery number  (DARK)
+     ──────────────────────────────────────────────────────────────────── */
+  .s-mystery { background: #0d1117; color: #fff; }
+  .s-mystery .frame { justify-content: center; align-items: center; }
+  .s-mystery .num {
+    font-size: 360px; line-height: 1;
+    font-weight: 600; letter-spacing: -0.05em;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+  .s-mystery .slide-num { color: rgba(255,255,255,0.35); }
+
+  /* ────────────────────────────────────────────────────────────────────
+     05 — Reveal  (DARK, same number position)
+     ──────────────────────────────────────────────────────────────────── */
+  .s-reveal { background: #0d1117; color: #fff; }
+  .s-reveal .frame { justify-content: center; align-items: center; position: relative; }
+  .s-reveal .num-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 36px;
+  }
+  .s-reveal .num {
+    font-size: 320px; line-height: 1;
+    font-weight: 600; letter-spacing: -0.05em;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    position: relative;
+  }
+  /* Handwritten = 2²⁰ annotation in accent */
+  .s-reveal .annot {
+    transform: rotate(-3deg);
+    font-family: 'Caveat', 'Bradley Hand', 'Comic Sans MS', cursive;
+    font-size: 180px; line-height: 1;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .s-reveal .annot sup {
+    font-size: 0.55em; vertical-align: super; line-height: 0;
+  }
+  .s-reveal .squiggle {
+    position: absolute;
+    left: -30px; bottom: -40px;
+    width: calc(100% + 60px);
+    height: 32px;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+  .s-reveal .below {
+    margin-top: 90px;
+    font-size: 56px; line-height: 1.1;
+    font-weight: 500; letter-spacing: -0.02em;
+    color: #fff; text-align: center;
+  }
+  .s-reveal .below .small {
+    display: block;
+    margin-top: 22px;
+    font-size: 28px; font-weight: 400;
+    color: #8b949e;
+    letter-spacing: 0.01em;
+  }
+  .s-reveal .punch {
+    position: absolute; left: 0; right: 0; bottom: 110px;
+    text-align: center;
+    font-size: 30px; color: #c2cdd9;
+    font-style: italic;
+    letter-spacing: -0.005em;
+  }
+  .s-reveal .punch b { color: var(--accent); font-weight: 600; font-style: normal; }
+  .s-reveal .slide-num { color: rgba(255,255,255,0.35); }
+
+  /* ────────────────────────────────────────────────────────────────────
+     06 — Contrast: Spreadsheet vs Database
+     ──────────────────────────────────────────────────────────────────── */
+  .s-contrast { background: var(--paper); }
+  .s-contrast .frame { padding-top: 130px; }
+  .s-contrast .cols {
+    display: grid; grid-template-columns: 1fr 1.15fr;
+    gap: 56px; flex: 1; min-height: 0;
+    margin-top: 24px;
+  }
+  .s-contrast .col {
+    border-radius: 20px; padding: 56px 56px 56px;
+    display: flex; flex-direction: column; gap: 28px;
+    position: relative;
+  }
+  .s-contrast .col.ss {
+    background: #fff;
+    border: 1px solid var(--hairline);
+  }
+  .s-contrast .col.db {
+    background: linear-gradient(180deg, #1a3a66 0%, #0f223e 100%);
+    color: #fff;
+    box-shadow: 0 32px 80px -32px rgba(13,17,23,0.4);
+  }
+  .s-contrast .col h3 {
+    margin: 0; font-size: 52px;
+    line-height: 1.05; letter-spacing: -0.025em;
+    font-weight: 600;
+  }
+  .s-contrast .col.db h3 { color: #fff; }
+  .s-contrast .col .visual {
+    height: 220px;
+    display: grid; place-items: center;
+    margin: 8px 0 4px;
+  }
+  .s-contrast .col .visual svg { height: 100%; width: auto; max-width: 100%; display: block; }
+  .s-contrast .col ul {
+    margin: 0; padding: 0; list-style: none;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .s-contrast .col li {
+    font-size: 30px; line-height: 1.3; font-weight: 400;
+    color: var(--ink-soft);
+    padding-left: 36px; position: relative;
+  }
+  .s-contrast .col li::before {
+    content: ""; position: absolute; left: 0; top: 18px;
+    width: 20px; height: 2px; background: var(--muted);
+    border-radius: 2px;
+  }
+  .s-contrast .col.db li { color: #c2dafa; }
+  .s-contrast .col.db li::before { background: var(--accent); }
+  .s-contrast .col.db li b { color: #fff; font-weight: 600; }
+  .s-contrast .col .tag {
+    font-size: 22px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .s-contrast .col.db .tag { color: var(--accent); }
+
+  /* ────────────────────────────────────────────────────────────────────
+     07 — Why we need one
+     ──────────────────────────────────────────────────────────────────── */
+  .s-why .frame { justify-content: center; align-items: center; }
+  .s-why .quote {
+    font-size: 64px; line-height: 1.15;
+    font-weight: 500; letter-spacing: -0.025em;
+    color: var(--ink); margin: 0 0 100px;
+    max-width: 1500px; text-align: center;
+  }
+  .s-why .quote em {
+    font-style: normal; color: var(--accent-deep); font-weight: 600;
+  }
+  .s-why .diagram {
+    display: grid; grid-template-columns: 1fr 80px 1fr;
+    gap: 40px; align-items: center;
+    width: 100%; max-width: 1500px;
+  }
+  .s-why .group {
+    display: flex; flex-direction: column; gap: 18px;
+    align-items: center;
+  }
+  .s-why .group .caption {
+    font-size: 22px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); text-align: center;
+  }
+  .s-why .group.now .caption { color: var(--accent-deep); }
+  .s-why .boards-row {
+    display: flex; gap: 18px; justify-content: center;
+  }
+  .s-why .one-board {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .s-why .mini-board {
+    width: 130px; height: 90px;
+    background: #fff; border: 1px solid var(--hairline);
+    border-radius: 8px;
+    background-image:
+      linear-gradient(to right, var(--hairline) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--hairline) 1px, transparent 1px);
+    background-size: 26px 22px;
+  }
+  .s-why .one-board .person {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--muted);
+  }
+  .s-why .group.now .mini-board.big {
+    width: 460px; height: 220px;
+    border-color: var(--accent);
+    background-image:
+      linear-gradient(to right, rgba(72,175,240,0.25) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(72,175,240,0.25) 1px, transparent 1px);
+    background-size: 38px 28px;
+    box-shadow: 0 16px 40px -22px rgba(72,175,240,0.45);
+  }
+  .s-why .group.now .people-row {
+    display: flex; gap: 18px; margin-top: 4px;
+  }
+  .s-why .group.now .people-row .person {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(72,175,240,0.18);
+  }
+  .s-why .diagram .arrow {
+    display: grid; place-items: center; color: var(--accent);
+  }
+  .s-why .diagram .arrow svg { width: 80px; height: 40px; }
+
+  /* ────────────────────────────────────────────────────────────────────
+     04 — Build intro: the example app (deal tracker)
+     ──────────────────────────────────────────────────────────────────── */
+  .s-build .frame { padding-top: 130px; }
+  .s-build h2.title { margin-bottom: 16px; }
+  .s-build h2.title em { font-style: normal; color: var(--accent-deep); font-weight: 600; }
+  .s-build .lede {
+    font-size: 30px; line-height: 1.4;
+    color: var(--ink-soft); max-width: 1500px;
+    margin: 0 0 36px; font-weight: 400;
+    letter-spacing: -0.005em;
+  }
+  .s-build .lede b { color: var(--ink); font-weight: 600; }
+  .s-build .layout {
+    display: grid;
+    grid-template-columns: 1.45fr 1fr;
+    gap: 56px; align-items: stretch;
+    flex: 1; min-height: 0;
+  }
+  .s-build .mock {
+    border-radius: 14px; overflow: hidden;
+    background: #fff; border: 1px solid var(--hairline);
+    box-shadow: 0 24px 60px -28px rgba(13,17,23,0.25);
+    display: flex; flex-direction: column;
+  }
+  .s-build .side {
+    display: flex; flex-direction: column;
+    gap: 24px; justify-content: space-between;
+  }
+  .s-build .feature-list {
+    display: flex; flex-direction: column; gap: 22px;
+    padding-top: 12px;
+  }
+  .s-build .feature {
+    display: grid; grid-template-columns: 44px 1fr;
+    gap: 18px; align-items: baseline;
+  }
+  .s-build .feature .marker {
+    color: var(--accent); font-weight: 700;
+    font-size: 26px; line-height: 1;
+  }
+  .s-build .feature .text {
+    font-size: 26px; line-height: 1.35;
+    color: var(--ink); letter-spacing: -0.005em;
+  }
+  .s-build .feature .text b { font-weight: 600; }
+  .s-build .caution-strip {
+    margin-top: 8px;
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 20px 24px;
+    background: var(--note-bg); border: 1px solid var(--note-edge);
+    border-radius: 8px;
+    transform: rotate(-0.4deg);
+    box-shadow: 0 10px 24px -16px rgba(140,100,0,0.25);
+  }
+  .s-build .caution-strip .tag {
+    font-size: 16px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--note-tag);
+    flex-shrink: 0; padding-top: 2px;
+  }
+  .s-build .caution-strip .text {
+    font-size: 22px; line-height: 1.35;
+    color: var(--note-ink); font-weight: 500;
+    letter-spacing: -0.005em;
+  }
+  .s-build .caution-strip .text b { color: #3a2a02; font-weight: 700; }
+
+  /* ─────────────────────────────────────────────────────────────────
+     05–07 — Setup slides (install tools)
+     ─────────────────────────────────────────────────────────────────  */
+  .s-setup .frame { padding-top: 130px; }
+  .s-setup h2.title { margin-bottom: 12px; }
+  .s-setup h2.title em { font-style: normal; color: var(--accent-deep); font-weight: 600; }
+  .s-setup .lede {
+    font-size: 30px; line-height: 1.4;
+    color: var(--ink-soft); max-width: 1500px;
+    margin: 0 0 32px; font-weight: 400;
+    letter-spacing: -0.005em;
+  }
+  .s-setup .lede b { color: var(--ink); font-weight: 600; }
+  .s-setup .lede code {
+    font-family: var(--font-mono);
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    padding: 2px 10px; border-radius: 6px;
+    font-size: 26px; color: var(--accent-deep);
+  }
+  .s-setup .term {
+    background: var(--terminal-bg); color: var(--terminal-fg);
+    border-radius: 16px;
+    font-family: var(--font-mono);
+    box-shadow: 0 28px 70px -28px rgba(13,17,23,0.4),
+                0 2px 0 rgba(255,255,255,0.04) inset;
+    border: 1px solid #1c232c;
+    overflow: hidden;
+    flex: 1; min-height: 0;
+    display: flex; flex-direction: column;
+  }
+  .s-setup .term-bar {
+    display: flex; align-items: center;
+    padding: 18px 22px;
+    border-bottom: 1px solid #1c232c;
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0));
+    position: relative;
+    flex-shrink: 0;
+  }
+  .s-setup .term-bar .dots { display: flex; gap: 10px; }
+  .s-setup .term-bar .dot { width: 14px; height: 14px; border-radius: 50%; }
+  .s-setup .term-bar .dot.r { background: #ff5f57; }
+  .s-setup .term-bar .dot.y { background: #febc2e; }
+  .s-setup .term-bar .dot.g { background: #28c840; }
+  .s-setup .term-bar .title-tab {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    font-size: 22px; color: var(--terminal-dim);
+    letter-spacing: 0.04em;
+  }
+  .s-setup .term-body {
+    padding: 36px 48px;
+    font-size: 30px; line-height: 1.55;
+    flex: 1;
+    overflow: hidden;
+  }
+  .s-setup .term-body .blank { height: 18px; }
+  .s-setup .term-body .indent { padding-left: 2ch; }
+  .s-setup .term-body .path { color: var(--terminal-blue); }
+  .s-setup .term-body .prompt { color: var(--terminal-dim); }
+  .s-setup .term-body .cmd { color: #fff; }
+  .s-setup .term-body .ok { color: var(--terminal-green); }
+  .s-setup .term-body .dim { color: var(--terminal-dim); }
+  .s-setup .term-body .url { color: var(--terminal-blue); text-decoration: underline; text-underline-offset: 4px; }
+  .s-setup .term-body .arrow { color: #ffa657; }
+  .s-setup .term-body .key { color: #c2a3ff; }
+  .s-setup .term-body .val { color: #7ee787; }
+  .s-setup .term-body code { font-family: inherit; }
+
+  /* ─────────────────────────────────────────────────────────────────
+     05 — Make accounts (Supabase + Vercel sign-up)
+     ─────────────────────────────────────────────────────────────────  */
+  .s-accounts .frame { padding-top: 130px; }
+  .s-accounts h2.title { margin-bottom: 12px; }
+  .s-accounts h2.title em { font-style: normal; color: var(--accent-deep); font-weight: 600; }
+  .s-accounts .lede {
+    font-size: 30px; line-height: 1.4;
+    color: var(--ink-soft); max-width: 1500px;
+    margin: 0 0 36px; font-weight: 400;
+    letter-spacing: -0.005em;
+  }
+  .s-accounts .lede b { color: var(--ink); font-weight: 600; }
+  .s-accounts .pair {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 56px; flex: 1; min-height: 0;
+  }
+  .s-accounts .site {
+    display: flex; flex-direction: column; gap: 18px;
+    min-height: 0;
+  }
+  .s-accounts .browser-frame {
+    flex: 1; min-height: 0;
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid var(--hairline);
+    background: #fff;
+    box-shadow: 0 28px 70px -32px rgba(13,17,23,0.28);
+    display: flex; flex-direction: column;
+  }
+  .s-accounts .browser-frame .bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--hairline);
+    background: #f5f9fc;
+    flex-shrink: 0;
+  }
+  .s-accounts .browser-frame .bar .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .s-accounts .browser-frame .bar .dot.r { background: #ff5f57; }
+  .s-accounts .browser-frame .bar .dot.y { background: #febc2e; }
+  .s-accounts .browser-frame .bar .dot.g { background: #28c840; }
+  .s-accounts .browser-frame .bar .url {
+    margin-left: 14px;
+    padding: 6px 14px;
+    background: #fff; border: 1px solid var(--hairline);
+    border-radius: 6px;
+    font-family: var(--font-mono); font-size: 20px;
+    color: var(--ink-soft); font-weight: 500;
+    flex: 1;
+  }
+  .s-accounts .browser-frame .bar .url .lock {
+    color: var(--muted); margin-right: 6px;
+  }
+  .s-accounts .browser-frame .mock-page {
+    flex: 1; min-height: 0; width: 100%;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .s-accounts .mock-page .topnav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 22px;
+    flex-shrink: 0;
+  }
+  .s-accounts .mock-page .topnav .brand-lockup {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 600; font-size: 17px;
+  }
+  .s-accounts .mock-page .topnav .brand-lockup svg { width: 22px; height: 22px; display: block; }
+  .s-accounts .mock-page .topnav .menu {
+    display: flex; align-items: center; gap: 22px;
+    font-size: 14px;
+  }
+  .s-accounts .mock-page .topnav .menu .item { opacity: 0.65; }
+  .s-accounts .mock-page .topnav .menu .cta {
+    padding: 7px 14px; border-radius: 6px;
+    font-weight: 600; font-size: 14px;
+  }
+  .s-accounts .mock-page .hero {
+    flex: 1; min-height: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 28px 36px 36px;
+    gap: 18px;
+  }
+  .s-accounts .mock-page .hero h4 {
+    margin: 0;
+    font-size: 34px; line-height: 1.05;
+    font-weight: 600; letter-spacing: -0.02em;
+  }
+  .s-accounts .mock-page .hero p {
+    margin: 0;
+    font-size: 15px; line-height: 1.4;
+    opacity: 0.6;
+    max-width: 360px;
+  }
+  .s-accounts .mock-page .hero .big-cta {
+    margin-top: 8px;
+    padding: 12px 22px; border-radius: 8px;
+    font-weight: 600; font-size: 15px;
+    display: inline-flex; align-items: center; gap: 8px;
+    box-shadow: 0 8px 24px -10px rgba(0,0,0,0.35);
+  }
+
+  /* Supabase mock theme */
+  .s-accounts .mock-page.supabase {
+    background: #1c1c1c; color: #fff;
+  }
+  .s-accounts .mock-page.supabase .topnav {
+    border-bottom: 1px solid #2a2a2a;
+  }
+  .s-accounts .mock-page.supabase .topnav .brand-lockup { color: #fff; }
+  .s-accounts .mock-page.supabase .menu .item { color: #cfd2cf; }
+  .s-accounts .mock-page.supabase .menu .cta {
+    background: #3ECF8E; color: #0c2419;
+  }
+  .s-accounts .mock-page.supabase .hero h4 { color: #fff; }
+  .s-accounts .mock-page.supabase .hero h4 em {
+    font-style: normal; color: #3ECF8E;
+  }
+  .s-accounts .mock-page.supabase .hero p { color: #a7adac; }
+  .s-accounts .mock-page.supabase .hero .big-cta {
+    background: #3ECF8E; color: #0c2419;
+  }
+
+  /* Vercel mock theme */
+  .s-accounts .mock-page.vercel {
+    background: #fff; color: #000;
+  }
+  .s-accounts .mock-page.vercel .topnav {
+    border-bottom: 1px solid #ededed;
+  }
+  .s-accounts .mock-page.vercel .topnav .brand-lockup { color: #000; }
+  .s-accounts .mock-page.vercel .menu .item { color: #666; }
+  .s-accounts .mock-page.vercel .menu .cta {
+    background: #000; color: #fff;
+  }
+  .s-accounts .mock-page.vercel .hero h4 { color: #000; }
+  .s-accounts .mock-page.vercel .hero p { color: #666; }
+  .s-accounts .mock-page.vercel .hero .big-cta {
+    background: #000; color: #fff;
+  }
+
+  .s-accounts .browser-frame .homepage-shot {
+    flex: 1; min-height: 0; width: 100%;
+    object-fit: cover; object-position: top center;
+    display: block;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────
+     06 — What's MCP? (interstitial explainer)
+     ─────────────────────────────────────────────────────────────────  */
+  .s-mcp .frame { padding-top: 130px; }
+  .s-mcp h2.title { margin-bottom: 12px; }
+  .s-mcp h2.title em { font-style: normal; color: var(--accent-deep); font-weight: 600; }
+  .s-mcp .lede {
+    font-size: 32px; line-height: 1.35;
+    color: var(--ink-soft); max-width: 1500px;
+    margin: 0 0 40px; font-weight: 400;
+    letter-spacing: -0.005em;
+  }
+  .s-mcp .lede b { color: var(--ink); font-weight: 600; }
+  .s-mcp .lede .acronym {
+    color: var(--accent-deep); font-weight: 700;
+    text-decoration: underline; text-decoration-color: rgba(72,175,240,0.4);
+    text-underline-offset: 6px;
+  }
+  .s-mcp .diagram {
+    flex: 1; min-height: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+    position: relative;
+    padding-top: 16px;
+  }
+  .s-mcp .claude-card {
+    padding: 22px 56px;
+    border-radius: 16px;
+    background: var(--ink); color: #fff;
+    font-size: 36px; font-weight: 600; letter-spacing: -0.01em;
+    box-shadow: 0 20px 50px -20px rgba(13,17,23,0.4);
+    display: inline-flex; align-items: center; gap: 16px;
+  }
+  .s-mcp .claude-card .badge {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(72,175,240,0.25);
+  }
+  .s-mcp .stem {
+    width: 4px; height: 56px;
+    background: linear-gradient(180deg, var(--ink), var(--accent));
+  }
+  .s-mcp .bus {
+    width: 90%; max-width: 1500px; height: 4px;
+    background: var(--accent);
+    position: relative;
+  }
+  .s-mcp .bus-label {
+    position: absolute; top: -42px; left: 50%; transform: translateX(-50%);
+    padding: 6px 18px; border-radius: 999px;
+    background: #fff; border: 2px solid var(--accent);
+    font-size: 22px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+  .s-mcp .tools-row {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 28px; width: 90%; max-width: 1500px;
+    margin-top: 0;
+  }
+  .s-mcp .tool-leg {
+    width: 4px; height: 40px;
+    background: var(--accent);
+    justify-self: center;
+  }
+  .s-mcp .tool-card {
+    padding: 24px 22px;
+    background: #fff; border: 1px solid var(--hairline);
+    border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    text-align: center;
+  }
+  .s-mcp .tool-card .ic {
+    width: 44px; height: 44px;
+    display: grid; place-items: center;
+  }
+  .s-mcp .tool-card .ic svg { width: 100%; height: 100%; }
+  .s-mcp .tool-card .name {
+    font-size: 22px; font-weight: 600;
+    color: var(--ink); letter-spacing: -0.005em;
+  }
+  .s-mcp .tool-card .role {
+    font-size: 16px; color: var(--muted);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    font-weight: 600;
+  }
+  .s-mcp .tool-card.is-supabase {
+    border: 2px solid #3ECF8E;
+    box-shadow: 0 0 0 4px rgba(62,207,142,0.15),
+                0 12px 28px -16px rgba(13,17,23,0.18);
+    position: relative;
+  }
+  .s-mcp .tool-card.is-supabase::after {
+    content: "you just added this";
+    position: absolute; bottom: -38px; left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 12px; border-radius: 999px;
+    background: #3ECF8E; color: #0c2419;
+    font-size: 16px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .s-mcp .footnote {
+    margin-top: 48px;
+    font-size: 24px; line-height: 1.4;
+    color: var(--muted); text-align: center;
+    max-width: 1400px; align-self: center;
+  }
+  .s-mcp .footnote code {
+    font-family: var(--font-mono);
+    background: #fff; border: 1px solid var(--hairline);
+    padding: 2px 10px; border-radius: 6px;
+    color: var(--accent-deep); font-size: 22px;
+  }
+  .s-mcp .footnote b { color: var(--ink); font-weight: 600; }
+
+  .s-accounts .browser-frame image-slot {
+    flex: 1; min-height: 0; width: 100%;
+    display: block;
+  }
+  .s-accounts .caption {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 18px;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+  }
+  .s-accounts .caption .logo-tiny {
+    width: 36px; height: 36px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .s-accounts .caption .logo-tiny svg { width: 100%; height: 100%; display: block; }
+  .s-accounts .caption .text {
+    font-size: 24px; line-height: 1.35;
+    color: var(--ink-soft);
+  }
+  .s-accounts .caption .text b { color: var(--ink); font-weight: 600; }
+  .s-accounts .caption .text code {
+    font-family: var(--font-mono);
+    background: #fff; border: 1px solid var(--hairline);
+    padding: 2px 8px; border-radius: 4px;
+    color: var(--accent-deep); font-size: 22px;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────
+     06–08 — Setup slides (install tools)
+     ─────────────────────────────────────────────────────────────────  */
+  .s-setup .frame { padding-top: 130px; }
+  .s-setup h2.title { margin-bottom: 12px; }
+  .s-setup h2.title em { font-style: normal; color: var(--accent-deep); font-weight: 600; }
+  .s-setup .lede {
+    font-size: 30px; line-height: 1.4;
+    color: var(--ink-soft); max-width: 1500px;
+    margin: 0 0 32px; font-weight: 400;
+    letter-spacing: -0.005em;
+  }
+  .s-setup .lede b { color: var(--ink); font-weight: 600; }
+  .s-setup .lede code {
+    font-family: var(--font-mono);
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    padding: 2px 10px; border-radius: 6px;
+    font-size: 26px; color: var(--accent-deep);
+  }
+  .s-setup .term {
+    background: var(--terminal-bg); color: var(--terminal-fg);
+    border-radius: 16px;
+    font-family: var(--font-mono);
+    box-shadow: 0 28px 70px -28px rgba(13,17,23,0.4),
+                0 2px 0 rgba(255,255,255,0.04) inset;
+    border: 1px solid #1c232c;
+    overflow: hidden;
+    flex: 1; min-height: 0;
+    display: flex; flex-direction: column;
+  }
+  .s-setup .term-bar {
+    display: flex; align-items: center;
+    padding: 18px 22px;
+    border-bottom: 1px solid #1c232c;
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0));
+    position: relative;
+    flex-shrink: 0;
+  }
+  .s-setup .term-bar .dots { display: flex; gap: 10px; }
+  .s-setup .term-bar .dot { width: 14px; height: 14px; border-radius: 50%; }
+  .s-setup .term-bar .dot.r { background: #ff5f57; }
+  .s-setup .term-bar .dot.y { background: #febc2e; }
+  .s-setup .term-bar .dot.g { background: #28c840; }
+  .s-setup .term-bar .title-tab {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    font-size: 22px; color: var(--terminal-dim);
+    letter-spacing: 0.04em;
+  }
+  .s-setup .term-body {
+    padding: 36px 48px;
+    font-size: 30px; line-height: 1.55;
+    flex: 1;
+    overflow: hidden;
+  }
+  .s-setup .term-body .blank { height: 18px; }
+  .s-setup .term-body .indent { padding-left: 2ch; }
+  .s-setup .term-body .path { color: var(--terminal-blue); }
+  .s-setup .term-body .prompt { color: var(--terminal-dim); }
+  .s-setup .term-body .cmd { color: #fff; }
+  .s-setup .term-body .ok { color: var(--terminal-green); }
+  .s-setup .term-body .dim { color: var(--terminal-dim); }
+  .s-setup .term-body .url { color: var(--terminal-blue); text-decoration: underline; text-underline-offset: 4px; }
+  .s-setup .term-body .arrow { color: #ffa657; }
+  .s-setup .term-body .key { color: #c2a3ff; }
+  .s-setup .term-body .val { color: #7ee787; }
+  .s-setup .term-body code { font-family: inherit; }
+
+  /* The caution sticky-notes — Rule 1 and Rule 2 */
+  .note {
+    background: var(--note-bg);
+    border: 1px solid var(--note-edge);
+    border-radius: 6px;
+    padding: 28px 32px;
+    position: relative;
+    box-shadow: 0 12px 28px -16px rgba(140, 100, 0, 0.25);
+    transform: rotate(-1deg);
+  }
+  .note:nth-child(2) { transform: rotate(0.8deg); }
+  .note .tag {
+    font-size: 22px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--note-tag);
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px;
+  }
+  .note .tag .marker {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: var(--note-tag); color: #fff;
+    display: grid; place-items: center;
+    font-size: 16px;
+  }
+  .note .text {
+    font-size: 34px; line-height: 1.3;
+    color: var(--note-ink); font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .note .text b { color: #3a2a02; font-weight: 700; }
+
+  /* ── inline mock of the deal tracker (used on slide 8) ─────────── */
+  .tracker {
+    display: flex; flex-direction: column;
+    background: #fff;
+  }
+  .tracker .bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--hairline);
+    background: #f5f9fc;
+  }
+  .tracker .bar .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .tracker .bar .dot.r { background: #ff5f57; }
+  .tracker .bar .dot.y { background: #febc2e; }
+  .tracker .bar .dot.g { background: #28c840; }
+  .tracker .bar .url {
+    margin-left: 14px; padding: 4px 12px;
+    background: #fff; border: 1px solid var(--hairline);
+    border-radius: 6px;
+    font-family: var(--font-mono); font-size: 16px;
+    color: var(--muted);
+    flex: 1;
+  }
+  .tracker .head {
+    padding: 24px 28px 18px;
+    border-bottom: 1px solid var(--hairline);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .tracker .head h4 {
+    margin: 0; font-size: 26px; font-weight: 600;
+    letter-spacing: -0.01em; color: var(--ink);
+  }
+  .tracker .head .btn {
+    padding: 8px 14px; border-radius: 6px;
+    background: var(--accent-deep); color: #fff;
+    font-size: 15px; font-weight: 600;
+  }
+  .tracker table {
+    width: 100%; border-collapse: collapse;
+    font-size: 17px;
+  }
+  .tracker th, .tracker td {
+    text-align: left; padding: 14px 28px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .tracker th {
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted);
+    background: #fafcfe;
+  }
+  .tracker td { color: var(--ink-soft); font-weight: 400; }
+  .tracker td.deal { color: var(--ink); font-weight: 500; }
+  .tracker td.amt { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; }
+  .pill {
+    display: inline-flex; align-items: center;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 14px; font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .pill.new { background: #eaf6ff; color: var(--accent-deep); }
+  .pill.prog { background: #fff4d6; color: #8a5a00; }
+  .pill.won { background: #e3f5e8; color: #1f7a3a; }
+  .pill.lost { background: #fde6e6; color: #a32a2a; }
+  .tracker .foot {
+    padding: 16px 28px; border-top: 1px solid var(--hairline);
+    background: #fafcfe;
+    display: flex; justify-content: space-between;
+    font-size: 16px;
+  }
+  .tracker .foot .lbl { color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; font-weight: 600; font-size: 13px; }
+  .tracker .foot .sum { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* ────────────────────────────────────────────────────────────────────
+     09 — Schema
+     ──────────────────────────────────────────────────────────────────── */
+  .s-schema .frame { padding-top: 130px; }
+  .s-schema h2.title { margin-bottom: 12px; }
+  .s-schema .lede {
+    font-size: 28px; color: var(--muted);
+    margin: 0 0 40px; max-width: 1400px;
+    font-weight: 500; letter-spacing: 0.01em;
+  }
+  .schema-card {
+    border: 1px solid var(--hairline);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 24px 60px -32px rgba(13,17,23,0.18);
+    overflow: hidden;
+  }
+  .schema-card .table {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr 1.5fr 1.1fr 1.3fr;
+  }
+  .schema-card .cell {
+    padding: 28px 36px;
+    border-bottom: 1px solid var(--hairline);
+    border-right: 1px solid var(--hairline);
+  }
+  .schema-card .cell:nth-child(5n) { border-right: none; }
+  .schema-card .row-head .cell {
+    background: #fafcfe;
+    font-size: 28px; font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .schema-card .row-head .cell .type {
+    display: block; margin-top: 8px;
+    font-size: 22px; font-weight: 500;
+    color: var(--muted); letter-spacing: 0.02em;
+  }
+  .schema-card .row-head .cell .type.special {
+    color: var(--accent-deep);
+    font-family: var(--font-mono);
+    background: rgba(72,175,240,0.10);
+    padding: 4px 10px; border-radius: 6px;
+    display: inline-block;
+  }
+  .schema-card .row-example .cell {
+    border-bottom: none;
+    font-size: 32px; font-weight: 500; color: var(--ink);
+    letter-spacing: -0.01em;
+    background: #fff;
+  }
+  .schema-card .row-example .cell.muted {
+    color: var(--muted); font-weight: 400;
+    font-style: italic; font-size: 26px;
+  }
+  .schema-card .row-example .cell .pill {
+    font-size: 22px; padding: 6px 14px;
+  }
+  .schema-card .row-example .cell .auto {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; border-radius: 6px;
+    background: rgba(72,175,240,0.10);
+    color: var(--accent-deep);
+    font-family: var(--font-mono); font-size: 22px;
+    font-weight: 500;
+  }
+  .schema-card .example-flag {
+    padding: 14px 36px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--hairline);
+    font-size: 20px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+  .s-schema .below {
+    margin-top: 32px; font-size: 26px; color: var(--muted);
+    line-height: 1.4;
+  }
+  .s-schema .below b { color: var(--ink); font-weight: 600; }
+
+  /* ────────────────────────────────────────────────────────────────────
+     10 — Build (live) — five checkpoints
+     ──────────────────────────────────────────────────────────────────── */
+  .s-live { background: #0d1117; color: #fff; }
+  .s-live .frame {
+    justify-content: center; align-items: center;
+    text-align: center;
+  }
+  .s-live .slide-eyebrow { color: var(--accent); }
+  .s-live h2 {
+    margin: 0 0 80px;
+    font-size: 76px; line-height: 1.05;
+    font-weight: 500; letter-spacing: -0.025em;
+    color: #fff;
+  }
+  .s-live h2 em { font-style: normal; color: var(--accent); font-weight: 600; }
+  .checkpoints {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr 60px 1fr 60px 1fr 60px 1fr;
+    gap: 0; align-items: center;
+    width: 100%; max-width: 1600px;
+  }
+  .checkpoint {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 22px;
+  }
+  .checkpoint .circle {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    border: 2px solid rgba(72,175,240,0.45);
+    background: rgba(72,175,240,0.10);
+    display: grid; place-items: center;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 30px; font-weight: 500;
+  }
+  .checkpoint .label {
+    font-size: 36px; font-weight: 600;
+    letter-spacing: -0.015em; color: #fff;
+  }
+  .checkpoints .connector {
+    height: 2px;
+    background: rgba(72,175,240,0.35);
+    transform: translateY(-30px); /* align to circle midline */
+    position: relative;
+  }
+  .checkpoints .connector::after {
+    content: "→"; position: absolute;
+    right: -10px; top: -16px;
+    color: var(--accent); font-size: 22px;
+    font-family: var(--font-mono);
+  }
+  .s-live .below {
+    margin-top: 80px; font-size: 28px; color: #8b949e;
+    font-style: italic;
+  }
+  .s-live .below b { color: var(--accent); font-weight: 600; font-style: normal; }
+  .s-live .slide-num { color: rgba(255,255,255,0.35); }
+
+  /* ────────────────────────────────────────────────────────────────────
+     11 — Sharing payoff: two browser frames
+     ──────────────────────────────────────────────────────────────────── */
+  .s-share .frame { padding-top: 130px; }
+  .s-share h2.title { margin-bottom: 8px; }
+  .s-share .caption {
+    font-size: 32px; color: var(--ink-soft);
+    margin: 0 0 40px; font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .s-share .caption b { color: var(--accent-deep); font-weight: 600; }
+  .s-share .caption .sep { color: var(--accent); margin: 0 14px; font-weight: 700; }
+  .s-share .pair {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 130px; flex: 1; min-height: 0;
+    position: relative;
+  }
+  .s-share .browser {
+    border-radius: 14px; overflow: hidden;
+    background: #fff; border: 1px solid var(--hairline);
+    box-shadow: 0 28px 70px -32px rgba(13,17,23,0.28);
+    display: flex; flex-direction: column;
+  }
+  .s-share .browser .who {
+    position: absolute; top: -36px;
+    font-size: 18px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .s-share .browser.left .who { left: 8px; }
+  .s-share .browser.right .who { right: 8px; }
+  .s-share .new-row { background: rgba(72,175,240,0.10); }
+  .s-share .new-row td.deal { color: var(--accent-deep); }
+  .s-share .pulse {
+    position: absolute;
+    left: 24px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 6px rgba(72,175,240,0.2);
+  }
+  /* The middle arrow + refresh hint */
+  .s-share .mid-arrow {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 8px;
+  }
+  .s-share .mid-arrow svg { width: 90px; height: 44px; color: var(--accent); }
+  .s-share .mid-arrow .lbl {
+    font-size: 18px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-deep);
+    background: #fff; padding: 6px 14px;
+    border-radius: 999px; border: 1px solid var(--hairline);
+  }
+
+  /* ────────────────────────────────────────────────────────────────────
+     12 — Deploy
+     ──────────────────────────────────────────────────────────────────── */
+  .s-deploy {
+    background: linear-gradient(180deg, #eaf6ff 0%, #ffffff 70%);
+  }
+  .s-deploy .frame { justify-content: center; align-items: center; text-align: center; }
+  .s-deploy h2 {
+    margin: 0 0 56px; font-size: 64px; line-height: 1.05;
+    font-weight: 500; letter-spacing: -0.025em; color: var(--ink);
+  }
+  .s-deploy h2 em { font-style: normal; color: var(--accent-deep); font-weight: 600; }
+  .deploy-term {
+    background: var(--terminal-bg); color: var(--terminal-fg);
+    border-radius: 18px; padding: 36px 56px;
+    font-family: var(--font-mono);
+    box-shadow: 0 32px 80px -28px rgba(13,17,23,0.45),
+                0 2px 0 rgba(255,255,255,0.04) inset;
+    border: 1px solid #1c232c;
+    display: inline-flex; align-items: center; gap: 28px;
+  }
+  .deploy-term .prompt { color: var(--accent); font-size: 84px; line-height: 1; font-weight: 500; }
+  .deploy-term .cmd { color: #fff; font-size: 84px; line-height: 1.05; letter-spacing: -0.02em; font-weight: 500; }
+  .deploy-term .cursor {
+    display: inline-block; width: 0.45em; height: 0.85em;
+    background: #fff; vertical-align: middle;
+    margin-left: 8px; animation: blink 1s steps(2) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .s-deploy .chain {
+    margin-top: 56px;
+    display: flex; gap: 32px; align-items: center;
+    font-size: 30px; color: var(--ink-soft);
+  }
+  .s-deploy .chain .arrow { color: var(--accent); font-size: 36px; font-weight: 600; }
+  .s-deploy .chain b {
+    color: var(--ink); font-weight: 600;
+    background: #fff; padding: 8px 18px; border-radius: 8px;
+    border: 1px solid var(--hairline);
+    font-family: var(--font-mono); font-size: 28px;
+  }
+
+  /* ────────────────────────────────────────────────────────────────────
+     13 — Closer: three → one
+     ──────────────────────────────────────────────────────────────────── */
+  .s-closer { background: var(--paper); }
+  .s-closer .frame { padding-top: 130px; }
+  .s-closer h2.title { margin-bottom: 64px; }
+  .s-closer .stack {
+    display: flex; flex-direction: column; align-items: center;
+    flex: 1; justify-content: center; gap: 36px;
+  }
+  .s-closer .tag-row {
+    display: flex; gap: 28px; flex-wrap: wrap; justify-content: center;
+  }
+  .s-closer .tag-row .note {
+    transform: rotate(0deg);
+    padding: 22px 32px; min-width: 320px;
+    text-align: center;
+  }
+  .s-closer .tag-row .note:nth-child(1) { transform: rotate(-1.2deg); }
+  .s-closer .tag-row .note:nth-child(2) { transform: rotate(0.8deg); }
+  .s-closer .tag-row .note:nth-child(3) { transform: rotate(-0.6deg); }
+  .s-closer .tag-row .note .text {
+    font-size: 30px; font-weight: 600;
+    letter-spacing: -0.005em; color: var(--note-ink);
+  }
+  .s-closer .conv-arrow {
+    color: var(--accent);
+  }
+  .s-closer .conv-arrow svg { width: 80px; height: 80px; display: block; }
+  .s-closer .conclusion {
+    font-size: 64px; line-height: 1.1;
+    font-weight: 600; letter-spacing: -0.03em;
+    color: var(--ink); text-align: center;
+    max-width: 1500px;
+  }
+  .s-closer .conclusion em {
+    font-style: normal; color: var(--accent-deep);
+  }
+  .s-closer .below {
+    margin-top: 36px; font-size: 26px; color: var(--muted);
+    text-align: center; max-width: 1100px;
+    letter-spacing: 0.01em;
+  }
+  .s-closer .below b { color: var(--ink); font-weight: 600; }
+
+  /* ────────────────────────────────────────────────────────────────────
+     14 — Next time
+     ──────────────────────────────────────────────────────────────────── */
+  .s-next .frame { justify-content: center; align-items: center; text-align: center; }
+  .s-next .label {
+    font-size: 22px; font-weight: 600;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 40px;
+    display: inline-flex; align-items: center; gap: 14px;
+  }
+  .s-next .label .key {
+    display: inline-grid; place-items: center;
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: rgba(72,175,240,0.10);
+    border: 1px solid rgba(72,175,240,0.35);
+    color: var(--accent-deep);
+  }
+  .s-next h2 {
+    margin: 0; font-size: 84px; line-height: 1.05;
+    font-weight: 500; letter-spacing: -0.03em;
+    color: var(--ink); max-width: 1600px;
+  }
+  .s-next h2 em { font-style: normal; color: var(--accent-deep); font-weight: 600; }
+  .s-next .footnote {
+    margin-top: 80px; font-size: 22px; color: var(--muted);
+    letter-spacing: 0.16em; text-transform: uppercase;
+    font-weight: 600;
+  }
+
+</style>
+
+<script type="application/json" id="speaker-notes">[]</script>
+
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- ── 01 · Title ────────────────────────────────────────────────── -->
+  <section data-label="01 Title" data-screen-label="01 Title" class="s-title">
+    <svg class="motif" viewBox="0 0 920 620" fill="none" stroke="currentColor" stroke-width="1.4">
+      <!-- grid on the left -->
+      <g opacity="0.9">
+        <rect x="20" y="80" width="380" height="400" rx="8"></rect>
+        <line x1="20" y1="140" x2="400" y2="140"></line>
+        <line x1="20" y1="200" x2="400" y2="200"></line>
+        <line x1="20" y1="260" x2="400" y2="260"></line>
+        <line x1="20" y1="320" x2="400" y2="320"></line>
+        <line x1="20" y1="380" x2="400" y2="380"></line>
+        <line x1="20" y1="440" x2="400" y2="440"></line>
+        <line x1="100" y1="80" x2="100" y2="480"></line>
+        <line x1="180" y1="80" x2="180" y2="480"></line>
+        <line x1="260" y1="80" x2="260" y2="480"></line>
+        <line x1="340" y1="80" x2="340" y2="480"></line>
+      </g>
+      <!-- arrow → -->
+      <g stroke-width="2.2">
+        <line x1="430" y1="280" x2="540" y2="280"></line>
+        <polyline points="520,265 540,280 520,295"></polyline>
+      </g>
+      <!-- cloud on the right -->
+      <g stroke-width="1.6">
+        <path d="M620 320 q-40 0 -40 -40 q0 -50 50 -50 q10 -40 60 -40 q50 0 60 40 q40 0 40 40 q0 50 -60 50 z"></path>
+        <circle cx="660" cy="290" r="4" fill="currentColor"></circle>
+        <circle cx="700" cy="290" r="4" fill="currentColor"></circle>
+        <circle cx="740" cy="290" r="4" fill="currentColor"></circle>
+      </g>
+    </svg>
+    <div class="frame">
+      <div class="hero-brand">
+        <img class="hero-logo" src="assets/anduin-full.svg" alt="Anduin">
+        <span class="hero-program">Fast Track</span>
+      </div>
+      <div style="flex:1"></div>
+      <div class="kicker">Day 2 · Vibecoding Workshop</div>
+      <h1 class="hero">Databases &amp;<br>Deployment.</h1>
+      <p class="sub">Your app remembers things. Then it goes live on the internet.</p>
+    </div>
+    <div class="byline">
+      <span><b>Charles Lee</b> · CoderSchool</span>
+      <span>May 28, 2026</span>
+    </div>
+  </section>
+
+  <!-- ── 02 · What today is ───────────────────────────────────────── -->
+  <section data-label="02 Today" data-screen-label="02 Today" class="s-today">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">What today is</div>
+      <h2 class="title">Today: <em>databases &amp; deployment.</em></h2>
+      <div class="cols">
+        <div class="col">
+          <div class="icon">
+            <!-- cylinder / database -->
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="32" cy="14" rx="22" ry="7"></ellipse>
+              <path d="M10 14 v36 c0 4 10 7 22 7 s22 -3 22 -7 v-36"></path>
+              <path d="M10 26 c0 4 10 7 22 7 s22 -3 22 -7"></path>
+              <path d="M10 38 c0 4 10 7 22 7 s22 -3 22 -7"></path>
+            </svg>
+          </div>
+          <h3>Databases</h3>
+          <p>So your app <b>remembers</b> things — and <b>everyone shares</b> the same data.</p>
+        </div>
+        <div class="col">
+          <div class="icon">
+            <!-- cloud -->
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 46 q-10 0 -10 -10 q0 -10 10 -12 q2 -12 16 -12 q12 0 14 12 q10 0 10 10 q0 12 -12 12 z"></path>
+            </svg>
+          </div>
+          <h3>Deployment</h3>
+          <p>So it <b>lives on the internet</b> — not just your laptop.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">02 / 19</div>
+  </section>
+
+  <!-- ── 03 · Agenda ──────────────────────────────────────────────── -->
+  <section data-label="03 Tools" data-screen-label="03 Tools" class="s-tools">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The two tools we'll use</div>
+      <h2 class="title">Meet <em>Supabase</em> and <em>Vercel.</em></h2>
+      <div class="cols">
+        <div class="col">
+          <div class="role-tag">For the database</div>
+          <div class="logo-row">
+            <div class="logo-mark">
+              <svg viewBox="0 0 109 113" fill="none" aria-label="Supabase">
+                <defs>
+                  <linearGradient id="sb-a" x1="54" y1="40" x2="100" y2="110" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="#249361"/>
+                    <stop offset="1" stop-color="#3ECF8E"/>
+                  </linearGradient>
+                </defs>
+                <path d="M63.7076 110.284C60.8481 113.885 55.0502 111.912 54.974 107.314L53.8636 40.0177H99.1666C107.355 40.0177 111.962 49.4644 106.945 55.9202L63.7076 110.284Z" fill="url(#sb-a)"/>
+                <path d="M45.317 2.07103C48.1765 -1.53037 53.9745 0.442775 54.0506 5.04098L54.537 72.3372H9.83833C1.64935 72.3372 -2.95603 62.8905 2.06093 56.4347L45.317 2.07103Z" fill="#3ECF8E"/>
+              </svg>
+            </div>
+            <div class="wordmark supabase">Supabase</div>
+          </div>
+          <h3>Our <em>database.</em></h3>
+          <p>Lives in the cloud. <b>Claude talks to it for us</b> — we never touch it directly.</p>
+        </div>
+        <div class="col">
+          <div class="role-tag">For deployment</div>
+          <div class="logo-row">
+            <div class="logo-mark">
+              <svg viewBox="0 0 76 65" fill="none" aria-label="Vercel">
+                <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="#000"/>
+              </svg>
+            </div>
+            <div class="wordmark">Vercel</div>
+          </div>
+          <h3>How we <em>go live.</em></h3>
+          <p>Your app <span style="color:var(--accent-deep);font-weight:600">→</span> a public URL. <b>One command.</b></p>
+        </div>
+      </div>
+      <div class="setup-strip">
+        <span class="lbl">Today's setup:</span>
+        a free <b>Supabase</b> account + the <b>Vercel</b> command-line tool. Personal accounts, free tiers — takes about two minutes.
+      </div>
+    </div>
+    <div class="slide-num">03 / 19</div>
+  </section>
+
+  <!-- ── 04 · Build intro: the example app ─────────────────────── -->
+  <section data-label="04 Example app" data-screen-label="04 Example app" class="s-build">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Today's example app</div>
+      <h2 class="title">A <em>shared deal tracker.</em></h2>
+      <p class="lede">Think Salesforce, stripped to the bone. Track deals through stages — <b>anyone on the team adds or edits</b>, everyone sees the same numbers, from any browser.</p>
+      <div class="layout">
+        <div class="mock">
+          <div class="tracker">
+            <div class="bar">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="url">deal-tracker.vercel.app</span>
+            </div>
+            <div class="head">
+              <h4>Deals</h4>
+              <div class="btn">+ New Deal</div>
+            </div>
+            <table>
+              <thead>
+                <tr><th>Deal</th><th>Value</th><th>Stage</th><th>Owner</th><th>Created</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="deal">Acme Corp</td><td class="amt">$40,000</td><td><span class="pill prog">In Progress</span></td><td>Jordan</td><td>2026-05-28</td></tr>
+                <tr><td class="deal">Northwind Capital</td><td class="amt">$120,000</td><td><span class="pill new">New</span></td><td>Sam</td><td>2026-05-27</td></tr>
+                <tr><td class="deal">Stark Industries</td><td class="amt">$85,000</td><td><span class="pill won">Won</span></td><td>Priya</td><td>2026-05-26</td></tr>
+                <tr><td class="deal">Wayne &amp; Co.</td><td class="amt">$22,000</td><td><span class="pill lost">Lost</span></td><td>Alex</td><td>2026-05-25</td></tr>
+              </tbody>
+            </table>
+            <div class="foot">
+              <span class="lbl">Total pipeline</span>
+              <span class="sum">$267,000</span>
+            </div>
+          </div>
+        </div>
+        <div class="side">
+          <div class="feature-list">
+            <div class="feature"><div class="marker">→</div><div class="text"><b>Add</b> a new deal.</div></div>
+            <div class="feature"><div class="marker">→</div><div class="text"><b>Move</b> it through stages — New, In&nbsp;Progress, Won, Lost.</div></div>
+            <div class="feature"><div class="marker">→</div><div class="text"><b>See the total pipeline</b> update.</div></div>
+            <div class="feature"><div class="marker">→</div><div class="text"><b>Open it on your phone</b> when we deploy.</div></div>
+          </div>
+          <div class="caution-strip">
+            <div class="tag">FYI</div>
+            <div class="text">No login means anyone with the URL can see and edit — so <b>never put real deal data in this.</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">04 / 19</div>
+  </section>
+
+  <!-- ── 05 · Make accounts ──────────────────────────────────────── -->
+  <section data-label="05 Make accounts" data-screen-label="05 Make accounts" class="s-accounts">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Setup · 1 of 4 · Do this first</div>
+      <h2 class="title">Make a <em>Supabase</em> and a <em>Vercel</em> account.</h2>
+      <p class="lede">Free, personal, no credit card. <b>Two browser tabs</b> — sign up, come back. Takes about a minute each.</p>
+      <div class="pair">
+        <div class="site">
+          <div class="browser-frame">
+            <div class="bar">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="url"><span class="lock">🔒</span> supabase.com</span>
+            </div>
+            <img src="assets/supabase-homepage.jpg" alt="supabase.com homepage" class="homepage-shot">
+          </div>
+          <div class="caption">
+            <div class="logo-tiny">
+              <svg viewBox="0 0 109 113" fill="none" aria-label="Supabase">
+                <path d="M63.7076 110.284C60.8481 113.885 55.0502 111.912 54.974 107.314L53.8636 40.0177H99.1666C107.355 40.0177 111.962 49.4644 106.945 55.9202L63.7076 110.284Z" fill="#3ECF8E"/>
+                <path d="M45.317 2.07103C48.1765 -1.53037 53.9745 0.442775 54.0506 5.04098L54.537 72.3372H9.83833C1.64935 72.3372 -2.95603 62.8905 2.06093 56.4347L45.317 2.07103Z" fill="#3ECF8E" fill-opacity="0.85"/>
+              </svg>
+            </div>
+            <div class="text">Go to <code>supabase.com</code> &middot; click <b>Start your project</b>.</div>
+          </div>
+        </div>
+        <div class="site">
+          <div class="browser-frame">
+            <div class="bar">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="url"><span class="lock">🔒</span> vercel.com</span>
+            </div>
+            <img src="assets/vercel-homepage.jpg" alt="vercel.com homepage" class="homepage-shot">
+          </div>
+          <div class="caption">
+            <div class="logo-tiny">
+              <svg viewBox="0 0 76 65" fill="none" aria-label="Vercel">
+                <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="#000"/>
+              </svg>
+            </div>
+            <div class="text">Go to <code>vercel.com</code> &middot; click <b>Sign Up</b>.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">05 / 19</div>
+  </section>
+
+  <!-- ── 06 · What's MCP? ──────────────────────────────────────── -->
+  <section data-label="06 What is MCP" data-screen-label="06 What is MCP" class="s-mcp">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Quick aside · New acronym</div>
+      <h2 class="title">What's <em>MCP?</em></h2>
+      <p class="lede"><span class="acronym">M</span>odel <span class="acronym">C</span>ontext <span class="acronym">P</span>rotocol. <b>The standard way Claude plugs into outside tools</b> — like USB, but for AI.</p>
+      <div class="diagram">
+        <div class="claude-card"><span class="badge"></span>Claude</div>
+        <div class="stem"></div>
+        <div class="bus">
+          <div class="bus-label">MCP</div>
+        </div>
+        <div class="tools-row">
+          <div class="tool-leg"></div>
+          <div class="tool-leg"></div>
+          <div class="tool-leg"></div>
+          <div class="tool-leg"></div>
+          <div class="tool-leg"></div>
+        </div>
+        <div class="tools-row" style="margin-top:0">
+          <div class="tool-card is-supabase">
+            <div class="ic">
+              <svg viewBox="0 0 109 113" fill="none">
+                <path d="M63.7076 110.284C60.8481 113.885 55.0502 111.912 54.974 107.314L53.8636 40.0177H99.1666C107.355 40.0177 111.962 49.4644 106.945 55.9202L63.7076 110.284Z" fill="#3ECF8E"/>
+                <path d="M45.317 2.07103C48.1765 -1.53037 53.9745 0.442775 54.0506 5.04098L54.537 72.3372H9.83833C1.64935 72.3372 -2.95603 62.8905 2.06093 56.4347L45.317 2.07103Z" fill="#3ECF8E" fill-opacity="0.85"/>
+              </svg>
+            </div>
+            <div class="name">Supabase</div>
+            <div class="role">Database</div>
+          </div>
+          <div class="tool-card">
+            <div class="ic">
+              <svg viewBox="0 0 24 24" fill="#000">
+                <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.02c-3.2.7-3.88-1.36-3.88-1.36-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.78 1.19 1.78 1.19 1.04 1.78 2.72 1.27 3.38.97.1-.75.4-1.27.73-1.56-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18.91-.25 1.89-.38 2.86-.38.97 0 1.95.13 2.86.38 2.18-1.49 3.14-1.18 3.14-1.18.62 1.59.23 2.76.11 3.05.73.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.79.56 4.57-1.52 7.85-5.84 7.85-10.91C23.5 5.65 18.35.5 12 .5z"/>
+              </svg>
+            </div>
+            <div class="name">GitHub</div>
+            <div class="role">Code</div>
+          </div>
+          <div class="tool-card">
+            <div class="ic">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="3" width="18" height="18" rx="4" fill="#5E6AD2"/>
+                <path d="M7 13 l4 4 l6 -7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="name">Linear</div>
+            <div class="role">Tasks</div>
+          </div>
+          <div class="tool-card">
+            <div class="ic">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="2" width="20" height="20" rx="4" fill="#fff" stroke="#000" stroke-width="1.5"/>
+                <text x="12" y="17" text-anchor="middle" font-family="serif" font-size="16" font-weight="700" fill="#000">N</text>
+              </svg>
+            </div>
+            <div class="name">Notion</div>
+            <div class="role">Docs</div>
+          </div>
+          <div class="tool-card">
+            <div class="ic">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="2" width="20" height="20" rx="5" fill="#4A154B"/>
+                <path d="M9 14 a2 2 0 0 1 2 -2 h1 v3 a2 2 0 0 1 -2 2 a2 2 0 0 1 -1 -3z M14 9 a2 2 0 0 1 2 -2 a2 2 0 0 1 2 2 a2 2 0 0 1 -2 2 h-2 v-2z" fill="#ECB22E"/>
+              </svg>
+            </div>
+            <div class="name">Slack</div>
+            <div class="role">Chat</div>
+          </div>
+        </div>
+      </div>
+      <div class="footnote">
+        Next slide: you'll run <code>claude mcp add supabase ...</code> — that's <b>Claude installing a new plug</b>. Then it can read your tables and run queries for you.
+      </div>
+    </div>
+    <div class="slide-num">06 / 19</div>
+  </section>
+
+  <!-- ── 07 · Setup: Connect Claude to Supabase ──────────────────── -->
+  <section data-label="07 Setup Supabase" data-screen-label="07 Setup Supabase" class="s-setup">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Setup · 2 of 4</div>
+      <h2 class="title">Connect Claude to <em>Supabase.</em></h2>
+      <p class="lede">One command. From now on Claude can <b>create tables, read rows, run queries</b> for you — you stay in the chat.</p>
+      <div class="term">
+        <div class="term-bar">
+          <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+          <div class="title-tab">~ — claude — 100×30</div>
+        </div>
+        <div class="term-body">
+          <div><span class="path">~/projects/deal-tracker</span> <span class="prompt">$</span> <span class="cmd">claude mcp add supabase https://mcp.supabase.com/mcp</span></div>
+          <div class="blank"></div>
+          <div><span class="ok">✓</span> <span class="cmd">Added MCP server:</span> <span class="key">supabase</span></div>
+          <div class="indent"><span class="dim">Type:</span> <span class="dim">http</span></div>
+          <div class="indent"><span class="dim">URL: </span> <span class="url">https://mcp.supabase.com/mcp</span></div>
+          <div class="blank"></div>
+          <div><span class="path">~/projects/deal-tracker</span> <span class="prompt">$</span> <span class="cmd">claude</span></div>
+          <div class="blank"></div>
+          <div><span class="arrow">→</span> <span class="cmd">Authenticate</span> <span class="key">supabase</span> <span class="cmd">— opening browser…</span></div>
+          <div class="indent"><span class="dim">Sign in and pick the organization you want Claude to access.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">07 / 19</div>
+  </section>
+
+  <!-- ── 08 · Setup: Drop in your Supabase keys ──────────────────── -->
+  <section data-label="08 Setup env" data-screen-label="08 Setup env" class="s-setup">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Setup · 3 of 4</div>
+      <h2 class="title">Drop in your <em>Supabase keys.</em></h2>
+      <p class="lede">Open <code>.env.local</code> in your project. Paste two lines. Save. <b>Don't commit it.</b><br><span style="font-size:24px;color:var(--muted);font-weight:500;letter-spacing:0.01em">These are <b style="color:var(--ink-soft);font-weight:600">for the app itself</b> at runtime — different from the MCP setup, which is for Claude.</span></p>
+      <div class="term">
+        <div class="term-bar">
+          <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+          <div class="title-tab">.env.local — deal-tracker</div>
+        </div>
+        <div class="term-body">
+          <div><span class="dim"># Drop your Supabase keys here, never in code.</span></div>
+          <div><span class="dim"># Vercel reads this when you deploy; Next.js exposes NEXT_PUBLIC_* to the browser.</span></div>
+          <div class="blank"></div>
+          <div><span class="key">NEXT_PUBLIC_SUPABASE_URL</span>=<span class="url">https://mhyeepgaxaflatxwmksp.supabase.co</span></div>
+          <div><span class="key">NEXT_PUBLIC_SUPABASE_ANON_KEY</span>=<span class="val">sb_publishable_g4VsQH3NW5DvW5qyd-Ascw_nMmyz…</span></div>
+          <div class="blank"></div>
+          <div><span class="dim"># That's it. Save the file. Don't commit it.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">08 / 19</div>
+  </section>
+
+  <!-- ── 09 · Setup: Install the Vercel CLI ──────────────────────── -->
+  <section data-label="09 Setup Vercel" data-screen-label="09 Setup Vercel" class="s-setup">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Setup · 4 of 4</div>
+      <h2 class="title">Install the <em>Vercel CLI.</em></h2>
+      <p class="lede">One install. One login. You're set up to <b>ship from the terminal</b> later.</p>
+      <div class="term">
+        <div class="term-bar">
+          <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+          <div class="title-tab">~ — npm — 100×24</div>
+        </div>
+        <div class="term-body">
+          <div><span class="path">~</span> <span class="prompt">$</span> <span class="cmd">npm i -g vercel</span></div>
+          <div class="blank"></div>
+          <div><span class="dim">added 247 packages in 8s</span></div>
+          <div class="blank"></div>
+          <div><span class="dim">42 packages are looking for funding</span></div>
+          <div class="indent"><span class="dim">run `npm fund` for details</span></div>
+          <div class="blank"></div>
+          <div><span class="path">~</span> <span class="prompt">$</span> <span class="cmd">vercel --version</span></div>
+          <div><span class="val">39.2.6</span></div>
+          <div class="blank"></div>
+          <div><span class="path">~</span> <span class="prompt">$</span> <span class="cmd">vercel login</span></div>
+          <div><span class="arrow">→</span> <span class="cmd">Sign in to Vercel — opening browser…</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">09 / 19</div>
+  </section>
+
+  <!-- ── 10 · Mystery number (dark) ───────────────────────────────── -->
+  <section data-label="10 Mystery" data-screen-label="10 Mystery" class="s-mystery">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="num">1,048,576</div>
+    </div>
+    <div class="slide-num">10 / 19</div>
+  </section>
+
+  <!-- ── 11 · Reveal ──────────────────────────────────────────────── -->
+  <section data-label="11 Reveal" data-screen-label="11 Reveal" class="s-reveal">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="num-wrap">
+        <div class="num">
+          1,048,576
+          <svg class="squiggle" viewBox="0 0 1000 40" preserveAspectRatio="none" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round">
+            <path d="M 5 25 Q 80 5, 160 22 T 320 22 T 480 22 T 640 22 T 800 22 T 990 22"></path>
+          </svg>
+        </div>
+        <div class="annot">= 2<sup>20</sup></div>
+      </div>
+      <div class="below">
+        Excel's row limit.
+        <span class="small">Old Excel: 65,536&nbsp;&nbsp;=&nbsp;&nbsp;2<sup>16</sup></span>
+      </div>
+    </div>
+    <p class="punch">A spreadsheet runs out of <b>bits</b>. A database doesn't.</p>
+    <div class="slide-num">11 / 19</div>
+  </section>
+
+  <!-- ── 12 · The contrast ────────────────────────────────────────── -->
+  <section data-label="12 Contrast" data-screen-label="12 Contrast" class="s-contrast">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Spreadsheet vs database</div>
+      <h2 class="title">Where the data lives matters.</h2>
+      <div class="cols">
+        <div class="col ss">
+          <div class="tag">Spreadsheet</div>
+          <div class="visual">
+            <!-- spreadsheet grid -->
+            <svg viewBox="0 0 220 180" fill="none" stroke="var(--muted)" stroke-width="1.5">
+              <rect x="10" y="20" width="200" height="150" rx="6" fill="#fafcfe"></rect>
+              <line x1="10" y1="48" x2="210" y2="48"></line>
+              <line x1="10" y1="76" x2="210" y2="76"></line>
+              <line x1="10" y1="104" x2="210" y2="104"></line>
+              <line x1="10" y1="132" x2="210" y2="132"></line>
+              <line x1="60" y1="20" x2="60" y2="170"></line>
+              <line x1="110" y1="20" x2="110" y2="170"></line>
+              <line x1="160" y1="20" x2="160" y2="170"></line>
+              <rect x="10" y="20" width="200" height="28" fill="#eef3f8"></rect>
+              <!-- one person -->
+              <circle cx="190" cy="6" r="14" fill="#fff" stroke="var(--muted)" stroke-width="2"></circle>
+              <circle cx="190" cy="2" r="5" fill="var(--muted)" stroke="none"></circle>
+              <path d="M 178 14 q 12 -10 24 0" fill="var(--muted)" stroke="none"></path>
+            </svg>
+          </div>
+          <h3>One file<br>on your laptop.</h3>
+          <ul>
+            <li><b>~1M rows</b> — hard cap</li>
+            <li>Your <b>copy</b></li>
+            <li>On <b>your machine</b></li>
+          </ul>
+        </div>
+        <div class="col db">
+          <div class="tag">Database</div>
+          <div class="visual">
+            <!-- cloud + arrows from people -->
+            <svg viewBox="0 0 320 180" fill="none" stroke="#cae6fb" stroke-width="2">
+              <!-- cloud -->
+              <path d="M120 80 q-22 0 -22 -22 q0 -28 28 -28 q5 -22 32 -22 q28 0 32 22 q22 0 22 22 q0 28 -32 28 z" fill="rgba(72,175,240,0.18)" stroke="var(--accent)" stroke-width="2"></path>
+              <!-- three people -->
+              <g fill="var(--accent)" stroke="none">
+                <circle cx="40" cy="150" r="12"></circle>
+                <circle cx="160" cy="160" r="12"></circle>
+                <circle cx="280" cy="150" r="12"></circle>
+              </g>
+              <g stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round">
+                <path d="M48 138 Q 100 110 130 90"></path>
+                <polyline points="120,82 132,88 125,98"></polyline>
+                <path d="M160 148 Q 162 120 162 100"></path>
+                <polyline points="155,108 162,98 169,108"></polyline>
+                <path d="M272 138 Q 220 110 192 92"></path>
+                <polyline points="200,84 188,88 196,100"></polyline>
+              </g>
+            </svg>
+          </div>
+          <h3>One shared copy<br>in the cloud.</h3>
+          <ul>
+            <li><b>No real limit</b></li>
+            <li><b>One shared copy</b></li>
+            <li><b>Many people at once</b></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">12 / 19</div>
+  </section>
+
+  <!-- ── 13 · Why we need one ─────────────────────────────────────── -->
+  <section data-label="13 Why" data-screen-label="13 Why" class="s-why">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <p class="quote">On your laptop, you'd each have your own board.<br>A database makes it <em>one shared board.</em></p>
+      <div class="diagram">
+        <div class="group">
+          <div class="caption">Three laptops</div>
+          <div class="boards-row">
+            <div class="one-board"><div class="mini-board"></div><div class="person"></div></div>
+            <div class="one-board"><div class="mini-board"></div><div class="person"></div></div>
+            <div class="one-board"><div class="mini-board"></div><div class="person"></div></div>
+          </div>
+        </div>
+        <div class="arrow">
+          <svg viewBox="0 0 80 40" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="6" y1="20" x2="68" y2="20"></line>
+            <polyline points="56,8 72,20 56,32"></polyline>
+          </svg>
+        </div>
+        <div class="group now">
+          <div class="caption">One database</div>
+          <div class="mini-board big"></div>
+          <div class="people-row">
+            <div class="person"></div>
+            <div class="person"></div>
+            <div class="person"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">13 / 19</div>
+  </section>
+
+  
+  <!-- ── 14 · Schema ─────────────────────────────────────────────── -->
+  <section data-label="14 Schema" data-screen-label="14 Schema" class="s-schema">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The spec · Five fields</div>
+      <h2 class="title">What a "deal" is.</h2>
+      <p class="lede">Hand this spec to Claude — the example row does the teaching.</p>
+      <div class="schema-card">
+        <div class="table row-head">
+          <div class="cell"><div>deal name</div><span class="type">text</span></div>
+          <div class="cell"><div>value</div><span class="type">number</span></div>
+          <div class="cell"><div>stage</div><span class="type special">New / In Progress / Won / Lost</span></div>
+          <div class="cell"><div>owner</div><span class="type">just a label</span></div>
+          <div class="cell"><div>created_at</div><span class="type special">automatic</span></div>
+        </div>
+        <div class="example-flag">Example row</div>
+        <div class="table row-example">
+          <div class="cell">Acme Corp</div>
+          <div class="cell">$40,000</div>
+          <div class="cell"><span class="pill prog">In Progress</span></div>
+          <div class="cell">Jordan</div>
+          <div class="cell"><span class="auto">2026-05-28</span></div>
+        </div>
+      </div>
+      <p class="below">Five fields. That's the whole database. <b>Stage</b> is a dropdown; <b>created_at</b> fills itself in.</p>
+    </div>
+    <div class="slide-num">14 / 19</div>
+  </section>
+
+  <!-- ── 15 · Build (live) — five checkpoints ─────────────────────── -->
+  <section data-label="15 Build live" data-screen-label="15 Build live" class="s-live">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Live build · Five checkpoints</div>
+      <h2>One prompt. Five things it needs to do.</h2>
+      <div class="checkpoints">
+        <div class="checkpoint"><div class="circle">01</div><div class="label">Read</div></div>
+        <div class="connector"></div>
+        <div class="checkpoint"><div class="circle">02</div><div class="label">Create</div></div>
+        <div class="connector"></div>
+        <div class="checkpoint"><div class="circle">03</div><div class="label">Update</div></div>
+        <div class="connector"></div>
+        <div class="checkpoint"><div class="circle">04</div><div class="label">Delete</div></div>
+        <div class="connector"></div>
+        <div class="checkpoint"><div class="circle">05</div><div class="label">Sum</div></div>
+      </div>
+      <p class="below">Watch the screen, not this slide. <b>If you fall behind, raise a hand.</b></p>
+    </div>
+    <div class="slide-num">15 / 19</div>
+  </section>
+
+  <!-- ── 16 · Sharing payoff ──────────────────────────────────────── -->
+  <section data-label="16 Sharing" data-screen-label="16 Sharing" class="s-share">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The payoff · The same app, twice</div>
+      <h2 class="title">One shared board.</h2>
+      <p class="caption">Add here <span class="sep">→</span> refresh here <span class="sep">→</span> <b>it's there.</b></p>
+      <div class="pair">
+        <div class="browser left">
+          <div class="who">Your laptop</div>
+          <div class="tracker">
+            <div class="bar">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="url">deal-tracker.vercel.app</span>
+            </div>
+            <table>
+              <thead><tr><th>Deal</th><th>Value</th><th>Stage</th></tr></thead>
+              <tbody>
+                <tr class="new-row"><td class="deal">▸ Helios Partners</td><td class="amt">$60,000</td><td><span class="pill new">New</span></td></tr>
+                <tr><td class="deal">Acme Corp</td><td class="amt">$40,000</td><td><span class="pill prog">In Progress</span></td></tr>
+                <tr><td class="deal">Northwind Capital</td><td class="amt">$120,000</td><td><span class="pill new">New</span></td></tr>
+                <tr><td class="deal">Stark Industries</td><td class="amt">$85,000</td><td><span class="pill won">Won</span></td></tr>
+              </tbody>
+            </table>
+            <div class="foot"><span class="lbl">Total pipeline</span><span class="sum">$305,000</span></div>
+          </div>
+        </div>
+        <div class="mid-arrow">
+          <div class="lbl">Refresh</div>
+          <svg viewBox="0 0 100 56" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="28" x2="84" y2="28"></line>
+            <polyline points="68,10 90,28 68,46"></polyline>
+          </svg>
+        </div>
+        <div class="browser right">
+          <div class="who">Neighbor's laptop</div>
+          <div class="tracker">
+            <div class="bar">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="url">deal-tracker.vercel.app</span>
+            </div>
+            <table>
+              <thead><tr><th>Deal</th><th>Value</th><th>Stage</th></tr></thead>
+              <tbody>
+                <tr class="new-row"><td class="deal">▸ Helios Partners</td><td class="amt">$60,000</td><td><span class="pill new">New</span></td></tr>
+                <tr><td class="deal">Acme Corp</td><td class="amt">$40,000</td><td><span class="pill prog">In Progress</span></td></tr>
+                <tr><td class="deal">Northwind Capital</td><td class="amt">$120,000</td><td><span class="pill new">New</span></td></tr>
+                <tr><td class="deal">Stark Industries</td><td class="amt">$85,000</td><td><span class="pill won">Won</span></td></tr>
+              </tbody>
+            </table>
+            <div class="foot"><span class="lbl">Total pipeline</span><span class="sum">$305,000</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">16 / 19</div>
+  </section>
+
+  <!-- ── 17 · Deploy ─────────────────────────────────────────────── -->
+  <section data-label="17 Deploy" data-screen-label="17 Deploy" class="s-deploy">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">It goes live · Just ask</div>
+      <h2>Ship it. <em>Tell Claude.</em></h2>
+      <div class="deploy-term">
+        <span class="prompt">›</span>
+        <span class="cmd">ship this to vercel<span class="cursor"></span></span>
+      </div>
+      <div class="chain">
+        <span class="arrow">→</span><b>live URL</b>
+        <span class="arrow">→</span><b>open it on your phone</b>
+      </div>
+    </div>
+    <div class="slide-num">17 / 19</div>
+  </section>
+
+  <!-- ── 18 · Closer: three → one ────────────────────────────────── -->
+  <section data-label="18 Closer" data-screen-label="18 Closer" class="s-closer">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The part to remember</div>
+      <h2 class="title">Why this isn't for real data.</h2>
+      <div class="stack">
+        <div class="tag-row">
+          <div class="note"><div class="text">No login</div></div>
+          <div class="note"><div class="text">Full database access</div></div>
+          <div class="note"><div class="text">Public deploy</div></div>
+        </div>
+        <div class="conv-arrow">
+          <!-- three lines converging down into one arrow -->
+          <svg viewBox="0 0 220 80" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 30 8 Q 110 20 110 50"></path>
+            <path d="M 110 8 L 110 50"></path>
+            <path d="M 190 8 Q 110 20 110 50"></path>
+            <line x1="110" y1="40" x2="110" y2="74"></line>
+            <polyline points="96,62 110,76 124,62"></polyline>
+          </svg>
+        </div>
+        <p class="conclusion">= <em>never real Anduin or fund data.</em></p>
+        <p class="below">Real apps: <b>auth, locked-down access, AWS — with engineering.</b></p>
+      </div>
+    </div>
+    <div class="slide-num">18 / 19</div>
+  </section>
+
+  <!-- ── 19 · Next time ──────────────────────────────────────────── -->
+  <section data-label="19 Next time" data-screen-label="19 Next time" class="s-next">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="label">
+        <span class="key">
+          <!-- key icon -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8" cy="15" r="4"></circle>
+            <line x1="10.5" y1="12.5" x2="20" y2="3"></line>
+            <line x1="16" y1="7" x2="19" y2="10"></line>
+            <line x1="13" y1="10" x2="16" y2="13"></line>
+          </svg>
+        </span>
+        Next time
+      </div>
+      <h2>Auth — <em>teaching your app who you are.</em></h2>
+      <div class="footnote">Day 3 · Same time, same room</div>
+    </div>
+    <div class="slide-num">19 / 19</div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>
