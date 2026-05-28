@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What is Node.js?</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root {
+    --bg: #0b0b0f;
+    --panel: #14141b;
+    --panel-hi: #1d1d27;
+    --border: #2a2a36;
+    --text: #e8e8ee;
+    --muted: #8a8a97;
+    --accent: #7c5cff;
+    --accent-hi: #9a82ff;
+    --node: #6cc24a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); min-height: 100%; }
+  body {
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    padding: 64px 32px;
+  }
+  .deck { max-width: 1100px; margin: 0 auto; }
+
+  .slide {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 56px 64px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .eyebrow {
+    color: var(--node);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  h1 {
+    margin: 0 0 18px;
+    font-size: 56px;
+    font-weight: 700;
+    letter-spacing: -1.2px;
+    line-height: 1.05;
+  }
+  h1 em {
+    color: var(--node);
+    font-style: normal;
+  }
+  h2 {
+    margin: 0 0 14px;
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .lede {
+    font-size: 22px;
+    color: var(--text);
+    margin: 0 0 24px;
+    max-width: 760px;
+    line-height: 1.45;
+  }
+  .lede b { color: var(--accent-hi); }
+  p { font-size: 18px; margin: 12px 0; color: #c8c8d2; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 24px;
+  }
+  .card {
+    background: var(--panel-hi);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 26px;
+  }
+  .card h3 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    color: var(--accent-hi);
+  }
+  .card p { font-size: 16px; margin: 8px 0 0; }
+
+  .timeline {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .timeline .step {
+    background: var(--panel-hi);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    position: relative;
+  }
+  .timeline .step .n {
+    color: var(--node);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .timeline .step h4 {
+    margin: 4px 0 8px;
+    font-size: 18px;
+  }
+  .timeline .step p { font-size: 14px; margin: 0; }
+
+  .analogy {
+    background: rgba(108,194,74,0.07);
+    border-left: 3px solid var(--node);
+    border-radius: 0 12px 12px 0;
+    padding: 18px 22px;
+    margin: 24px 0;
+    font-size: 18px;
+  }
+  .analogy strong { color: var(--node); }
+
+  ul.checks {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0;
+  }
+  ul.checks li {
+    font-size: 18px;
+    padding: 6px 0 6px 28px;
+    position: relative;
+  }
+  ul.checks li::before {
+    content: "✓";
+    color: var(--node);
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+
+  code {
+    background: #0a0a10;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.92em;
+    color: #d5d5e0;
+  }
+
+  @media (max-width: 760px) {
+    body { padding: 32px 16px; }
+    .slide { padding: 36px 28px; }
+    h1 { font-size: 36px; }
+    h2 { font-size: 26px; }
+    .lede { font-size: 18px; }
+    .two-col, .timeline { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <section class="slide">
+    <div class="eyebrow">Week 2 · Background</div>
+    <h1>What is <em>Node.js?</em><br>And why do we need it?</h1>
+    <p class="lede">
+      Short version: <b>Node.js lets you run JavaScript on your computer</b> — not just inside a web browser.
+      That's it. That's the whole thing.
+    </p>
+  </section>
+
+  <section class="slide">
+    <h2>JavaScript used to live in one place.</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Before Node</h3>
+        <p>JavaScript only ran inside web browsers. To do anything useful, you needed a webpage open. There was no way to run a <code>.js</code> file from your terminal.</p>
+      </div>
+      <div class="card">
+        <h3>After Node</h3>
+        <p>Someone took the JavaScript engine out of Chrome and made it standalone. Now you can run a <code>.js</code> file the same way you'd run a Python script: <code>node script.js</code>.</p>
+      </div>
+    </div>
+    <div class="analogy">
+      <strong>Analogy:</strong> Node.js is to JavaScript what the Python interpreter is to Python — the program on your computer that knows how to <em>execute</em> the language.
+    </div>
+  </section>
+
+  <section class="slide">
+    <h2>OK, but why do <em>we</em> care?</h2>
+    <p class="lede">Because the entire modern JavaScript toolchain runs on Node. Even if your app eventually runs in a browser, you need Node to <b>build it, install its dependencies, and run a dev server</b>.</p>
+    <ul class="checks">
+      <li><b>npm</b> (the package installer) comes with Node. <code>npm install</code> only works because Node is running it.</li>
+      <li><b>The dev server</b> (the thing that gives you a live-reloading <code>localhost:3000</code>) is a Node program.</li>
+      <li><b>The Vercel CLI</b>, the React build tools, TypeScript — all Node programs.</li>
+      <li>Even though your finished app runs in the <em>user's browser</em>, you ship it from your <em>Node-powered workshop</em>.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <h2>So in practice…</h2>
+    <div class="timeline">
+      <div class="step">
+        <div class="n">01</div>
+        <h4>Install Node</h4>
+        <p>One installer from nodejs.org. You now have <code>node</code> and <code>npm</code> on your machine.</p>
+      </div>
+      <div class="step">
+        <div class="n">02</div>
+        <h4>Install project deps</h4>
+        <p><code>npm install</code> reads <code>package.json</code> and downloads everything the app needs.</p>
+      </div>
+      <div class="step">
+        <div class="n">03</div>
+        <h4>Run / build</h4>
+        <p><code>npm run dev</code> starts the local server. <code>npm run build</code> produces the files Vercel will ship.</p>
+      </div>
+    </div>
+    <p style="margin-top:28px;color:var(--muted);font-size:15px">
+      Bottom line: <b style="color:var(--text)">install it once, forget about it</b>. It's the foundation everything else sits on.
+    </p>
+  </section>
+
+</div>
+</body>
+</html>

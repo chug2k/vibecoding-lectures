@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Week 2 — Setup Cheat Sheet</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root {
+    --bg: #0b0b0f;
+    --panel: #14141b;
+    --panel-hi: #1d1d27;
+    --border: #2a2a36;
+    --text: #e8e8ee;
+    --muted: #8a8a97;
+    --accent: #7c5cff;
+    --accent-hi: #9a82ff;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
+  body {
+    font: 15px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    padding: 48px 24px 96px;
+  }
+  .wrap {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+    margin-bottom: 32px;
+  }
+  h1 {
+    margin: 0 0 6px;
+    font-size: 32px;
+    letter-spacing: -0.3px;
+  }
+  header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .step {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+    position: relative;
+  }
+  .step-num {
+    position: absolute;
+    top: 22px;
+    right: 24px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .step h2 {
+    margin: 0 0 4px;
+    font-size: 20px;
+  }
+  .step .tagline {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .step p { margin: 10px 0; }
+  .step ul, .step ol { margin: 8px 0; padding-left: 22px; }
+  .step li { margin: 6px 0; }
+  .step a {
+    color: var(--accent-hi);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent);
+  }
+  .step a:hover { color: var(--text); }
+
+  .code {
+    position: relative;
+    background: #0a0a10;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 12px 0;
+    overflow: hidden;
+  }
+  .code pre {
+    margin: 0;
+    padding: 14px 16px;
+    padding-right: 76px;
+    overflow-x: auto;
+    font: 13px/1.55 ui-monospace, "SF Mono", Menlo, monospace;
+    color: #d5d5e0;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .code button.copy {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 5px;
+    padding: 4px 9px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .code button.copy:hover { background: var(--panel-hi); color: var(--text); }
+  .code button.copy.copied { color: var(--ok); border-color: var(--ok); }
+
+  .callout {
+    border-left: 3px solid var(--warn);
+    background: rgba(251,191,36,0.07);
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+    font-size: 13px;
+    color: #f5e6c1;
+  }
+  .callout.ok {
+    border-color: var(--ok);
+    background: rgba(74,222,128,0.07);
+    color: #c5f0d5;
+  }
+  .callout strong { color: var(--text); }
+
+  kbd {
+    background: var(--panel-hi);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font: 12px ui-monospace, monospace;
+    color: var(--text);
+  }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Week 2 — Setup cheat sheet</h1>
+    <p>Get Claude Code talking to Supabase via MCP, end to end. Do these in order.</p>
+  </header>
+
+  <section class="step">
+    <div class="step-num">Read first</div>
+    <h2>Are you in the terminal, or are you in Claude?</h2>
+    <div class="tagline">If you take one thing from this page, take this. Mixing them up is the #1 reason things go sideways.</div>
+
+    <p><strong>The terminal</strong> (Terminal.app on Mac, or your VS Code terminal) is your shell. It runs commands like <code>cd</code>, <code>mkdir</code>, <code>ls</code>, <code>npm install</code>, and <code>node</code>. The prompt usually ends in <code>$</code> or <code>%</code>.</p>
+
+    <p><strong>Claude Code</strong> is what starts when you type <code>claude</code> in the terminal and hit enter. The prompt changes — now you're chatting with an AI. Your keystrokes are going to Claude, <em>not</em> the shell.</p>
+
+    <div class="code"><pre><span style="color:#8a8a97">~/projects/deal-tracker $</span> claude        <span style="color:#8a8a97"># &lt;-- in terminal</span>
+<span style="color:#8a8a97">  …Claude starts…</span>
+<span style="color:#7c5cff">&gt;</span> make me a folder called src      <span style="color:#8a8a97"># &lt;-- now you're in Claude</span></pre></div>
+
+    <h3 style="margin-top:18px;font-size:14px;color:var(--accent-hi);text-transform:uppercase;letter-spacing:0.5px">Inside Claude, do this:</h3>
+    <ul>
+      <li>Talk in plain English: <em>“create a new folder called src and add an index.ts file”</em></li>
+      <li>Use slash commands: <code>/mcp</code>, <code>/help</code>, <code>/exit</code>, <code>/clear</code></li>
+    </ul>
+
+    <h3 style="font-size:14px;color:var(--accent-hi);text-transform:uppercase;letter-spacing:0.5px">Inside Claude, <u>don't</u> do this:</h3>
+    <ul>
+      <li>Don't type raw shell commands at the Claude prompt: <code>cd ../foo</code>, <code>mkdir bar</code>, <code>npm install</code>. Claude will <em>try</em> to be helpful, but you'll get weird half-states. Just <em>ask</em> for what you want.</li>
+      <li>Don't paste long terminal output expecting Claude to run it — describe what happened instead.</li>
+    </ul>
+
+    <div class="callout"><strong>Need a shell command right now?</strong> Type <kbd>/exit</kbd> to leave Claude → you're back in the terminal → run the command → type <code>claude</code> to come back. (Or in some setups, you can prefix a line with <code>!</code> to run one shell command from inside Claude — try <code>!pwd</code>.)</div>
+
+    <div class="callout ok"><strong>Quick check:</strong> Is the cursor sitting after a <code>$</code>/<code>%</code>? You're in the terminal. Is it after <code>&gt;</code> with a Claude UI around it? You're in Claude.</div>
+  </section>
+
+  <section class="step">
+    <div class="step-num">Step 1</div>
+    <h2>Install Node.js</h2>
+    <div class="tagline">Required for most modern JS tooling. Use the official installer.</div>
+    <ol>
+      <li>Go to <a href="https://nodejs.org/en/download/current" target="_blank" rel="noopener">nodejs.org/en/download/current</a></li>
+      <li>Download the installer for your OS (the “Current” release is fine).</li>
+      <li>Run the installer, accept defaults.</li>
+      <li>Verify in a fresh terminal:
+        <div class="code">
+          <button class="copy" type="button">Copy</button>
+          <pre>node -v
+npm -v</pre>
+        </div>
+      </li>
+    </ol>
+    <div class="callout">If <code>node -v</code> says “command not found”, close and reopen your terminal so the PATH refreshes.</div>
+  </section>
+
+  <section class="step">
+    <div class="step-num">Step 2</div>
+    <h2>Grab a Supabase Personal Access Token (PAT)</h2>
+    <div class="tagline">This is what authenticates the MCP server to your Supabase account.</div>
+    <ol>
+      <li>Go to <a href="https://supabase.com/dashboard/account/tokens" target="_blank" rel="noopener">supabase.com/dashboard/account/tokens</a>
+        <br><em>(or: profile picture top-right → Account Settings → Tokens)</em>
+      </li>
+      <li>Click <strong>Generate new token</strong>, give it a name (e.g. <code>claude-mcp</code>).</li>
+      <li>Copy the token immediately — it starts with <code>sbp_…</code> and you only see it once.</li>
+    </ol>
+    <div class="callout"><strong>If prompted by Supabase:</strong> choose <strong>“this project”</strong> (not global), and <strong>“token”</strong> (not keys). Tokens are user-scoped, keys are project-scoped — MCP wants a token.</div>
+  </section>
+
+  <section class="step">
+    <div class="step-num">Step 3</div>
+    <h2>Add the Supabase MCP server to Claude Code</h2>
+    <div class="tagline">One command. Replace <code>$SUPABASE_PAT</code> with the token from step 2.</div>
+    <div class="code">
+      <button class="copy" type="button">Copy</button>
+      <pre>claude mcp add --transport http supabase -s project \
+  "https://mcp.supabase.com/mcp" \
+  --header "Authorization: Bearer $SUPABASE_PAT"</pre>
+    </div>
+    <p>Concretely it looks like:</p>
+    <div class="code">
+      <button class="copy" type="button">Copy</button>
+      <pre>claude mcp add --transport http supabase -s project \
+  "https://mcp.supabase.com/mcp" \
+  --header "Authorization: Bearer sbp_yourtokenhere"</pre>
+    </div>
+    <div class="callout">Already added? Remove and re-add:
+      <div class="code" style="margin-top:8px">
+        <button class="copy" type="button">Copy</button>
+        <pre>claude mcp remove supabase -s project</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="step">
+    <div class="step-num">Step 4</div>
+    <h2>Verify it works</h2>
+    <div class="tagline">Restart Claude Code so it picks up the new MCP config, then check.</div>
+    <ol>
+      <li>In Claude Code, type <kbd>/exit</kbd> to quit, then re-run <code>claude</code>.</li>
+      <li>Once in, type <kbd>/mcp</kbd>. You should see <code>supabase</code> in the list with a green “connected” status.</li>
+    </ol>
+    <div class="callout ok">If it shows up green: you're done. Try asking Claude to <em>“list my supabase projects”</em> as a smoke test.</div>
+    <div class="callout">Red / disconnected? 99% of the time it's a bad PAT — regenerate it, run <code>claude mcp remove supabase -s project</code>, and redo step 3.</div>
+  </section>
+
+  <footer>
+    Week 2 — Databases &amp; Deployment · cheat sheet · vibecoding lectures
+  </footer>
+</div>
+
+<script>
+  document.querySelectorAll(".code .copy").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const pre = btn.parentElement.querySelector("pre");
+      try {
+        await navigator.clipboard.writeText(pre.innerText);
+        btn.textContent = "Copied";
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.textContent = "Copy";
+          btn.classList.remove("copied");
+        }, 1400);
+      } catch (_) {
+        btn.textContent = "Press ⌘C";
+      }
+    });
+  });
+</script>
+</body>
+</html>

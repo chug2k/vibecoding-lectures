@@ -18,19 +18,27 @@
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
   body {
+    --sidebar-w: 260px;
     font: 14px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
     background: var(--bg);
     color: var(--text);
     display: grid;
-    grid-template-columns: 260px 1fr;
+    grid-template-columns: var(--sidebar-w) 1fr;
     grid-template-rows: 100%;
+    transition: grid-template-columns 0.2s ease;
   }
+  body.sidebar-hidden { --sidebar-w: 0px; }
 
-  aside {
+  aside.sidebar {
     background: var(--panel);
     border-right: 1px solid var(--border);
-    overflow-y: auto;
+    overflow: hidden;
     padding: 18px 14px;
+  }
+  body.sidebar-hidden aside.sidebar {
+    padding-left: 0;
+    padding-right: 0;
+    border-right: 0;
   }
   .brand {
     font-weight: 700;
@@ -103,6 +111,30 @@
     gap: 8px;
   }
   [hidden] { display: none !important; }
+
+  .sidebar-toggle {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 11;
+    background: rgba(20,20,27,0.85);
+    backdrop-filter: blur(8px);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    font-family: inherit;
+    padding: 0;
+  }
+  .sidebar-toggle:hover { opacity: 1; background: var(--panel-hi); }
   .placeholder kbd {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -191,7 +223,7 @@
 </style>
 </head>
 <body>
-  <aside>
+  <aside class="sidebar">
     <div class="brand">
       Vibe Coding
       <small>Lecture viewer</small>
@@ -200,6 +232,7 @@
   </aside>
 
   <main>
+    <button id="sidebarToggle" class="sidebar-toggle" type="button" title="Toggle sidebar (\)" aria-label="Toggle sidebar">☰</button>
     <div class="topbar" id="topbar" hidden>
       <button id="notesToggle" type="button">Notes</button>
       <a id="openNew" target="_blank" rel="noopener">Open in new tab ↗</a>
@@ -266,6 +299,16 @@ for now.</code></pre>
           `,
         },
         {
+          title: "What is Node.js?",
+          sub: "supplemental — background",
+          path: "wk2/what-is-nodejs.html",
+        },
+        {
+          title: "Setup cheat sheet",
+          sub: "supplemental — Node + Supabase MCP",
+          path: "wk2/cheatsheet.html",
+        },
+        {
           title: "Deal Tracker demo",
           sub: "supplemental — live app",
           path: "https://deal-tracker-nu-bice.vercel.app/",
@@ -288,6 +331,29 @@ for now.</code></pre>
 
   notesToggle.addEventListener("click", () => {
     notesEl.classList.toggle("open");
+  });
+
+  const sidebarToggle = document.getElementById("sidebarToggle");
+  const SIDEBAR_KEY = "vc.sidebarHidden";
+  function setSidebar(hidden) {
+    document.body.classList.toggle("sidebar-hidden", hidden);
+    try { localStorage.setItem(SIDEBAR_KEY, hidden ? "1" : "0"); } catch (_) {}
+  }
+  sidebarToggle.addEventListener("click", () => {
+    setSidebar(!document.body.classList.contains("sidebar-hidden"));
+  });
+  // Restore preference.
+  try {
+    if (localStorage.getItem(SIDEBAR_KEY) === "1") setSidebar(true);
+  } catch (_) {}
+  // Keyboard shortcut: `\` toggles the sidebar.
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "\\" && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      e.preventDefault();
+      setSidebar(!document.body.classList.contains("sidebar-hidden"));
+    }
   });
 
   function render() {
