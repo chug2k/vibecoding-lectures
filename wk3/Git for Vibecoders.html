@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Git for Vibecoders — 90 min</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  :root{
+    --type-statement: 92px;
+    --type-title: 74px;
+    --type-subtitle: 38px;
+    --type-lead: 36px;
+    --type-body: 32px;
+    --type-small: 26px;
+    --type-eyebrow: 25px;
+    --type-code: 31px;
+    --pad-x: 120px;
+    --pad-top: 80px;
+    --pad-bottom: 80px;
+    --gap-section: 52px;
+    --ink: #1F3145;
+    --term-bg: #16242F;
+  }
+  html,body{margin:0;background:#000;}
+  deck-stage:not(:defined){visibility:hidden;}
+
+  section{
+    box-sizing:border-box;
+    font-family:var(--font-display);
+    color:var(--color-gray-9);
+    background:#fff;
+    display:flex;
+    flex-direction:column;
+    padding:var(--pad-top) var(--pad-x) var(--pad-bottom);
+    -webkit-font-smoothing:antialiased;
+  }
+  section.tint{ background:var(--bg-page); }
+  section.navy{ background:var(--ink); color:#fff; }
+  section.cover{ background:url('assets/brand/cover-gradient.png') center/cover; }
+  section.close{ background:url('assets/brand/wide-gradient.png') center/cover; }
+
+  /* ── header ── */
+  .head{ display:flex; justify-content:space-between; align-items:center; flex:0 0 auto; }
+  .brand{ display:flex; align-items:center; gap:11px; }
+  .brand img{ width:34px; height:34px; display:block; }
+  .brand span{ font-family:var(--font-display); font-weight:700; font-size:25px; letter-spacing:-0.01em; color:var(--ink); }
+  .navy .brand span, .cover .brand span, .close .brand span{ color:#fff; }
+  .meta{ font-size:var(--type-small); color:var(--fg-muted); letter-spacing:0.02em; }
+  .navy .meta{ color:rgba(255,255,255,0.62); }
+
+  /* ── body ── */
+  .body{ flex:1 1 auto; display:flex; flex-direction:column; margin-top:var(--gap-section); min-height:0; }
+  .body.center{ justify-content:center; margin-top:0; }
+
+  /* ── type ── */
+  .eyebrow{ font-size:var(--type-eyebrow); font-weight:600; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-primary-4); margin:0 0 22px; }
+  .navy .eyebrow{ color:#7FC4F5; }
+  .cover .eyebrow, .close .eyebrow{ color:#fff; opacity:0.92; }
+  .chip-ex{ display:inline-flex; align-items:center; gap:10px; font-size:var(--type-eyebrow); font-weight:600; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-warning-5); background:var(--color-warning-1); border-radius:var(--radius-full); padding:9px 20px 9px 16px; margin:0 0 22px; }
+  .navy .chip-ex{ color:#FFD79A; background:rgba(255,193,94,0.16); }
+  .chip-ex .dot{ width:11px; height:11px; border-radius:50%; background:var(--color-warning-4); }
+
+  .title{ font-size:var(--type-title); font-weight:600; letter-spacing:-0.022em; line-height:1.06; margin:0; color:var(--ink); text-wrap:balance; }
+  .navy .title{ color:#fff; }
+  .statement{ font-size:var(--type-statement); font-weight:600; letter-spacing:-0.025em; line-height:1.05; margin:0; color:#fff; text-wrap:balance; }
+  .subtitle{ font-size:var(--type-subtitle); font-weight:400; line-height:1.34; color:var(--fg-muted); margin:24px 0 0; max-width:1180px; text-wrap:pretty; }
+  .navy .subtitle{ color:rgba(255,255,255,0.78); }
+  .blue{ color:var(--color-primary-4); }
+  .navy .blue{ color:#7FC4F5; }
+
+  /* ── footer ── */
+  .foot{ position:absolute; left:var(--pad-x); right:var(--pad-x); bottom:42px; display:flex; justify-content:space-between; align-items:baseline; font-size:var(--type-small); color:var(--fg-subtle); }
+  .foot b{ font-weight:600; color:var(--fg-muted); }
+  .navy .foot{ color:rgba(255,255,255,0.5); }
+  .navy .foot b{ color:rgba(255,255,255,0.7); }
+
+  /* ── terminal ── */
+  .term{ background:var(--term-bg); border:1px solid rgba(255,255,255,0.07); border-radius:var(--radius-12); padding:30px 36px 34px; font-family:var(--font-mono); font-size:var(--type-code); line-height:1.7; color:#C7D4E0; box-shadow:var(--shadow-dialog); }
+  .term .bar{ display:flex; gap:9px; margin-bottom:22px; }
+  .term .bar i{ width:14px; height:14px; border-radius:50%; background:#3A4D5E; display:block; }
+  .term .row{ white-space:pre-wrap; }
+  .term .c{ color:#6E8499; }
+  .term .p{ color:#48AFF0; }
+  .term .k{ color:#9AD4FF; }
+  .term .a{ color:#E6B673; }
+  .term .hl{ color:#fff; }
+
+  /* ── two definitions ── */
+  .twodef{ display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-top:8px; }
+  .def{ background:#fff; border:1px solid var(--border-hairline); border-radius:var(--radius-16); padding:44px 44px 46px; }
+  .def .tag{ font-family:var(--font-mono); font-size:34px; font-weight:600; color:var(--color-primary-4); margin-bottom:18px; }
+  .def p{ font-size:var(--type-body); line-height:1.4; color:var(--fg-default); margin:0; }
+
+  /* ── table ── */
+  table.split{ width:100%; border-collapse:collapse; margin-top:4px; }
+  table.split th{ text-align:left; font-size:var(--type-small); font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--fg-subtle); padding:0 0 18px; border-bottom:2px solid var(--color-gray-3); }
+  table.split td{ padding:17px 0; border-bottom:1px solid var(--color-gray-3); vertical-align:middle; }
+  table.split td.thing{ font-size:30px; color:var(--ink); }
+  table.split td.thing code{ font-family:var(--font-mono); font-size:28px; color:var(--ink); background:var(--color-gray-1); border:1px solid var(--color-gray-3); border-radius:var(--radius-4); padding:3px 10px; }
+  .ans{ display:inline-flex; align-items:center; font-size:24px; font-weight:600; border-radius:var(--radius-full); padding:7px 18px; letter-spacing:0.01em; }
+  .ans.git{ color:var(--color-primary-5); background:var(--color-primary-1); }
+  .ans.gh{ color:#fff; background:var(--ink); }
+  .ans.mix{ color:var(--color-gray-8); background:var(--color-gray-2); }
+
+  /* ── noun list ── */
+  .nouns{ display:flex; flex-direction:column; gap:0; margin-top:4px; }
+  .noun{ display:grid; grid-template-columns:340px 1fr; gap:48px; align-items:baseline; padding:21px 0; border-bottom:1px solid var(--color-gray-3); }
+  .noun:last-child{ border-bottom:none; }
+  .noun .n{ font-family:var(--font-mono); font-size:32px; font-weight:600; color:var(--color-primary-4); }
+  .noun .d{ font-size:30px; line-height:1.35; color:var(--fg-default); }
+
+  /* ── callout ── */
+  .callout{ display:flex; gap:18px; align-items:flex-start; margin-top:34px; padding:24px 30px; background:var(--color-warning-1); border-radius:var(--radius-12); max-width:1180px; }
+  .callout .k{ font-size:30px; line-height:1.35; color:#7A5A12; }
+  .callout .k b{ color:#5E4407; font-weight:600; }
+
+  /* ── flow (slide 7) ── */
+  .flow{ display:flex; align-items:stretch; gap:14px; margin-top:8px; }
+  .step{ flex:1 1 0; background:#fff; border:1px solid var(--border-hairline); border-radius:var(--radius-12); padding:26px 14px; display:flex; align-items:center; justify-content:center; text-align:center; font-family:var(--font-mono); font-size:25px; color:var(--ink); line-height:1.3; }
+  .sep{ flex:0 0 auto; align-self:center; color:var(--color-primary-3); font-size:34px; }
+
+  /* ── loop (slide 9) ── */
+  .loop{ display:flex; align-items:stretch; gap:6px; margin-top:8px; }
+  .lnode{ flex:1 1 0; min-width:0; background:var(--color-gray-1); border:1px solid var(--border-hairline); border-radius:var(--radius-12); padding:22px 6px; display:flex; flex-direction:column; align-items:center; gap:13px; text-align:center; }
+  .lnode .b{ width:44px; height:44px; border-radius:50%; background:var(--color-primary-1); color:var(--color-primary-5); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:25px; }
+  .lnode .l{ font-weight:500; font-size:24px; line-height:1.18; color:var(--ink); }
+  .lsep{ flex:0 0 auto; align-self:center; color:var(--color-primary-3); font-size:25px; }
+  .loopcap{ display:flex; align-items:center; gap:14px; justify-content:center; margin-top:38px; font-size:30px; color:var(--fg-muted); }
+  .loopcap .r{ font-size:38px; color:var(--color-primary-4); }
+
+  /* ── checklist (slide 8) ── */
+  .split2{ display:grid; grid-template-columns:1.18fr 0.82fr; gap:52px; align-items:start; margin-top:8px; }
+  .split2 .term{ font-size:26px; }
+  .split2 .term .row{ white-space:nowrap; }
+  .checkhd{ font-size:30px; font-weight:600; color:var(--ink); margin:0 0 24px; }
+  .check{ display:flex; flex-direction:column; gap:20px; }
+  .check li{ list-style:none; display:flex; gap:18px; align-items:flex-start; font-size:29px; line-height:1.32; color:var(--fg-default); }
+  .check ul{ margin:0; padding:0; display:flex; flex-direction:column; gap:20px; }
+  .check .box{ flex:0 0 auto; width:34px; height:34px; border-radius:var(--radius-6); border:2px solid var(--color-primary-3); margin-top:3px; }
+
+  /* ── merge/rebase + dev/staging ── */
+  .duo{ display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-top:8px; }
+  .tri{ display:grid; grid-template-columns:repeat(3,1fr); gap:32px; margin-top:8px; }
+  .card{ background:#fff; border:1px solid var(--border-hairline); border-radius:var(--radius-16); padding:38px 40px 40px; }
+  .card .h{ font-size:36px; font-weight:600; color:var(--color-primary-4); margin:0 0 16px; }
+  .card .h.mono{ font-family:var(--font-mono); font-size:32px; }
+  .card p{ font-size:29px; line-height:1.38; color:var(--fg-default); margin:0; }
+  .bigline{ font-size:48px; font-weight:600; letter-spacing:-0.015em; color:var(--ink); margin-top:auto; text-wrap:balance; }
+
+  /* ── badges (slide 13) ── */
+  .badges{ display:flex; align-items:center; gap:34px; margin-top:36px; }
+  .badge{ display:inline-flex; font-family:var(--font-mono); font-size:27px; border-radius:var(--radius-4); overflow:hidden; box-shadow:var(--shadow-card); }
+  .badge .lbl{ background:#3A4D5E; color:#fff; padding:11px 18px; }
+  .badge .val{ padding:11px 18px; color:#fff; font-weight:600; }
+  .badge .val.red{ background:var(--color-danger-4); }
+  .badge .val.green{ background:var(--color-success-4); }
+  .badgearrow{ font-size:40px; color:var(--color-primary-3); }
+  .badgenote{ font-size:28px; color:var(--fg-muted); }
+
+  /* ── stack of two lines (loop emphasis) ── */
+  .lead{ font-size:var(--type-lead); line-height:1.4; color:var(--fg-default); margin:0; max-width:1200px; text-wrap:pretty; }
+  .keyline{ font-size:42px; font-weight:600; letter-spacing:-0.012em; color:var(--ink); margin:38px 0 0; }
+  .micro{ font-size:28px; color:var(--fg-subtle); margin:20px 0 0; }
+  .navy .keyline{ color:#fff; }
+
+  /* ── thesis points (slide 4) ── */
+  .points{ display:flex; gap:0; margin-top:56px; }
+  .point{ flex:1 1 0; padding:0 44px; border-left:1px solid rgba(255,255,255,0.16); }
+  .point:first-child{ padding-left:0; border-left:none; }
+  .point .num{ font-family:var(--font-mono); font-size:26px; color:#7FC4F5; margin-bottom:16px; }
+  .point .t{ font-size:36px; font-weight:500; line-height:1.25; color:#fff; }
+  .point.key .t{ color:#9AD4FF; }
+</style>
+<script type="application/json" id="speaker-notes">
+[
+"Open cold — don't read this slide. Open a terminal and show them something real: make a one-line change to a file, then run git status and git diff so the room watches the machinery before we name anything. The whole frame for the next ninety minutes is that the AI writes the code and runs the git plumbing now, so your job moves to judgment — one task per branch, a PR that tells one clear story, and reading the diff before you trust it. The terminal is where this session really lives; the slides are just the few things worth projecting.",
+"Start with why this thing exists at all, because it makes everything after it click. Strip it all the way down and Git solves two everyday problems: we need to work together on the same code without stepping on each other, and we need to keep track of our work so nothing gets lost. Every change becomes a save point you can go back to, you can always see exactly what changed, and several people — plus your AI tools — can work on the same project at once without overwriting each other. Everything else today is just the machinery that makes those two things true.",
+"Quick laugh, but it's the whole 'why' in one image — this is what keeping track of your work looks like without Git: project, project-final, project-final-for-real. Everyone has been at the bottom of that brain. Ten seconds on it, then move on.",
+"If I had to guess where most early confusion comes from, it's these two words getting tangled, so let's go slow. Git is the tool that lives on your laptop — it quietly keeps the receipts, recording every change as a checkpoint you can look at or throw away. GitHub is the website where your team reads those receipts: pull requests, issues, status, all of it. You can happily use Git without ever touching GitHub, but you can't do much on GitHub without Git underneath. Same root word, very different jobs.",
+"This one always gets a laugh — someone earnestly describing GitHub without realizing it already exists: store your code in the cloud, check in versions, revert anytime, a hub for code. And right underneath, the cautionary version: four months of work gone because there was no version control at all. That's the stakes, said funnier than I could.",
+"This tends to be the slide people photograph, so give it a beat. The rule of thumb: if it happens on your machine — status, commit, the dot-git folder, gitignore — that's Git. If it's about your team seeing your work — pull requests, issues, CI, badges — that's GitHub. Don't get bogged down in edge cases here; in a minute we'll draw the picture that shows why the line between 'your machine' and 'the server' is blurrier than it looks.",
+"People get scared of Git because it feels like a thousand commands, but the day-to-day is really five verbs. Commit saves a checkpoint of your work on your laptop. Branch starts a separate line of work so you don't disturb main. Push sends your commits up to GitHub, and pull brings everyone else's commits down to you. And merge or rebase is how you fold a branch back together with another — we'll dig into that pair in a few slides. Honestly, get these five and you've got about ninety percent of it; everything else is a detail you can look up.",
+"The point of this one: the beginner and the expert do exactly the same three things — add, commit, push. Only the anxious middle memorizes the scary commands, and those are precisely the ones your AI handles now, so you get to live at either end of the curve and skip the misery in between.",
+"Before anyone touches a terminal, give them the picture, because the words finally click once you can see them. Each dot is a commit — a full snapshot of the project you can always return to. A branch is just a separate line of those dots, so you can work on something without disturbing main, and merging brings the lines back together. Then the part that surprises people: every copy of the repo — yours and GitHub's — holds the entire history. There's no special central server; GitHub is simply the copy everyone agrees to meet at. That's what 'decentralized' really means, and it's exactly why push and pull make sense — they're just syncing two equal copies.",
+"First exercise, and it's the whole real loop in miniature — everyone do it together. I'll have already created a repo, so you clone it by copying the URL from GitHub's green Code button and running git clone. Then open Claude, make a small change, and just tell it to branch the change and open a PR — it handles the git for you. Hop over to GitHub, add a neighbor as the reviewer, and once they approve, merge it with 'Rebase and merge'. Don't worry that we haven't explained branches, PRs, or rebasing in depth yet — the point is to feel the end-to-end shape once, and we'll unpack each piece over the next few slides.",
+"Before we make a conflict on purpose, here's the situation in one image — two people, the same file, the same line, set to two different values. It happens all the time: two of you grab the same config and each points it somewhere different. Have a laugh, then let's look at it in real code.",
+"Here it is for real — two editors open on the same config.js, both of you change supabaseUrl on the same line to a different value, and both commit. Git now has two truths for one line and flatly refuses to guess; it stops and asks a human to choose. That's all a conflict is — not an error you broke, just Git being careful. With that in mind, let's create one on purpose and resolve it together.",
+"Now that everyone can branch, let's talk about what happens when two branches touch the same thing — this is the exercise that always runs long, so set it up tightly. A conflict just means two people changed the same spot, and Git won't guess; it hands the call to a human. Show the marker shape once so they recognize it in the wild, but nobody should be hand-editing it. Setup: two people change the same line in team.json on two branches, person A merges first, person B pulls with rebase and hits the conflict, and B asks the AI to resolve it keeping both intents, then reads the diff. A conflict isn't an emergency — it's just a sign two people's work overlapped.",
+"So if branches drift apart, merge and rebase are the two ways to bring them back together — I just want everyone to leave owning these two words. Merge ties two branches together and keeps the full history, sometimes with a merge commit. Rebase replays your commits on top of the latest base for a cleaner, more linear history. For short-lived feature branches, rebase usually reads nicer. The one caution: don't surprise-rebase a shared, long-running branch, because rewriting shared history pulls the rug out from under everyone else. In practice you just say 'rebase my branch onto main and resolve the conflicts' and let the tool do it.",
+"And here's why rebase is worth the habit, in one image — the top is a clean fast-forward pull that just slots in, the bottom is the same pull turned into a wall of merge conflicts. Rebasing onto the latest main keeps your history linear and tidy, so day to day it feels a lot more like the top. Marie Kondo would approve.",
+"This is the turn in the session — everything before this was mechanics, and this is the part that's actually yours. It's 2026: the AI handles the conflicts, the rebases, and opening PRs, and it's genuinely good at all of it. So the value you add isn't memorizing commands, it's judgment — deciding a branch is one task, making sure a PR tells one clear story, and reading the diff before you put your name on it. Say it plainly, let it land, and then we'll spend the next few slides on what that looks like in practice.",
+"Here's the routine that judgment turns into — an opinionated default, not a law, but most teams land close to it. Pull main, branch off it, make small commits, push, open the PR, rebase onto the latest main, get a review, merge, delete the branch, and start again on the next task. One nice thing to plant for later, not to build in class: you can fold your team's conventions — branch naming, rebase preferences, 'show me the diff first' — into a Claude Code or Codex skill, so the assistant just follows the house rules on its own.",
+"If the nine-step loop felt like a lot, this is the slide that puts everyone at ease — it all boils down to three rules. Always branch off main, so every piece of work starts from the same known-good place. Don't branch off another branch, because stacking branches is where people tie themselves in knots — keep everything rooted in main. And open a PR, choosing rebase when it merges back, so history stays clean and linear. Be honest that this is heavily simplified and Git has far more to offer, but for now this is genuinely enough to work safely. Best of all, you can drop these three lines into an AGENTS.md and your agent will just follow them — or you can simply work this way yourself. One guardrail worth saying out loud: avoid force-pushing. Almost everything in Git is recoverable once it's committed, so a force-push is really the main way to actually lose work — including other people's — which is why you or your agent should be certain it's needed before reaching for it, and in normal day-to-day work you basically never are.",
+"Here's the force warning as a cartoon — 'let me just force-push to fix this,' deletes the whole team's history, concludes Git is too hard. Don't be this person. Almost everything in Git is recoverable; this is the one move that genuinely isn't, so make your agent prove it really needs it.",
+"Third exercise, and this is where the judgment becomes concrete. Branch off a fresh main, make one focused change, push it, and open a PR back into main. The commands are the part you'll happily let the tool handle — the real work is the checklist, and that part is on you. Does this PR do one thing? Are there unrelated AI edits sneaking into the diff? Could someone follow it from the diff alone? Is the target branch right? You didn't type any of this by hand, so what you're really doing is vouching that it's coherent and well-scoped. For branch names, a simple convention helps: feature-slash, fix-slash, docs-slash, chore-slash. And one aside worth landing: branches are handy locally too — if you want to try a risky idea or compare two versions, keep it on a branch and switch back and forth. We won't run git switch by hand today; you'd just tell Claude Code to try it in a branch so you can flip between them.",
+"Quick one, and easy to cut if we're short on time. Main — sometimes called master — is your production-ready source of truth. Staging is pre-production, where you test and integrate. Dev is the active integration branch. The point isn't the diagram, it's matching the ceremony to your team's actual risk: a small team can PR straight to main and that's completely fine, while a team with real money on the line might run dev to staging to main. Just don't copy a workflow off the internet because it happened to have more boxes.",
+"This one's a detail, but a useful one — and an easy live moment. Your AI tools are constantly dropping caches, scratch files, and local config into your folder, and gitignore keeps that noise out of the shared history. Make a notes-dot-tmp file, run git status so everyone sees it appear, add star-dot-tmp to gitignore, run status again, and it's gone. The thing worth saying clearly is that gitignore only stops files from entering history in the first place — if you've already committed an API key, gitignore won't save you; that key is still in there, and that's a different problem with a different fix.",
+"Last exercise, and don't skip it for a check that's always green. Workflows live in dot-github-slash-workflows, and they run on every push and PR. Make the CI check validate the exact file they keep editing — a one-liner that loads team.json and fails if the JSON is broken. Then break team.json on purpose, push, and watch the check go red right there on the PR; fix it, push, watch it turn green. That red-to-green moment is the whole point of CI. And a badge is just an image whose URL returns live status — shields.io will make you the same kind of badge for license, version, coverage, whatever you like.",
+"One last laugh before we land the plane: in case of fire — commit, push, leave the building. It's a joke, but it's also the literal reason we push: your work should live on GitHub, not only on the laptop that's currently on fire. Nice segue into the one habit to keep.",
+"This is the close, so land it gently and stop. The assistant writes the code and runs the plumbing — the conflicts, the rebases, the PRs, all of it. The part that stays yours is reading what actually changed and being willing to stand behind it. Git status, git diff — run them before you trust yourself, before you trust the AI, and before you ask anyone else to review. It's a small habit, but it'll still be useful long after any specific command we covered today. Thanks, everyone."
+]
+</script>
+<script src="deck-stage.js"></script>
+</head>
+<body>
+<deck-stage width="1920" height="1080">
+
+  <!-- 1 — TITLE -->
+  <section class="cover" data-label="Title">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-white.svg" alt=""><span>Anduin</span></div>
+      <div class="meta" style="color:#fff;opacity:.9;">90-minute workshop</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">Terminal-first · Collaborating with AI</p>
+      <h1 class="title" style="font-size:108px;line-height:1.02;">Git for Vibecoders</h1>
+      <p class="subtitle" style="color:#1c3a52;max-width:1080px;">Enough Git and GitHub to collaborate while AI writes the code.</p>
+      <p style="font-size:30px;color:#fff;margin:46px 0 0;font-weight:500;max-width:1000px;text-wrap:pretty;">The AI runs the mechanics now. Your job is judgment.</p>
+    </div>
+  </section>
+
+  <!-- 2 — WHY GIT EXISTS -->
+  <section class="navy" data-label="Why Git">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-white.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Why Git</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">Why this exists at all</p>
+      <h2 class="statement">We work together.<br>We keep track of our work.</h2>
+      <div class="points">
+        <div class="point"><div class="num">01</div><div class="t">Keep track — every change is a save point you can return to.</div></div>
+        <div class="point"><div class="num">02</div><div class="t">Work together — people and AI edit one project without colliding.</div></div>
+        <div class="point key"><div class="num">03</div><div class="t">Stay in control — see exactly what changed; nothing is ever lost.</div></div>
+      </div>
+    </div>
+    <div class="foot"><span><b>Everything else today is machinery for these two things.</b></span><span>02</span></div>
+  </section>
+
+  <!-- MEME — EXPANDING BRAIN -->
+  <section class="tint" data-label="Meme: folder chaos">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Aside</div>
+    </div>
+    <div class="body center">
+      <div style="display:grid;grid-template-columns:1fr 0.72fr;gap:80px;align-items:center;">
+        <div>
+          <p class="eyebrow">Why we need this</p>
+          <h2 class="title" style="margin-bottom:0;">The folder-naming hall of shame</h2>
+          <p class="subtitle">Everyone has lived at the bottom of this brain: <code style="font-family:var(--font-mono);font-size:0.86em;">project-final-for-real</code>. That's keeping track of your work without Git — and there's a much better way.</p>
+        </div>
+        <div style="justify-self:center;">
+          <img src="assets/memes/expanding-brain.png" alt="Expanding-brain meme escalating from Git to chaotic project-final folder names" style="display:block;max-width:100%;max-height:680px;border-radius:8px;box-shadow:var(--shadow-dialog);border:1px solid var(--border-hairline);">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 — TWO SENTENCES -->
+  <section data-label="Git vs GitHub">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Foundations</div>
+    </div>
+    <div class="body">
+      <h2 class="title">So we built two things. <span class="blue">Git</span> keeps the record; <span class="blue">GitHub</span> is where the team meets.</h2>
+      <div class="twodef">
+        <div class="def">
+          <div class="tag">Git</div>
+          <p>The version-control tool on your laptop. It records every change as a checkpoint you can inspect, trust, or throw away.</p>
+        </div>
+        <div class="def">
+          <div class="tag">GitHub</div>
+          <p>The website where the team gathers around that record — pull requests, issues, and status, all in one place.</p>
+        </div>
+      </div>
+      <p class="micro" style="font-size:30px;color:var(--fg-muted);margin-top:36px;">You'll use both — they're just not the same thing.</p>
+    </div>
+    <div class="foot"><span><b>Git for Vibecoders</b></span><span>03</span></div>
+  </section>
+
+  <!-- MEME — REINVENT GITHUB -->
+  <section class="tint" data-label="Meme: reinvent GitHub">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Aside</div>
+    </div>
+    <div class="body center">
+      <div style="display:grid;grid-template-columns:1fr 0.7fr;gap:80px;align-items:center;">
+        <div>
+          <p class="eyebrow">Meanwhile, on the internet</p>
+          <h2 class="title" style="margin-bottom:0;">“Someone should really invent that.”</h2>
+          <p class="subtitle">A tool to store your code in the cloud, check in versions, and revert anytime — a hub for code, if you will. It exists. It's GitHub. The reply underneath is what happens without it: four months of work, gone.</p>
+        </div>
+        <div style="justify-self:center;">
+          <img src="assets/memes/reinvent-github.png" alt="Tweet earnestly describing GitHub, above a Reddit post about losing four months of work with no version control" style="display:block;max-width:100%;max-height:790px;border-radius:8px;box-shadow:var(--shadow-dialog);border:1px solid var(--border-hairline);">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 — THE SPLIT TABLE -->
+  <section class="tint" data-label="Git or GitHub">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Foundations</div>
+    </div>
+    <div class="body">
+      <p class="eyebrow">The split</p>
+      <h2 class="title" style="margin-bottom:30px;">Wait — which part is which?</h2>
+      <table class="split">
+        <thead><tr><th>Thing</th><th>Git or GitHub?</th></tr></thead>
+        <tbody>
+          <tr><td class="thing"><code>git status</code> , <code>git commit</code></td><td><span class="ans git">Git · local</span></td></tr>
+          <tr><td class="thing">the <code>.git</code> folder</td><td><span class="ans git">Git · local</span></td></tr>
+          <tr><td class="thing"><code>.gitignore</code></td><td><span class="ans git">Git · local</span></td></tr>
+          <tr><td class="thing">branches</td><td><span class="ans mix">Git, shown by GitHub</span></td></tr>
+          <tr><td class="thing">pull requests</td><td><span class="ans gh">GitHub</span></td></tr>
+          <tr><td class="thing">issues</td><td><span class="ans gh">GitHub</span></td></tr>
+          <tr><td class="thing">Actions / CI</td><td><span class="ans gh">GitHub</span></td></tr>
+          <tr><td class="thing">README badges</td><td><span class="ans gh">GitHub</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="foot"><span><b>Git for Vibecoders</b></span><span>04</span></div>
+  </section>
+
+  <!-- 5 — FIVE VERBS -->
+  <section data-label="Five verbs">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">The mechanics</div>
+    </div>
+    <div class="body">
+      <p class="eyebrow">The mechanics</p>
+      <h2 class="title" style="margin-bottom:28px;">Git is really five verbs</h2>
+      <div class="nouns">
+        <div class="noun"><div class="n">commit</div><div class="d">Save a checkpoint of your work. Local, and yours until you push.</div></div>
+        <div class="noun"><div class="n">branch</div><div class="d">Start a separate line of work without disturbing main.</div></div>
+        <div class="noun"><div class="n">push</div><div class="d">Send your commits up to GitHub for everyone else.</div></div>
+        <div class="noun"><div class="n">pull</div><div class="d">Bring everyone else's commits down to you.</div></div>
+        <div class="noun"><div class="n">merge / rebase</div><div class="d">Fold a branch back together with another.</div></div>
+      </div>
+    </div>
+    <div class="foot"><span><b>Five verbs cover about ninety percent of it.</b></span><span>05</span></div>
+  </section>
+
+  <!-- MEME — BELL CURVE -->
+  <section class="tint" data-label="Meme: bell curve">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Aside</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow" style="text-align:center;">Vibecoding makes this easier</p>
+      <h2 class="title" style="text-align:center;margin-bottom:14px;">Both ends of the curve agree</h2>
+      <p class="subtitle" style="text-align:center;max-width:1100px;margin:0 auto 30px;"><code style="font-family:var(--font-mono);font-size:0.82em;">add</code>, <code style="font-family:var(--font-mono);font-size:0.82em;">commit</code>, <code style="font-family:var(--font-mono);font-size:0.82em;">push</code> — beginners and wizards do the same three things. The scary middle is exactly what your AI handles for you.</p>
+      <img src="assets/memes/bell-curve.png" alt="Bell-curve meme: both the low-IQ and high-IQ ends just run git add, commit, push while the middle stresses over advanced commands" style="display:block;max-width:1120px;max-height:540px;margin:0 auto;border-radius:8px;box-shadow:var(--shadow-dialog);border:1px solid var(--border-hairline);">
+    </div>
+  </section>
+
+  <!-- 6 — COMMIT GRAPH -->
+  <section class="tint" data-label="Commits & branches">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">The mechanics</div>
+    </div>
+    <div class="body">
+      <p class="eyebrow">The mechanics</p>
+      <h2 class="title" style="margin-bottom:12px;">Commits, branches, and copies</h2>
+      <p class="subtitle" style="margin-bottom:26px;">A commit is a snapshot. A branch is a line of work. And every clone holds the whole thing.</p>
+      <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:60px;align-items:center;">
+        <svg viewBox="0 0 900 430" width="100%" style="display:block;max-width:860px;font-family:ui-monospace,Menlo,monospace;">
+          <path d="M80 250 H780" stroke="#C2CFDB" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <path d="M310 250 C 345 250, 360 110, 390 110 L 490 110 C 525 110, 540 250, 560 250" stroke="#48AFF0" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <circle cx="390" cy="110" r="18" fill="#2A5CC4" stroke="#fff" stroke-width="4"/>
+          <circle cx="490" cy="110" r="18" fill="#2A5CC4" stroke="#fff" stroke-width="4"/>
+          <circle cx="150" cy="250" r="18" fill="#1F3145" stroke="#fff" stroke-width="4"/>
+          <circle cx="310" cy="250" r="18" fill="#1F3145" stroke="#fff" stroke-width="4"/>
+          <circle cx="560" cy="250" r="18" fill="#1F3145" stroke="#fff" stroke-width="4"/>
+          <circle cx="720" cy="250" r="18" fill="#1F3145" stroke="#fff" stroke-width="4"/>
+          <text x="800" y="259" fill="#1F3145" font-size="28" font-weight="600">main</text>
+          <text x="440" y="78" fill="#2A5CC4" font-size="28" font-weight="600" text-anchor="middle">feature/login</text>
+          <text x="440" y="156" fill="#5b6b7a" font-size="26" text-anchor="middle">a separate line of work</text>
+          <text x="560" y="300" fill="#5b6b7a" font-size="26" text-anchor="middle">merge</text>
+          <text x="415" y="378" fill="#5b6b7a" font-size="27" text-anchor="middle">each dot is a commit — a snapshot you can return to</text>
+        </svg>
+        <div>
+          <svg viewBox="0 0 520 320" width="100%" style="display:block;max-width:520px;font-family:ui-monospace,Menlo,monospace;">
+            <rect x="30" y="14" width="460" height="96" rx="14" fill="#fff" stroke="#C2CFDB" stroke-width="2"/>
+            <text x="52" y="46" fill="#1F3145" font-size="26" font-weight="600">GitHub · origin</text>
+            <line x1="130" y1="84" x2="360" y2="84" stroke="#C2CFDB" stroke-width="4"/>
+            <circle cx="130" cy="84" r="13" fill="#1F3145"/><circle cx="245" cy="84" r="13" fill="#1F3145"/><circle cx="360" cy="84" r="13" fill="#1F3145"/>
+            <rect x="30" y="210" width="460" height="96" rx="14" fill="#fff" stroke="#C2CFDB" stroke-width="2"/>
+            <text x="52" y="242" fill="#1F3145" font-size="26" font-weight="600">Your laptop</text>
+            <line x1="130" y1="280" x2="360" y2="280" stroke="#C2CFDB" stroke-width="4"/>
+            <circle cx="130" cy="280" r="13" fill="#1F3145"/><circle cx="245" cy="280" r="13" fill="#1F3145"/><circle cx="360" cy="280" r="13" fill="#1F3145"/>
+            <line x1="205" y1="200" x2="205" y2="132" stroke="#2A5CC4" stroke-width="4"/>
+            <polygon points="205,117 196,136 214,136" fill="#2A5CC4"/>
+            <text x="193" y="178" fill="#2A5CC4" font-size="25" font-weight="600" text-anchor="end">push</text>
+            <line x1="315" y1="132" x2="315" y2="200" stroke="#48AFF0" stroke-width="4"/>
+            <polygon points="315,215 306,196 324,196" fill="#48AFF0"/>
+            <text x="327" y="178" fill="#2A8FD8" font-size="25" font-weight="600" text-anchor="start">pull</text>
+          </svg>
+          <p style="font-size:24px;line-height:1.4;color:var(--fg-muted);margin:18px 0 0;text-wrap:pretty;">Both copies hold the <b style="color:var(--fg-default);font-weight:600;">entire</b> history — no central server. “Decentralized” just means GitHub is the copy everyone agrees to meet at, so <b style="color:var(--fg-default);font-weight:600;">push</b> and <b style="color:var(--fg-default);font-weight:600;">pull</b> simply sync the two.</p>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span><b>Each clone is a full copy — that's why push and pull exist.</b></span><span>06</span></div>
+  </section>
+
+  <!-- 7 — INIT / ADD / COMMIT / PUSH -->
+  <section data-label="Your first loop">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">The mechanics</div>
+    </div>
+    <div class="body">
+      <p class="chip-ex"><span class="dot"></span>Exercise 1</p>
+      <h2 class="title" style="margin-bottom:14px;">Your first full loop, end to end</h2>
+      <p class="subtitle" style="margin-bottom:36px;">Clone an existing repo, let Claude make the change and open the PR, then review and merge on GitHub.</p>
+      <div style="display:flex;align-items:stretch;gap:14px;">
+        <div style="flex:1 1 0;background:#fff;border:1px solid var(--border-hairline);border-radius:var(--radius-16);padding:30px 26px;display:flex;flex-direction:column;gap:13px;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--color-primary-1);color:var(--color-primary-5);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:25px;font-family:var(--font-mono);">1</div>
+          <div style="font-size:29px;line-height:1.15;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">Clone the repo</div>
+          <div style="font-size:24px;line-height:1.34;color:var(--fg-muted);"><code style="font-family:var(--font-mono);font-size:1em;">git clone</code> the URL from GitHub's green “Code” button.</div>
+        </div>
+        <span class="sep">→</span>
+        <div style="flex:1 1 0;background:#fff;border:1px solid var(--border-hairline);border-radius:var(--radius-16);padding:30px 26px;display:flex;flex-direction:column;gap:13px;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--color-primary-1);color:var(--color-primary-5);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:25px;font-family:var(--font-mono);">2</div>
+          <div style="font-size:29px;line-height:1.15;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">Change it with Claude</div>
+          <div style="font-size:24px;line-height:1.34;color:var(--fg-muted);">Make an edit, then tell it: <span style="color:var(--color-primary-4);">“branch this and open a PR.”</span></div>
+        </div>
+        <span class="sep">→</span>
+        <div style="flex:1 1 0;background:#fff;border:1px solid var(--border-hairline);border-radius:var(--radius-16);padding:30px 26px;display:flex;flex-direction:column;gap:13px;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--color-primary-1);color:var(--color-primary-5);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:25px;font-family:var(--font-mono);">3</div>
+          <div style="font-size:29px;line-height:1.15;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">Request a reviewer</div>
+          <div style="font-size:24px;line-height:1.34;color:var(--fg-muted);">On GitHub, add a teammate as reviewer on your PR.</div>
+        </div>
+        <span class="sep">→</span>
+        <div style="flex:1 1 0;background:#fff;border:1px solid var(--border-hairline);border-radius:var(--radius-16);padding:30px 26px;display:flex;flex-direction:column;gap:13px;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--color-primary-1);color:var(--color-primary-5);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:25px;font-family:var(--font-mono);">4</div>
+          <div style="font-size:29px;line-height:1.15;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">Approve &amp; merge</div>
+          <div style="font-size:24px;line-height:1.34;color:var(--fg-muted);">They approve; you choose <span style="color:var(--color-primary-4);">“Rebase and merge.”</span></div>
+        </div>
+      </div>
+      <p class="micro" style="margin-top:30px;">No need to follow every detail yet — the point is to feel the whole shape once. We'll unpack branches, PRs, and rebasing over the next few slides.</p>
+    </div>
+    <div class="foot"><span><b>Git for Vibecoders</b></span><span>07</span></div>
+  </section>
+
+  <!-- MEME — SAME LINE CARS -->
+  <section class="tint" data-label="Meme: same line">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Aside</div>
+    </div>
+    <div class="body center">
+      <div style="display:grid;grid-template-columns:1fr 0.66fr;gap:80px;align-items:center;">
+        <div>
+          <p class="eyebrow">Two people, one file</p>
+          <h2 class="title" style="margin-bottom:0;">Same line. Two different values.</h2>
+          <p class="subtitle">It happens constantly — two of you grab the same config and each points it somewhere different. Here's the moment, immortalized.</p>
+        </div>
+        <div style="justify-self:center;">
+          <img src="assets/memes/same-line-cars.png" alt="Two-cars meme: two people each setting supabaseUrl to a different value" style="display:block;max-width:600px;width:100%;max-height:620px;border-radius:8px;box-shadow:var(--shadow-dialog);border:1px solid var(--border-hairline);">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPLAINER — SAME FILE, TWO EDITS -->
+  <section data-label="Same file, two edits">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Working together</div>
+    </div>
+    <div class="body">
+      <p class="eyebrow">Before we make one on purpose</p>
+      <h2 class="title" style="margin-bottom:14px;">What happens when two people touch the same file?</h2>
+      <p class="subtitle" style="margin-bottom:34px;">You both open <code style="font-family:var(--font-mono);font-size:0.84em;">config.js</code>, change the same line to different values, and commit.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;">
+        <div style="background:var(--term-bg);border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius-12);overflow:hidden;box-shadow:var(--shadow-dialog);font-family:var(--font-mono);">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 22px;background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.07);">
+            <div style="display:flex;align-items:center;gap:13px;color:#C7D4E0;font-size:24px;"><span style="display:flex;gap:7px;"><span style="width:12px;height:12px;border-radius:50%;background:#3A4D5E;"></span><span style="width:12px;height:12px;border-radius:50%;background:#3A4D5E;"></span><span style="width:12px;height:12px;border-radius:50%;background:#3A4D5E;"></span></span>config.js</div>
+            <span style="font-size:24px;font-weight:600;color:#9AD4FF;background:rgba(72,175,240,0.16);border-radius:var(--radius-full);padding:5px 18px;">You</span>
+          </div>
+          <div style="padding:22px 24px;font-size:25px;line-height:1.7;color:#C7D4E0;white-space:nowrap;">
+            <div><span style="color:#6E8499;">1</span>&nbsp;&nbsp;export const config = {</div>
+            <div style="background:rgba(72,175,240,0.18);margin:0 -24px;padding:0 24px;"><span style="color:#6E8499;">2</span>&nbsp;&nbsp;supabaseUrl: <span style="color:#E6B673;">'https://abc123…'</span>,</div>
+            <div><span style="color:#6E8499;">3</span>&nbsp;&nbsp;timeout: 5000,</div>
+            <div><span style="color:#6E8499;">4</span>&nbsp;&nbsp;}</div>
+          </div>
+        </div>
+        <div style="background:var(--term-bg);border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius-12);overflow:hidden;box-shadow:var(--shadow-dialog);font-family:var(--font-mono);">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 22px;background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.07);">
+            <div style="display:flex;align-items:center;gap:13px;color:#C7D4E0;font-size:24px;"><span style="display:flex;gap:7px;"><span style="width:12px;height:12px;border-radius:50%;background:#3A4D5E;"></span><span style="width:12px;height:12px;border-radius:50%;background:#3A4D5E;"></span><span style="width:12px;height:12px;border-radius:50%;background:#3A4D5E;"></span></span>config.js</div>
+            <span style="font-size:24px;font-weight:600;color:#F0B45A;background:rgba(230,150,60,0.18);border-radius:var(--radius-full);padding:5px 18px;">Teammate</span>
+          </div>
+          <div style="padding:22px 24px;font-size:25px;line-height:1.7;color:#C7D4E0;white-space:nowrap;">
+            <div><span style="color:#6E8499;">1</span>&nbsp;&nbsp;export const config = {</div>
+            <div style="background:rgba(230,150,60,0.16);margin:0 -24px;padding:0 24px;"><span style="color:#6E8499;">2</span>&nbsp;&nbsp;supabaseUrl: <span style="color:#E6B673;">'https://345xyz…'</span>,</div>
+            <div><span style="color:#6E8499;">3</span>&nbsp;&nbsp;timeout: 5000,</div>
+            <div><span style="color:#6E8499;">4</span>&nbsp;&nbsp;}</div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:32px;line-height:1.4;color:var(--ink);text-align:center;margin:34px 0 0;text-wrap:pretty;">Git now has <b style="font-weight:600;">two truths for one line</b> — it won't guess, so it stops and asks you. <span class="blue">That's a conflict.</span></p>
+    </div>
+  </section>
+
+  <!-- 8 — CONFLICT -->
+  <section class="tint" data-label="Conflicts">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Working together</div>
+    </div>
+    <div class="body">
+      <p class="chip-ex"><span class="dot"></span>Exercise 2</p>
+      <h2 class="title">Branches drift apart — then touch the same line</h2>
+      <p class="subtitle" style="margin-bottom:30px;">That's a conflict. Git won't guess which version wins; it hands the decision to a human.</p>
+      <div style="display:grid;grid-template-columns:0.95fr 1.05fr;gap:48px;align-items:center;">
+        <div class="term">
+          <div class="row"><span class="a">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span></div>
+          <div class="row">one version</div>
+          <div class="row"><span class="c">=======</span></div>
+          <div class="row">other version</div>
+          <div class="row"><span class="a">&gt;&gt;&gt;&gt;&gt;&gt;&gt; branch</span></div>
+        </div>
+        <div>
+          <p style="font-size:34px;line-height:1.4;color:var(--fg-default);margin:0 0 26px;">Tell the tool: <span class="blue">“Resolve this so both intents are kept, then continue.”</span></p>
+          <p class="keyline" style="margin:0;">Then read the diff.</p>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span><b>A conflict is an overlap, not an emergency.</b></span><span>08</span></div>
+  </section>
+
+  <!-- 9 — MERGE VS REBASE -->
+  <section data-label="Merge vs rebase">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Working together</div>
+    </div>
+    <div class="body">
+      <p class="eyebrow">Bringing branches back together</p>
+      <h2 class="title" style="margin-bottom:18px;">Merge vs rebase</h2>
+      <p class="subtitle" style="margin-bottom:38px;">Two ways to fold a branch back in. Same destination, different-looking history.</p>
+      <div class="duo">
+        <div class="card">
+          <p class="h">Merge</p>
+          <p>Tie two branches together and keep the full history — sometimes with a merge commit.</p>
+        </div>
+        <div class="card">
+          <p class="h">Rebase</p>
+          <p>Replay your commits on top of the latest base, for a cleaner, linear history. Usually nicer for short-lived branches.</p>
+        </div>
+      </div>
+      <p class="bigline" style="margin-top:48px;">Know the words — and <span class="blue">let the tool run it.</span></p>
+    </div>
+    <div class="foot"><span><b>Git for Vibecoders</b></span><span>09</span></div>
+  </section>
+
+  <!-- MEME — SPARK JOY REBASE -->
+  <section class="tint" data-label="Meme: spark joy">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Aside</div>
+    </div>
+    <div class="body center">
+      <div style="display:grid;grid-template-columns:1fr 0.7fr;gap:80px;align-items:center;">
+        <div>
+          <p class="eyebrow">Why we prefer rebase</p>
+          <h2 class="title" style="margin-bottom:0;">One of these sparks joy.</h2>
+          <p class="subtitle">A clean fast-forward pull on top; the same pull as a wall of merge conflicts on the bottom. Rebasing onto the latest main keeps history tidy and linear — so day to day, it looks a lot more like the top.</p>
+        </div>
+        <div style="justify-self:center;">
+          <img src="assets/memes/spark-joy-rebase.png" alt="Marie Kondo meme: a clean fast-forward git pull 'sparks joy'; a conflict-filled merge 'does not spark joy'" style="display:block;max-width:100%;max-height:800px;border-radius:8px;box-shadow:var(--shadow-dialog);border:1px solid var(--border-hairline);">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 — YOUR JOB IS JUDGMENT (best-practices opener) -->
+  <section class="navy" data-label="Your job is judgment">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-white.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Best practices</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">The part that's yours</p>
+      <h2 class="statement">The AI runs the mechanics now.<br>Your job is judgment.</h2>
+      <div class="points">
+        <div class="point"><div class="num">01</div><div class="t">Branch per task</div></div>
+        <div class="point"><div class="num">02</div><div class="t">One coherent PR</div></div>
+        <div class="point key"><div class="num">03</div><div class="t">Read the diff before you trust it</div></div>
+      </div>
+    </div>
+    <div class="foot"><span><b>The next few slides are what that looks like in practice.</b></span><span>10</span></div>
+  </section>
+
+  <!-- 11 — WORKFLOW LOOP -->
+  <section class="tint" data-label="The workflow loop">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Best practices</div>
+    </div>
+    <div class="body">
+      <p class="eyebrow">An opinionated default</p>
+      <h2 class="title" style="margin-bottom:44px;">The routine, every task</h2>
+      <div class="loop">
+        <div class="lnode"><div class="b">1</div><div class="l">pull main</div></div>
+        <span class="lsep">→</span>
+        <div class="lnode"><div class="b">2</div><div class="l">branch</div></div>
+        <span class="lsep">→</span>
+        <div class="lnode"><div class="b">3</div><div class="l">small commits</div></div>
+        <span class="lsep">→</span>
+        <div class="lnode"><div class="b">4</div><div class="l">push</div></div>
+        <span class="lsep">→</span>
+        <div class="lnode"><div class="b">5</div><div class="l">PR</div></div>
+        <span class="lsep">→</span>
+        <div class="lnode"><div class="b">6</div><div class="l">rebase</div></div>
+        <span class="lsep">→</span>
+        <div class="lnode"><div class="b">7</div><div class="l">review</div></div>
+        <span class="lsep">→</span>
+        <div class="lnode"><div class="b">8</div><div class="l">merge</div></div>
+        <span class="lsep">→</span>
+        <div class="lnode"><div class="b">9</div><div class="l">delete branch</div></div>
+      </div>
+      <div class="loopcap"><span class="r">↻</span><span>Encode it once as a Claude Code or Codex skill, and the assistant just follows the house rules.</span></div>
+    </div>
+    <div class="foot"><span><b>Git for Vibecoders</b></span><span>11</span></div>
+  </section>
+
+  <!-- 12 — THREE RULES -->
+  <section data-label="Three rules">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Best practices</div>
+    </div>
+    <div class="body">
+      <p class="eyebrow">If you remember nothing else</p>
+      <h2 class="title" style="margin-bottom:26px;">Three rules that keep you out of trouble</h2>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="display:grid;grid-template-columns:88px 1fr;gap:32px;align-items:baseline;background:var(--bg-page);border:1px solid var(--border-hairline);border-radius:var(--radius-16);padding:24px 44px;">
+          <div style="font-family:var(--font-mono);font-size:56px;font-weight:600;color:var(--color-primary-4);line-height:1;">1</div>
+          <div>
+            <div style="font-size:39px;line-height:1.15;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">Always branch off <code style="font-family:var(--font-mono);font-size:0.86em;">main</code>.</div>
+            <div style="font-size:28px;line-height:1.35;color:var(--fg-muted);margin-top:8px;">Pull the latest main first, then start your branch from it.</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:88px 1fr;gap:32px;align-items:baseline;background:var(--bg-page);border:1px solid var(--border-hairline);border-radius:var(--radius-16);padding:24px 44px;">
+          <div style="font-family:var(--font-mono);font-size:56px;font-weight:600;color:var(--color-primary-4);line-height:1;">2</div>
+          <div>
+            <div style="font-size:39px;line-height:1.15;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">Don't branch off another branch.</div>
+            <div style="font-size:28px;line-height:1.35;color:var(--fg-muted);margin-top:8px;">Keep every branch rooted in main — no stacking branches on branches.</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:88px 1fr;gap:32px;align-items:baseline;background:var(--bg-page);border:1px solid var(--border-hairline);border-radius:var(--radius-16);padding:24px 44px;">
+          <div style="font-family:var(--font-mono);font-size:56px;font-weight:600;color:var(--color-primary-4);line-height:1;">3</div>
+          <div>
+            <div style="font-size:39px;line-height:1.15;font-weight:600;color:var(--ink);letter-spacing:-0.01em;">Open a PR — and rebase to merge it back.</div>
+            <div style="font-size:28px;line-height:1.35;color:var(--fg-muted);margin-top:8px;">When merging into main, choose rebase for a clean, linear history.</div>
+          </div>
+        </div>
+      </div>
+      <p class="micro" style="font-size:26px;color:var(--fg-muted);margin-top:22px;text-wrap:pretty;">Heavily simplified, but enough to work safely — drop it in an <code style="font-family:var(--font-mono);">AGENTS.md</code> so your agent follows it too.</p>
+      <div class="callout" style="margin-top:18px;max-width:none;">
+        <div class="k"><b>And avoid <code style="font-family:var(--font-mono);font-size:0.92em;">--force</code>.</b> Almost everything in Git is undoable once it's committed — a force-push is the main way to lose work for good, including other people's. Be sure you truly need it before you (or your agent) reach for it.</div>
+      </div>
+    </div>
+    <div class="foot"><span><b>Simple enough to remember; good enough to ship.</b></span><span>12</span></div>
+  </section>
+
+  <!-- MEME — FORCE BIKE -->
+  <section class="tint" data-label="Meme: --force bike">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">A cautionary tale</div>
+    </div>
+    <div class="body center">
+      <div style="display:grid;grid-template-columns:1fr 0.6fr;gap:80px;align-items:center;">
+        <div>
+          <p class="eyebrow">A cautionary tale</p>
+          <h2 class="title" style="margin-bottom:0;">This, but with your team's history</h2>
+          <p class="subtitle"><code style="font-family:var(--font-mono);font-size:0.86em;">git push --force</code> is the stick-in-your-own-spokes of version control. Almost nothing else in Git can do this much damage — be very sure before you reach for it.</p>
+        </div>
+        <div style="justify-self:center;">
+          <img src="assets/memes/force-bike.png" alt="Comic: a cyclist force-pushes to 'fix' things, deletes the team's history, then declares Git too hard and dangerous" style="display:block;max-width:100%;max-height:720px;border-radius:8px;box-shadow:var(--shadow-dialog);border:1px solid var(--border-hairline);">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 — BRANCH + PR -->
+  <section data-label="Branch it, PR it">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Best practices</div>
+    </div>
+    <div class="body">
+      <p class="chip-ex"><span class="dot"></span>Exercise 3</p>
+      <h2 class="title" style="margin-bottom:36px;">Branch it, PR it — then vouch for it</h2>
+      <div class="split2">
+        <div class="term">
+          <div class="bar"><i></i><i></i><i></i></div>
+          <div class="row"><span class="p">$</span> <span class="k">git switch</span> -c <span class="a">feature/add-favorite-command</span></div>
+          <div class="row"><span class="c"># change one thing</span></div>
+          <div class="row"><span class="p">$</span> <span class="k">git push</span> -u <span class="a">origin feature/add-favorite-command</span></div>
+        </div>
+        <div>
+          <p class="checkhd">Before you request review</p>
+          <div class="check">
+            <ul>
+              <li><span class="box"></span><span>Does this PR do one thing?</span></li>
+              <li><span class="box"></span><span>Any unrelated AI edits in the diff?</span></li>
+              <li><span class="box"></span><span>Can someone understand it from the diff alone?</span></li>
+              <li><span class="box"></span><span>Is the target branch correct?</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:30px;padding:22px 30px;background:var(--color-primary-1);border-radius:var(--radius-12);">
+        <div style="font-size:28px;line-height:1.4;color:var(--color-primary-5);"><b style="font-weight:600;">Branches aren't only for PRs.</b> Want to compare two versions or test a risky idea? Keep it on a branch and switch back and forth. You won't run <code style="font-family:var(--font-mono);font-size:0.9em;">git switch</code> yourself — just tell Claude Code: <span style="color:var(--color-primary-4);">“try this in a branch so I can switch between them.”</span></div>
+      </div>
+    </div>
+    <div class="foot"><span><b>feature/ · fix/ · docs/ · chore/</b></span><span>13</span></div>
+  </section>
+
+  <!-- 14 — DEV / STAGING / MAIN -->
+  <section class="tint" data-label="Branch strategy">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Best practices</div>
+    </div>
+    <div class="body">
+      <p class="eyebrow">Branch strategy</p>
+      <h2 class="title" style="margin-bottom:40px;">Dev / staging / main</h2>
+      <div class="tri">
+        <div class="card">
+          <p class="h mono">main</p>
+          <p>Production-ready source of truth. The branch the world runs on.</p>
+        </div>
+        <div class="card">
+          <p class="h mono">staging</p>
+          <p>Pre-production. Where you test and integrate before release.</p>
+        </div>
+        <div class="card">
+          <p class="h mono">dev</p>
+          <p>The active integration branch where work comes together.</p>
+        </div>
+      </div>
+      <p class="micro" style="font-size:30px;color:var(--fg-muted);margin-top:42px;">Small teams PR straight to <code style="font-family:var(--font-mono);">main</code>. Cautious teams run dev → staging → main. Match the ceremony to the risk.</p>
+    </div>
+    <div class="foot"><span><b>Git for Vibecoders</b></span><span>14</span></div>
+  </section>
+
+  <!-- 15 — .gitignore -->
+  <section data-label="gitignore">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Housekeeping</div>
+    </div>
+    <div class="body">
+      <p class="eyebrow">A detail worth knowing</p>
+      <h2 class="title"><code style="font-family:var(--font-mono);font-size:0.82em;">.gitignore</code> — files Git pretends it can't see</h2>
+      <p class="subtitle" style="margin-bottom:36px;">Generated junk, caches, local config, and logs — kept out of shared history.</p>
+      <div style="display:grid;grid-template-columns:0.9fr 1.1fr;gap:48px;align-items:start;">
+        <div class="term">
+          <div class="bar"><i></i><i></i><i></i></div>
+          <div class="row"><span class="c"># .gitignore</span></div>
+          <div class="row">node_modules/</div>
+          <div class="row">*.tmp</div>
+          <div class="row">.env</div>
+          <div class="row">dist/</div>
+        </div>
+        <div class="callout">
+          <div class="k"><b>Not a fix for a secret you already committed.</b> A committed API key is still in history — that's a different problem with a different fix.</div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span><b>Git for Vibecoders</b></span><span>15</span></div>
+  </section>
+
+  <!-- 16 — CI -->
+  <section data-label="CI checks">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Automation</div>
+    </div>
+    <div class="body">
+      <p class="chip-ex"><span class="dot"></span>Exercise 4</p>
+      <h2 class="title">CI checks your work automatically</h2>
+      <p class="subtitle" style="margin-bottom:32px;">Workflows live in <code style="font-family:var(--font-mono);font-size:0.86em;">.github/workflows/*.yml</code> and run on every push and PR.</p>
+      <div class="term">
+        <div class="row"><span class="c"># a badge is just an image whose URL returns live status</span></div>
+        <div class="row">![Checks](https://github.com/<span class="a">OWNER/REPO</span>/actions/workflows/checks.yml/<span class="hl">badge.svg</span>)</div>
+      </div>
+      <div class="badges">
+        <span class="badge"><span class="lbl">checks</span><span class="val red">failing</span></span>
+        <span class="badgearrow">→</span>
+        <span class="badge"><span class="lbl">checks</span><span class="val green">passing</span></span>
+        <span class="badgenote">Break it on purpose, watch it go red, fix it, watch it go green. That loop <i>is</i> CI.</span>
+      </div>
+    </div>
+    <div class="foot"><span><b>Git for Vibecoders</b></span><span>16</span></div>
+  </section>
+
+  <!-- MEME — IN CASE OF FIRE -->
+  <section class="tint" data-label="Meme: in case of fire">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">In case of emergency</div>
+    </div>
+    <div class="body center">
+      <div style="display:grid;grid-template-columns:1fr 0.62fr;gap:80px;align-items:center;">
+        <div>
+          <p class="eyebrow">Workshop safety briefing</p>
+          <h2 class="title" style="margin-bottom:0;">In case of fire</h2>
+          <p class="subtitle"><code style="font-family:var(--font-mono);font-size:0.86em;">git commit</code>, <code style="font-family:var(--font-mono);font-size:0.86em;">git push</code>, leave the building. It's a joke — but it's the literal reason we push: your work should live on GitHub, not only on the laptop that's currently on fire.</p>
+        </div>
+        <div style="justify-self:center;">
+          <img src="assets/memes/fire-commit-push.png" alt="Fire-evacuation sign reading: in case of fire, 1. git commit, 2. git push, 3. leave building" style="display:block;max-width:100%;max-height:720px;border-radius:8px;box-shadow:var(--shadow-dialog);border:1px solid var(--border-hairline);">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 17 — CLOSE -->
+  <section class="close" data-label="The one habit">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-white.svg" alt=""><span>Anduin</span></div>
+      <div class="meta" style="color:#fff;opacity:.9;">Close</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">The one habit</p>
+      <h2 class="title" style="color:#1c3a52;max-width:1300px;">The one habit worth keeping</h2>
+      <div class="term" style="margin-top:42px;max-width:680px;">
+        <div class="row"><span class="p">$</span> <span class="k">git status</span></div>
+        <div class="row"><span class="p">$</span> <span class="k">git diff</span></div>
+      </div>
+      <p style="font-size:34px;line-height:1.4;color:#1c3a52;margin:40px 0 0;max-width:1180px;text-wrap:pretty;">Run these before you trust yourself, before you trust the AI, and before you ask anyone to review your work.</p>
+    </div>
+  </section>
+
+</deck-stage>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <rect width="200" height="200" fill="#1F3145"/>
+    <circle cx="66" cy="74" r="13" fill="#48AFF0"/>
+    <circle cx="66" cy="132" r="13" fill="#48AFF0"/>
+    <circle cx="134" cy="103" r="13" fill="#9AD4FF"/>
+    <path d="M66 87 v32 M66 119 C66 119 90 103 121 103" stroke="#48AFF0" stroke-width="6" fill="none"/>
+  </svg>
+</template>
+
+</body>
+</html>
