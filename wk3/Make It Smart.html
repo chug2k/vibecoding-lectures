@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Make It Smart — Day 3</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  :root{
+    --type-statement: 96px;
+    --type-title: 78px;
+    --type-subtitle: 38px;
+    --type-lead: 36px;
+    --type-body: 32px;
+    --type-small: 26px;
+    --type-eyebrow: 25px;
+    --type-code: 32px;
+    --pad-x: 120px;
+    --pad-top: 80px;
+    --pad-bottom: 80px;
+    --gap-section: 52px;
+    --ink: #1F3145;
+    --term-bg: #16242F;
+  }
+  html,body{margin:0;background:#000;}
+  deck-stage:not(:defined){visibility:hidden;}
+
+  section{
+    box-sizing:border-box;
+    font-family:var(--font-display);
+    color:var(--color-gray-9);
+    background:#fff;
+    display:flex;
+    flex-direction:column;
+    padding:var(--pad-top) var(--pad-x) var(--pad-bottom);
+    -webkit-font-smoothing:antialiased;
+  }
+  section.tint{ background:var(--bg-page); }
+  section.navy{ background:var(--ink); color:#fff; }
+  section.cover{ background:url('assets/brand/cover-gradient.png') center/cover; }
+  section.close{ background:url('assets/brand/wide-gradient.png') center/cover; }
+
+  /* ── header ── */
+  .head{ display:flex; justify-content:space-between; align-items:center; flex:0 0 auto; }
+  .brand{ display:flex; align-items:center; gap:11px; }
+  .brand img{ width:34px; height:34px; display:block; }
+  .brand span{ font-family:var(--font-display); font-weight:700; font-size:25px; letter-spacing:-0.01em; color:var(--ink); }
+  .navy .brand span, .cover .brand span, .close .brand span{ color:#fff; }
+  .meta{ font-size:var(--type-small); color:var(--fg-muted); letter-spacing:0.02em; }
+  .navy .meta{ color:rgba(255,255,255,0.62); }
+
+  /* ── body ── */
+  .body{ flex:1 1 auto; display:flex; flex-direction:column; margin-top:var(--gap-section); min-height:0; }
+  .body.center{ justify-content:center; margin-top:0; }
+
+  /* ── type ── */
+  .eyebrow{ font-size:var(--type-eyebrow); font-weight:600; letter-spacing:0.09em; text-transform:uppercase; color:var(--color-primary-4); margin:0 0 26px; }
+  .navy .eyebrow{ color:#7FC4F5; }
+  .cover .eyebrow, .close .eyebrow{ color:#fff; opacity:0.92; }
+
+  .title{ font-size:var(--type-title); font-weight:600; letter-spacing:-0.022em; line-height:1.06; margin:0; color:var(--ink); text-wrap:balance; }
+  .navy .title{ color:#fff; }
+  .statement{ font-size:var(--type-statement); font-weight:600; letter-spacing:-0.026em; line-height:1.04; margin:0; color:#fff; text-wrap:balance; }
+  section:not(.navy):not(.cover):not(.close) .statement{ color:var(--ink); }
+  .subtitle{ font-size:var(--type-subtitle); font-weight:400; line-height:1.34; color:var(--fg-muted); margin:30px 0 0; max-width:1180px; text-wrap:pretty; }
+  .navy .subtitle{ color:rgba(255,255,255,0.78); }
+  .cover .subtitle, .close .subtitle{ color:#1c3a52; }
+  .blue{ color:var(--color-primary-4); }
+  .navy .blue, .cover .blue, .close .blue{ color:#7FC4F5; }
+
+  /* ── footer ── */
+  .foot{ position:absolute; left:var(--pad-x); right:var(--pad-x); bottom:42px; display:flex; justify-content:space-between; align-items:baseline; font-size:var(--type-small); color:var(--fg-subtle); }
+  .foot b{ font-weight:600; color:var(--fg-muted); }
+  .navy .foot{ color:rgba(255,255,255,0.5); }
+  .navy .foot b{ color:rgba(255,255,255,0.7); }
+
+  /* ── three-beat recap / points ── */
+  .points{ display:flex; gap:0; margin-top:58px; }
+  .point{ flex:1 1 0; padding:0 46px; border-left:1px solid var(--color-gray-3); }
+  .navy .point{ border-left-color:rgba(255,255,255,0.16); }
+  .point:first-child{ padding-left:0; border-left:none; }
+  .point .num{ font-family:var(--font-mono); font-size:25px; color:var(--color-primary-4); margin-bottom:16px; letter-spacing:0.04em; }
+  .navy .point .num{ color:#7FC4F5; }
+  .point .t{ font-size:35px; font-weight:500; line-height:1.26; color:var(--ink); }
+  .navy .point .t{ color:#fff; }
+  .point.key .t{ color:var(--color-primary-4); }
+  .navy .point.key .t{ color:#9AD4FF; }
+
+  /* ── recap of prior weeks ── */
+  .recap{ display:flex; gap:0; margin-top:50px; }
+  .rcol{ flex:1 1 0; padding:0 52px; border-left:1px solid rgba(255,255,255,0.16); }
+  .rcol:first-child{ padding-left:0; border-left:none; }
+  .rcol .wk{ font-family:var(--font-mono); font-size:24px; letter-spacing:0.04em; color:#7FC4F5; margin-bottom:26px; }
+  .rcol ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:20px; }
+  .rcol li{ display:flex; gap:16px; font-size:33px; line-height:1.26; color:#fff; }
+  .rcol li .b{ color:#7FC4F5; flex:0 0 auto; }
+  .rcol li b{ font-weight:600; color:#9AD4FF; }
+
+  /* ── simple 3-node flow ── */
+  .flow{ display:flex; align-items:stretch; gap:16px; margin-top:18px; }
+  .step{ flex:1 1 0; background:#fff; border:1px solid var(--border-hairline); border-radius:var(--radius-12); padding:36px 22px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:12px; }
+  .step .st{ font-family:var(--font-mono); font-size:26px; font-weight:600; color:var(--color-primary-4); }
+  .step .sd{ font-size:26px; color:var(--fg-default); line-height:1.28; }
+  .sep{ flex:0 0 auto; align-self:center; color:var(--color-primary-3); font-size:42px; }
+
+  /* ── prompt / code artifact ── */
+  .prompt{ background:#fff; border:1px solid var(--border-hairline); border-left:5px solid var(--color-primary-4); border-radius:var(--radius-12); padding:38px 44px; font-family:var(--font-mono); font-size:32px; line-height:1.62; color:var(--ink); box-shadow:var(--shadow-card); max-width:1360px; }
+  .prompt .hl{ background:var(--color-primary-1); color:var(--color-primary-5); border-radius:var(--radius-4); padding:1px 8px; }
+
+  .term{ background:var(--term-bg); border:1px solid rgba(255,255,255,0.07); border-radius:var(--radius-12); padding:34px 40px 38px; font-family:var(--font-mono); font-size:var(--type-code); line-height:1.75; color:#C7D4E0; box-shadow:var(--shadow-dialog); max-width:1180px; }
+  .term .bar{ display:flex; gap:9px; margin-bottom:24px; }
+  .term .bar i{ width:14px; height:14px; border-radius:50%; background:#3A4D5E; display:block; }
+  .term .row{ white-space:pre-wrap; }
+  .term .c{ color:#6E8499; }
+  .term .p{ color:#48AFF0; }
+  .term .k{ color:#9AD4FF; }
+  .term .a{ color:#E6B673; }
+  .term .hl{ color:#fff; }
+
+  /* ── judgment checklist (sparse) ── */
+  .checks{ display:flex; flex-direction:column; gap:28px; margin-top:32px; }
+  .checks .c{ display:flex; gap:22px; align-items:baseline; font-size:40px; line-height:1.2; color:var(--ink); }
+  .checks .c .q{ font-family:var(--font-mono); font-size:30px; color:var(--color-primary-4); flex:0 0 auto; }
+  .checks .c b{ font-weight:600; color:var(--ink); }
+
+  /* ── tedious → automate (preview) ── */
+  .arrowline{ display:flex; align-items:center; gap:30px; margin-top:40px; flex-wrap:wrap; }
+  .arrowline .pill{ font-size:34px; padding:18px 30px; border-radius:var(--radius-full); border:1px solid var(--border-hairline); background:#fff; color:var(--ink); }
+  .arrowline .pill.old{ color:var(--fg-muted); }
+  .arrowline .pill.new{ background:var(--color-primary-1); border-color:var(--color-primary-3); color:var(--color-primary-5); font-weight:600; }
+  .arrowline .ar{ font-size:42px; color:var(--color-primary-3); }
+
+  /* ── ideas ── */
+  .ideas{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:28px; }
+  .idea{ background:#fff; border:1px solid var(--border-hairline); border-radius:var(--radius-12); padding:32px 30px; }
+  .idea .nm{ font-family:var(--font-mono); font-size:30px; font-weight:600; color:var(--color-primary-4); margin-bottom:12px; }
+  .idea .ds{ font-size:26px; line-height:1.3; color:var(--fg-default); }
+  .idea.wild{ background:var(--color-primary-1); border-color:var(--color-primary-3); }
+  .idea.wild .nm{ color:var(--color-primary-5); }
+</style>
+<script type="application/json" id="speaker-notes">
+[
+"Quick open — plant the hook and keep moving, because today is only sixty minutes and I'm going to feel every one of them. By the end, the deal tracker you built last week stops being a dumb table and starts doing real work for you: it'll write your follow-up emails. I build one feature live. But the lesson hiding under that feature is the part I actually care about — so listen past the code. Let's go.",
+"Fast but concrete recap — name the actual things, because we lean on every one of them today. Week one was vibe coding: you learned to talk to Claude Code in the terminal, and turn a plain-English sentence into a working app. That little ritual — make a folder, run claude, paste the prompt — is the runbook, and we use it again in five minutes, so it should feel familiar. Week two you gave the app real data with Supabase, a database that remembers; you defined a schema, which is just the fields a deal has; and you put it live on the internet with Vercel, so it had a link you could send someone. So the muscle you've got is: build with a prompt, store in a database, ship to a URL. The one thing it still can't do is think — that's today.",
+"This is the preview, and honestly the most important slide in the hour, so don't rush it. I'm going to add a feature that saves time. But watch the move that comes BEFORE the code: I asked myself, what do I do over and over that's a pain? For someone in sales, it's follow-up emails — the same message, slightly different, for the fiftieth time. So I'm going to program that away. The example is made up, but this is exactly how it works in real life: you don't start from 'what can AI do,' you start from 'what's eating my time.' Noticing that — coming up with the idea — is the real skill. The AI can build almost anything; knowing what's worth building is the part that stays yours. Hold onto this, because at the very end I'm going to turn it around and ask YOU for ideas.",
+"One quick idea before we build, because it quietly reframes everything you're about to see. For two weeks the AI has stood OUTSIDE your app — you talk to it, it writes the code, it leaves, and what it leaves behind is as smart as a spreadsheet. Today the AI moves INSIDE the app and runs while your users are using it. That's the whole leap of week three: the same magic that BUILT your app becomes a PART of your app. And the thing you're dropping inside is simple — it's just text in, text out, a function you call over the internet, the same way the app already calls the database.",
+"Now a live moment — we rebuild last week's tracker from scratch, right here, so nobody's stuck. Two reasons: it gets anyone who didn't finish last week back to the same starting line, and watching the whole app reappear from a single prompt is the most reassuring thing I can show before we add something new. I'll go quick — the recording from weeks one and two has every step if you're behind, so don't scramble to copy it down, just watch. Paste, talk through the lines, and in about two minutes the app is back.",
+"The setup — and the entire point is how short it is, especially after last week. Go to AI Studio, click once, get a key — it's just a long password that says these requests are mine. Paste it into a file called dot-env, which is where secrets live. Then tell Claude to use the google-genai library to call Gemini. Free tier, no credit card to start. Hold it up against last week's token-and-MCP ceremony on purpose: that's it. That's the whole configuration story for giving your app a brain. One key. Say the library name clearly — google-genai.",
+"Here's what we build together, and I picked it precisely because it can't embarrass us live. A 'Draft follow-up' button on every deal: click it, and the app writes a short, friendly follow-up email for that exact company. It's instantly useful, it runs on data we already have, and there's no fact for it to get wrong — it's a first draft. The safe crowd-pleaser. Let's build it; I'll narrate as Claude works.",
+"While that builds, here's the shape underneath it — and it's the same shape for EVERY smart feature, which is why it's worth thirty seconds. Three moves. One: take data you already have — the deal's company, value, stage. Two: staple an instruction to it — 'write a friendly follow-up email.' That combined thing is the prompt. Three: the model reasons over it and hands back a draft, which you show. Name the data, name the instruction, name where it shows up. That's the recipe for the email — and for whatever you dream up later.",
+"This is the actual thing I type, and notice it's plain English, not code — I'm describing the feature to Claude the way I'd describe it to a coworker. Read it aloud and point at the pieces: the fields that go in, what I ask for, where the draft shows up, and — I'll say it twice — the key reads from dot-env. If you can say those three things in one sentence, you can build the feature. This is the template for anything you build after today.",
+"Last beat on this feature, and it's the one piece of theory that earns its keep. Everything you've built so far is deterministic — ask the database for deal seven, you get deal seven, every single time. This is your first PROBABILISTIC part: it reasons, so it can be wrong, and if you ask twice you might get two answers. That's why it hands you a draft, not a fact — and why your job shifts from typist to editor. The AI wrote the feature; you read what it wrote. Did it actually feed the deal's data into the prompt? Is the key in dot-env and ignored by Git, not pasted into the code where it leaks? And does it do something sane when the model is slow or off? Glance before you trust.",
+"And this is where I hand it to you — depending on the clock. If we've got minutes left, start right now: pick something tedious in YOUR world and program it away. A few seeds are on the screen to get you unstuck, but the best feature in this room will be one nobody listed, because it scratches an itch only you have. If we're out of time — and we might be — that's the mission for next week: come back with one idea. Same skill as the preview: find what's eating your time, and build the thing that kills it.",
+"Land it. Three weeks: you learned to build, then to remember, then to think — and that last one cost exactly one API key. The tools are easy now. The hard, human part is noticing what's worth building. So between now and next week, watch yourself work and catch the moment you think 'ugh, this again.' That sigh is your next feature. Bring it back and we'll build it. Thanks, everyone."
+]
+</script>
+<script src="deck-stage.js"></script>
+</head>
+<body>
+<deck-stage width="1920" height="1080">
+
+  <!-- 1 — TITLE -->
+  <section class="cover" data-label="01 Title">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-white.svg" alt=""><span>Anduin</span></div>
+      <div class="meta" style="color:#fff;opacity:.9;">Vibe Coding · Day 3</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">Adding AI to the app you already built</p>
+      <h1 class="statement" style="font-size:118px;color:#fff;">Make It Smart</h1>
+      <p class="subtitle">Last week the app learned to remember. Today it learns to think.</p>
+    </div>
+  </section>
+
+  <!-- 2 — RECAP -->
+  <section class="navy" data-label="02 Recap">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-white.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">The story so far</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">The story so far</p>
+      <h2 class="title">What you've already built.</h2>
+      <div class="recap">
+        <div class="rcol">
+          <div class="wk">WEEK 1 · VIBE CODING</div>
+          <ul>
+            <li><span class="b">→</span><div>Talk to <b>Claude Code</b> in the terminal</div></li>
+            <li><span class="b">→</span><div>Plain-English prompt → a working app</div></li>
+            <li><span class="b">→</span><div>The runbook: new folder, run <b>claude</b>, paste</div></li>
+          </ul>
+        </div>
+        <div class="rcol">
+          <div class="wk">WEEK 2 · DATA &amp; DEPLOY</div>
+          <ul>
+            <li><span class="b">→</span><div><b>Supabase</b> — a database that remembers</div></li>
+            <li><span class="b">→</span><div>A <b>schema</b> — the deal's fields</div></li>
+            <li><span class="b">→</span><div><b>Vercel</b> — live online, a link to share</div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span><b>Build with a prompt · store in a database · ship to a URL. Today: make it think.</b></span><span>02</span></div>
+  </section>
+
+  <!-- 3 — PREVIEW / THE REAL SKILL -->
+  <section data-label="03 Preview">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Before any code</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">The real skill today</p>
+      <h2 class="title">Find what's tedious. Automate it.</h2>
+      <div class="arrowline">
+        <span class="pill old">writing the same follow-up email</span>
+        <span class="ar">→</span>
+        <span class="pill new">a button that writes it for you</span>
+      </div>
+      <p class="subtitle">The example's made up — but this is how it works in real life. You don't start from “what can AI do.” You start from “what's eating my time.”</p>
+    </div>
+    <div class="foot"><span><b>The AI can build almost anything. Knowing what's worth building is on you.</b></span><span>03</span></div>
+  </section>
+
+  <!-- 4 — THE LEAP (theory) -->
+  <section class="navy" data-label="04 Inside the app">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-white.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">The one idea</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">What changes today</p>
+      <h2 class="statement">The AI moves <span class="blue">inside</span> the app.</h2>
+      <p class="subtitle">For two weeks it built your app from the outside, then left. Now it runs while people use it — and it's just text in, text out, like calling the database.</p>
+    </div>
+    <div class="foot"><span><b>Build-time → run-time.</b></span><span>04</span></div>
+  </section>
+
+  <!-- 5 — REBUILD LIVE -->
+  <section data-label="05 Rebuild live">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Live · so everyone's caught up</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">First, we catch up</p>
+      <h2 class="title" style="margin-bottom:34px;">Rebuild last week's app — live.</h2>
+      <div class="prompt">build me a shared <span class="hl">deal tracker</span> that runs in the browser. each deal has a company, value, stage, owner, created &amp; updated dates. use <span class="hl">supabase</span> to store it. typescript and react. <span class="hl">no auth</span> for now.</div>
+    </div>
+    <div class="foot"><span><b>Going fast — the recording has every step from Weeks 1 &amp; 2.</b></span><span>05</span></div>
+  </section>
+
+  <!-- 6 — ONE KEY -->
+  <section class="tint" data-label="06 One key">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Setup · all of it</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">The entire configuration story</p>
+      <h2 class="title" style="margin-bottom:30px;">One key, and you're done.</h2>
+      <div class="term">
+        <div class="bar"><i></i><i></i><i></i></div>
+        <div class="row"><span class="c"># grab a key — free, no card to start</span></div>
+        <div class="row"><span class="hl">aistudio.google.com</span> <span class="c">→ Get API key</span></div>
+        <div class="row">&nbsp;</div>
+        <div class="row"><span class="c"># paste it where secrets live</span></div>
+        <div class="row"><span class="k">.env</span> &nbsp; <span class="a">GEMINI_API_KEY</span>=<span class="hl">your-key</span></div>
+        <div class="row">&nbsp;</div>
+        <div class="row"><span class="c"># tell Claude which library to use</span></div>
+        <div class="row"><span class="p">»</span> use <span class="hl">google-genai</span> to call Gemini</div>
+      </div>
+    </div>
+    <div class="foot"><span><b>Remember last week's setup? This is the whole thing this time.</b></span><span>06</span></div>
+  </section>
+
+  <!-- 7 — THE FEATURE -->
+  <section class="navy" data-label="07 The feature">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-white.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">We build this together</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">The feature I'll build live</p>
+      <h2 class="statement">Click a deal →<br>it <span class="blue">writes the email.</span></h2>
+      <p class="subtitle">A first draft, not a fact — so there's nothing for it to get wrong. The safe one to demo.</p>
+    </div>
+    <div class="foot"><span><b>Make It Smart</b></span><span>07</span></div>
+  </section>
+
+  <!-- 8 — THE PATTERN -->
+  <section class="tint" data-label="08 The pattern">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">The shape you'll reuse</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">Every smart feature, same recipe</p>
+      <h2 class="title" style="margin-bottom:8px;">Data + instruction → a draft.</h2>
+      <div class="flow">
+        <div class="step"><div class="st">the data</div><div class="sd">company · value · stage</div></div>
+        <div class="sep">+</div>
+        <div class="step"><div class="st">the ask</div><div class="sd">“write a follow-up”</div></div>
+        <div class="sep">→</div>
+        <div class="step"><div class="st">the draft</div><div class="sd">it reasons, you show it</div></div>
+      </div>
+    </div>
+    <div class="foot"><span><b>Name the data · name the instruction · name where it shows up.</b></span><span>08</span></div>
+  </section>
+
+  <!-- 9 — THE BUILD PROMPT -->
+  <section data-label="09 Build prompt">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">What I'll actually type</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">Plain English, not code</p>
+      <h2 class="title" style="margin-bottom:34px;">The prompt I hand to Claude</h2>
+      <div class="prompt">add a <span class="hl">“Draft follow-up”</span> button to each deal. on click, use <span class="hl">google-genai</span> to ask Gemini for a short, friendly follow-up email using that deal's <span class="hl">company, value, stage, owner</span>. show the draft in a box I can copy. read the key from <span class="hl">.env</span>.</div>
+    </div>
+    <div class="foot"><span><b>Make It Smart</b></span><span>09</span></div>
+  </section>
+
+  <!-- 10 — DRAFT, NOT FACT (theory + judgment) -->
+  <section class="tint" data-label="10 Read the diff">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Your first probabilistic part</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">A draft, not a fact — so read it</p>
+      <h2 class="title" style="margin-bottom:10px;">It reasons. So it can be wrong.</h2>
+      <div class="checks">
+        <div class="c"><span class="q">01</span><div>Did it actually feed the <b>deal's data</b> into the prompt?</div></div>
+        <div class="c"><span class="q">02</span><div>Is the key in <b>.env</b> and gitignored — never committed?</div></div>
+        <div class="c"><span class="q">03</span><div>Does it survive the model being <b>slow or wrong?</b></div></div>
+      </div>
+    </div>
+    <div class="foot"><span><b>The database looks it up. The model reasons it out. You're the editor now.</b></span><span>10</span></div>
+  </section>
+
+  <!-- 11 — YOUR TURN / NEXT WEEK -->
+  <section data-label="11 Your turn">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Now — or your mission for next week</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">Back to the real skill</p>
+      <h2 class="title">Now you: kill your own busywork.</h2>
+      <div class="ideas">
+        <div class="idea"><div class="nm">Smart add</div><div class="ds">Paste a messy email — the form fills itself in.</div></div>
+        <div class="idea"><div class="nm">Ask your pipeline</div><div class="ds">“What should I chase this week?”</div></div>
+        <div class="idea"><div class="nm">Deal health</div><div class="ds">Flag the deals about to go cold.</div></div>
+        <div class="idea"><div class="nm">Next step</div><div class="ds">One suggested action per deal.</div></div>
+        <div class="idea"><div class="nm">Tone switch</div><div class="ds">Rewrite the email formal or casual.</div></div>
+        <div class="idea wild"><div class="nm">…your own</div><div class="ds">The one nobody listed. That's the good one.</div></div>
+      </div>
+    </div>
+    <div class="foot"><span><b>If there's time, start now. If not — bring one idea next week.</b></span><span>11</span></div>
+  </section>
+
+  <!-- 12 — WRAP -->
+  <section class="close" data-label="12 Wrap">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-white.svg" alt=""><span>Anduin</span></div>
+      <div class="meta" style="color:#fff;opacity:.85;">Day 3 · wrap</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">Build · remember · think</p>
+      <h2 class="statement">The hard part isn't the code.<br>It's noticing <span class="blue">what to build.</span></h2>
+      <p class="subtitle">This week, catch yourself thinking “ugh, this again.” That's your next feature — bring it back and we'll build it.</p>
+    </div>
+  </section>
+
+</deck-stage>
+</body>
+</html>

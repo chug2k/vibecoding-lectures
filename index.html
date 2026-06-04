@@ -319,7 +319,53 @@ for now.</code></pre>
     {
       label: "Week 3",
       decks: [
-        { title: "Git for Vibecoders", sub: "main deck", path: "wk3/Git for Vibecoders.html" },
+        {
+          title: "Make It Smart — Day 3",
+          sub: "main deck",
+          path: "wk3/Make It Smart.html",
+          notes: `
+            <h2>Make It Smart</h2>
+            <p class="empty">Adding an AI feature to the Week 2 deal tracker.</p>
+
+            <h3>The one prereq</h3>
+            <ul>
+              <li>A Gemini API key (free) — <a href="https://aistudio.google.com" target="_blank" rel="noopener">aistudio.google.com</a> → <strong>Get API key</strong> → copy</li>
+            </ul>
+
+            <h3>Wire it up</h3>
+            <ol>
+              <li>Paste the key into <code>.env</code>:
+                <pre><code>GEMINI_API_KEY=your-key-here</code></pre>
+              </li>
+              <li>Tell Claude Code to use the <code>google-genai</code> library to call Gemini.</li>
+              <li>Make sure <code>.env</code> is in <code>.gitignore</code> — never commit the key.</li>
+            </ol>
+
+            <h3>Feature A — the build prompt</h3>
+            <pre><code>add a "Draft follow-up" button to each deal.
+when clicked, use the google-genai library to
+call Gemini with that deal's company, value,
+stage, and owner, and ask it to write a short,
+friendly follow-up email. show the draft in a
+box I can copy. read the key from .env.</code></pre>
+
+            <h3>Then: your turn</h3>
+            <p>Pick an idea or invent your own — same shape every time: <strong>name the data, name the instruction, name where it shows up.</strong></p>
+            <ul>
+              <li><strong>Smart add</strong> — paste a messy email, the form fills itself in</li>
+              <li><strong>Ask your pipeline</strong> — "what should I chase this week?"</li>
+              <li><strong>Deal health</strong> — flag deals that look stuck</li>
+              <li><strong>Next step</strong> — one suggested action per deal</li>
+              <li><strong>…something weird</strong> — the one nobody listed</li>
+            </ul>
+          `,
+        },
+      ],
+    },
+    {
+      label: "Bonus · Advanced",
+      decks: [
+        { title: "Git for Vibecoders", sub: "deep dive — optional", path: "bonus/Git for Vibecoders.html" },
       ],
     },
   ];
