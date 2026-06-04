@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Day 1 Recap — Vibe Coding</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="./colors_and_type.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--app-bg);
+    color: var(--color-gray-8);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 40px 24px 96px; }
+  .card {
+    background: var(--color-gray-0);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-16);
+    box-shadow: var(--shadow-card);
+    padding: 52px 56px 60px;
+  }
+
+  /* ── brand mark — same as the slides ── */
+  .brand-mark { display: flex; align-items: center; gap: 16px; margin-bottom: 40px; }
+  .brand-mark img { height: 22px; width: auto; display: block; }
+  .brand-mark .program {
+    padding-left: 16px;
+    border-left: 1px solid var(--border-default);
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--color-gray-6);
+  }
+
+  /* ── display type ── */
+  h1.title {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: 44px; line-height: 1.08; letter-spacing: -0.025em;
+    color: var(--color-gray-9); margin: 0 0 10px;
+  }
+  .meta { color: var(--color-gray-6); font-size: 14.5px; margin: 0 0 8px; }
+  .meta a { color: var(--fg-link); font-weight: 500; }
+
+  .eyebrow {
+    font-size: 12.5px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--color-primary-4);
+    margin: 56px 0 14px;
+  }
+  h2.sec {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: 27px; line-height: 1.15; letter-spacing: -0.02em;
+    color: var(--color-gray-9); margin: 0 0 4px;
+  }
+  .sec-wrap { margin-top: 56px; }
+  .sec-wrap .eyebrow { margin-top: 0; }
+  h3 {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: 18px; line-height: 1.3; color: var(--color-gray-9);
+    margin: 26px 0 4px; letter-spacing: -0.01em;
+  }
+  p { margin: 12px 0; }
+  strong { color: var(--color-gray-9); font-weight: 600; }
+  em { color: var(--color-gray-8); }
+  a { color: var(--fg-link); }
+  ul { margin: 10px 0; padding-left: 4px; list-style: none; }
+  li { margin: 9px 0; padding-left: 26px; position: relative; }
+  li::before {
+    content: ""; position: absolute; left: 6px; top: 11px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--color-primary-3);
+  }
+
+  code {
+    font-family: var(--font-mono); font-size: 14px;
+    background: var(--color-gray-1); border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-4); padding: 1px 6px; color: var(--color-primary-5);
+  }
+  pre {
+    background: var(--color-gray-9); color: #e6edf3;
+    border-radius: var(--radius-8); padding: 18px 20px;
+    overflow-x: auto; margin: 14px 0;
+  }
+  pre code {
+    font-family: var(--font-mono); font-size: 13.5px; line-height: 1.75;
+    background: transparent; border: 0; padding: 0; color: #e6edf3;
+  }
+  pre .cm { color: #8b949e; }
+
+  /* ── TL;DR callout ── */
+  .tldr {
+    background: var(--color-primary-1);
+    border: 1px solid color-mix(in oklch, var(--color-primary-3) 40%, transparent);
+    border-radius: var(--radius-12);
+    padding: 20px 24px; margin: 22px 0 0;
+  }
+  .tldr p { margin: 0; color: var(--color-gray-8); }
+
+  /* ── gotcha cards ── */
+  .gotcha {
+    background: var(--color-warning-1);
+    border: 1px solid color-mix(in oklch, var(--color-warning-3) 45%, transparent);
+    border-radius: var(--radius-12);
+    padding: 6px 26px 22px; margin: 16px 0;
+  }
+  .gotcha h3 { color: var(--color-gray-9); }
+  .gotcha h3:first-child { margin-top: 20px; }
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-warning-5);
+    background: color-mix(in oklch, var(--color-warning-2) 55%, transparent);
+    border-radius: var(--radius-full); padding: 3px 10px; margin: 18px 0 -2px;
+  }
+  .ts { color: var(--color-gray-5); font-variant-numeric: tabular-nums; font-size: 13px; font-weight: 500; }
+  .note { color: var(--color-gray-6); font-size: 14.5px; margin-top: 6px; }
+
+  /* ── eval scorecard ── */
+  .score-row {
+    display: flex; align-items: baseline; gap: 16px;
+    padding: 13px 0; border-bottom: 1px solid var(--border-hairline);
+  }
+  .score-row:last-child { border-bottom: 0; }
+  .score-dim { font-weight: 600; color: var(--color-gray-9); width: 150px; flex: none; font-size: 15px; }
+  .chip {
+    font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums;
+    border-radius: var(--radius-full); padding: 2px 11px; flex: none; width: 52px; text-align: center;
+  }
+  .chip.good { background: var(--color-success-1); color: var(--color-success-5); }
+  .chip.mid  { background: var(--color-warning-1); color: var(--color-warning-5); }
+  .chip.low  { background: var(--color-danger-1);  color: var(--color-danger-5); }
+  .score-note { color: var(--color-gray-7); font-size: 14.5px; }
+  .verdict {
+    margin: 20px 0 0; padding: 16px 20px;
+    background: var(--color-gray-1); border-radius: var(--radius-8);
+    color: var(--color-gray-8);
+  }
+  hr { border: 0; border-top: 1px solid var(--border-hairline); margin: 0; }
+
+  @media (max-width: 600px) {
+    .card { padding: 36px 24px 44px; }
+    h1.title { font-size: 34px; }
+    .score-row { flex-wrap: wrap; }
+    .score-dim { width: auto; }
+    .score-note { flex-basis: 100%; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+  <div class="card">
+    <div class="brand-mark">
+      <img src="assets/anduin-full.svg" alt="Anduin">
+      <span class="program">Fast Track</span>
+    </div>
+
+    <p class="eyebrow" style="margin-top:0">Week 1 Recap</p>
+    <h1 class="title">Day 1 — Vibe&nbsp;Coding</h1>
+    <p class="meta">Batch 2 · June 4, 2026 · ~60 min · Charles Lee</p>
+    <p class="meta"><a href="https://drive.google.com/file/d/1OW3MMeeV9aJqKuIADgZCVuh9Q2Pl9vpm/view" target="_blank" rel="noopener">▶ Watch the recording</a></p>
+
+    <div class="tldr">
+      <p><strong>TL;DR —</strong> You installed Claude Code, learned that the terminal is just Finder you type into, and built a real browser game from a single English sentence. Then we pointed the same move at real work — uploading a spreadsheet and asking Claude to build a dashboard. The big idea: the computer now understands what you <em>mean</em>, so the only question left is what you want to build.</p>
+    </div>
+
+    <div class="sec-wrap">
+      <p class="eyebrow">Recap</p>
+      <h2 class="sec">What we actually did</h2>
+      <ul>
+        <li><strong>Set up Claude Code</strong> — admin via Self-Service, installed from the terminal, logged in.</li>
+        <li><strong>Learned 3 terminal commands</strong> — <code>ls</code> (list files), <code>cd</code> (change folder), <code>mkdir</code> (make folder). The terminal is just Finder, typed.</li>
+        <li><strong>Built a game</strong> — Tetris / Flappy Bird / Breakout / Chess, each from a one-sentence prompt.</li>
+        <li><strong>Learned permission modes</strong> — <code>Shift+Tab</code> to cycle Accept Edits → Plan → <strong>Auto</strong>.</li>
+        <li><strong>Built a real tool</strong> — dropped an Excel file into a folder and asked Claude to turn it into a dashboard.</li>
+      </ul>
+    </div>
+
+    <div class="sec-wrap">
+      <p class="eyebrow">Read this before next week</p>
+      <h2 class="sec">⚡ Gotchas &amp; live notes</h2>
+      <p class="note">The things that came up <em>live</em> and aren't on the slides.</p>
+
+      <div class="gotcha">
+        <span class="tag">Biggest snag</span>
+        <h3>Couldn't log into Claude Code? Accept the invite first.</h3>
+        <p>Several people hit a wall at login. The fix: there's an <strong>invite email from the org</strong> you have to <strong>accept first</strong> — only then will <code>claude</code> let you log in. Still stuck? Find that invite and accept it before anything else. <span class="ts">~32:00</span></p>
+
+        <h3><code>claude --version</code> says "command not found"?</h3>
+        <p>The install finished but your shell can't find it yet — it needs to be added to your <strong>PATH</strong>. Flag it next time and we'll fix it in ten seconds; it's a one-liner. The version you should see is around <code>2.1.162</code>. <span class="ts">~19:48</span></p>
+
+        <h3>"Claude Code" vs. "Claude on the web" — which do I use?</h3>
+        <p><strong>Claude Code</strong> (the terminal one we used) works on the <em>real files on your computer</em> and can build whole apps. <strong>Claude on the web</strong> (<a href="https://claude.ai" target="_blank" rel="noopener">claude.ai</a>) runs in an isolated cloud box — great for one-off tasks like a quick script, but it can't build a full app on your machine. For this course: use Claude Code. <span class="ts">~40:00</span></p>
+
+        <h3>Claude keeps stopping to ask permission → use Auto Mode</h3>
+        <p>While building, Claude pauses on every file edit to ask "is this OK?" Press <strong><code>Shift+Tab</code></strong> to cycle modes. <strong>Auto Mode</strong> is the one to use ~99% of the time — before acting, Claude checks the action against a smaller safety model (Haiku) instead of stopping to ask you. Less babysitting, still safe. <span class="ts">~47:30</span></p>
+
+        <h3>"Am I talking to Claude or to the terminal?"</h3>
+        <p>Easy to confuse. If you see a <strong>folder name on the left</strong> of the line, you're in the plain terminal. After you run <code>claude</code>, you're talking to Claude Code. Type <code>exit</code> to drop back to the terminal.</p>
+
+        <h3>New project = new folder</h3>
+        <p>Keep each project in its own folder. To start a fresh one: <code>cd ..</code> goes <em>up</em> one level, then <code>mkdir</code> a new folder and <code>cd</code> in. Claude asks <strong>"do you trust this folder?"</strong> the first time it sees a new one — say yes.</p>
+
+        <h3>Bonus tip: drive Claude from your phone</h3>
+        <p>The <code>/remote-control</code> command lets you control a running session from your phone or the web app — handy for long builds. Catch: your computer has to stay <strong>on, unlocked, and plugged in</strong>. Optional, just a cool trick. <span class="ts">~43:00</span></p>
+      </div>
+    </div>
+
+    <div class="sec-wrap">
+      <p class="eyebrow">Copy-paste</p>
+      <h2 class="sec">The runbook</h2>
+      <pre><code><span class="cm"># start a project</span>
+cd ~/Documents
+mkdir ai-class      <span class="cm"># one folder for the whole course</span>
+cd ai-class
+mkdir week1
+cd week1
+claude              <span class="cm"># launches Claude Code — then paste your prompt</span></code></pre>
+      <p>To start a second project without mixing it in:</p>
+      <pre><code>cd ..               <span class="cm"># go up one level</span>
+mkdir week1-dashboard
+cd week1-dashboard
+claude</code></pre>
+    </div>
+
+    <div class="sec-wrap">
+      <p class="eyebrow">The one idea to keep</p>
+      <h2 class="sec">The computer now understands what you mean</h2>
+      <p>For fifty years <strong>you</strong> had to translate what you meant into rigid code, and the computer did <em>exactly</em> what you said — eggs-not-apples, or a $327M Mars orbiter lost to a units mismatch. AI flipped that: now the computer tries to understand what you <em>mean</em>. The cost of building has gone to roughly zero. The only question left is <strong>what you want to build.</strong></p>
+    </div>
+
+    <div class="sec-wrap">
+      <p class="eyebrow">If you missed it</p>
+      <h2 class="sec">Catching up</h2>
+      <ul>
+        <li><strong>Watch the <a href="https://drive.google.com/file/d/1OW3MMeeV9aJqKuIADgZCVuh9Q2Pl9vpm/view" target="_blank" rel="noopener">recording</a></strong> (~60 min).</li>
+        <li><strong>Get set up</strong> before next week: Self-Service → admin → install Claude Code → <strong>accept your org invite</strong> → log in → confirm <code>claude --version</code> works.</li>
+        <li><strong>Try one thing on your own</strong> — make a folder, run <code>claude</code>, and ask it to build something tiny. Anything counts.</li>
+      </ul>
+    </div>
+
+    <div class="sec-wrap">
+      <p class="eyebrow">Transparency · we grade ourselves too</p>
+      <h2 class="sec">How this session went</h2>
+      <p class="note">We review every lecture against the deck and the transcript, and we publish it. Here's the honest report card for this one — so you know what to expect, and what we're fixing.</p>
+
+      <div style="margin-top:22px;">
+        <div class="score-row"><span class="score-dim">Clarity</span><span class="chip good">4/5</span><span class="score-note">Analogies land — "the terminal is Finder, typed" did a lot of work.</span></div>
+        <div class="score-row"><span class="score-dim">Structure</span><span class="chip mid">3/5</span><span class="score-note">Strong arc, but setup reshuffled the planned order.</span></div>
+        <div class="score-row"><span class="score-dim">Coverage</span><span class="chip mid">3/5</span><span class="score-note">Core ideas hit; the planned closing got squeezed.</span></div>
+        <div class="score-row"><span class="score-dim">Pacing</span><span class="chip low">2/5</span><span class="score-note">The real problem — see below.</span></div>
+        <div class="score-row"><span class="score-dim">Tightness</span><span class="chip mid">3/5</span><span class="score-note">Mostly focused; a couple of fun tangents ran long.</span></div>
+        <div class="score-row"><span class="score-dim">Time mgmt</span><span class="chip low">2/5</span><span class="score-note">Setup overran and ate the ending.</span></div>
+      </div>
+
+      <p class="verdict"><strong>The honest headline:</strong> the first real concept didn't start until <strong>~34 minutes in</strong> — more than half the session went to admin, installs, intros, and that login wall. A good lecture with a setup-time problem.</p>
+
+      <h3>What we're changing for next time</h3>
+      <ul>
+        <li><strong>Pre-flight the setup.</strong> The invite-acceptance and PATH issues are predictable now, so we'll send a "do this before class" note — install, accept the invite, confirm <code>claude --version</code>. That alone buys back ~15 minutes.</li>
+        <li><strong>Timebox setup</strong> to ~10 minutes with a pair-with-a-neighbor fallback, so a couple of stuck laptops don't hold the whole room.</li>
+        <li><strong>Protect the closing.</strong> The best part — "the cost of building has gone to roughly zero; the only question left is what you want to build" — got rushed. It won't next time.</li>
+      </ul>
+      <p class="note" style="margin-top:18px;">What went well: vivid analogies, a good read of the room (this group is more AI-fluent than average), and genuinely useful live detours — Auto Mode and the Claude-Code-vs-web distinction — that we'll fold into the deck.</p>
+    </div>
+
+  </div>
+  </div>
+</body>
+</html>

@@ -88,6 +88,34 @@
     margin-top: 2px;
   }
 
+  /* Recording link — visually distinct from slide decks. */
+  .recording {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    margin-top: 4px;
+    border-radius: 7px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    border: 1px solid transparent;
+  }
+  .recording:hover {
+    background: var(--panel-hi);
+    color: var(--text);
+  }
+  .recording .play {
+    color: var(--accent-hi);
+    font-size: 10px;
+    line-height: 1;
+  }
+  .recording .ext {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 11px;
+  }
+
   main {
     position: relative;
     background: #000;
@@ -234,6 +262,7 @@
   <main>
     <button id="sidebarToggle" class="sidebar-toggle" type="button" title="Toggle sidebar (\)" aria-label="Toggle sidebar">☰</button>
     <div class="topbar" id="topbar" hidden>
+      <a id="recordingLink" target="_blank" rel="noopener" hidden>▶ Recording ↗</a>
       <button id="notesToggle" type="button">Notes</button>
       <a id="openNew" target="_blank" rel="noopener">Open in new tab ↗</a>
     </div>
@@ -247,11 +276,22 @@
 
 <script>
   // Edit this list to add weeks / decks.
+  //
+  // RECORDINGS: each week may have an optional `recordings` array. Each entry is
+  // { label, url } — e.g. { label: "Batch 2", url: "https://drive.google.com/..." }.
+  // To add a recording later, just drop a new entry into the relevant week's
+  // `recordings` array. They open in a new tab and show up both in the sidebar
+  // (under that week) and as a "▶ Recording" button in the topbar when any deck
+  // from that week is loaded. Multiple batches per week are supported out of the box.
   const WEEKS = [
     {
       label: "Week 1",
+      recordings: [
+        { label: "Batch 2", url: "https://drive.google.com/file/d/1OW3MMeeV9aJqKuIADgZCVuh9Q2Pl9vpm/view" },
+      ],
       decks: [
         { title: "Vibe Coding — Day 1", sub: "main deck", path: "wk1/Vibe Coding.html" },
+        { title: "Day 1 Recap", sub: "summary, gotchas & report card", path: "wk1/recap.html" },
         { title: "Dashboard demo", sub: "supplemental", path: "wk1/dashboard.html" },
       ],
     },
@@ -380,9 +420,14 @@ box I can copy. read the key from .env.</code></pre>
   const openNew = document.getElementById("openNew");
   const notesEl = document.getElementById("notes");
   const notesToggle = document.getElementById("notesToggle");
+  const recordingLink = document.getElementById("recordingLink");
 
   const deckByPath = {};
-  WEEKS.forEach((w) => w.decks.forEach((d) => { deckByPath[d.path] = d; }));
+  const weekByPath = {};
+  WEEKS.forEach((w) => w.decks.forEach((d) => {
+    deckByPath[d.path] = d;
+    weekByPath[d.path] = w;
+  }));
 
   notesToggle.addEventListener("click", () => {
     notesEl.classList.toggle("open");
@@ -438,6 +483,15 @@ box I can copy. read the key from .env.</code></pre>
         }
         wrap.appendChild(a);
       });
+      (wk.recordings || []).forEach((rec) => {
+        const r = document.createElement("a");
+        r.className = "recording";
+        r.href = rec.url;
+        r.target = "_blank";
+        r.rel = "noopener";
+        r.innerHTML = `<span class="play">▶</span><span>Recording${rec.label ? " · " + rec.label : ""}</span><span class="ext">↗</span>`;
+        wrap.appendChild(r);
+      });
       weeksEl.appendChild(wrap);
     });
   }
@@ -459,6 +513,18 @@ box I can copy. read the key from .env.</code></pre>
     notesToggle.hidden = !hasNotes;
     notesToggle.classList.toggle("has-notes", hasNotes);
     notesEl.classList.remove("open");
+
+    // Surface the week's most recent recording (last in the array) in the topbar.
+    const week = weekByPath[path];
+    const recs = (week && week.recordings) || [];
+    const rec = recs[recs.length - 1];
+    if (rec) {
+      recordingLink.href = rec.url;
+      recordingLink.textContent = `▶ Recording${rec.label ? " · " + rec.label : ""} ↗`;
+      recordingLink.hidden = false;
+    } else {
+      recordingLink.hidden = true;
+    }
     // Refocus iframe so arrow-key navigation in the deck works immediately.
     viewer.addEventListener("load", () => {
       try { viewer.contentWindow.focus(); } catch (_) {}
