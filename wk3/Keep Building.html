@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Make It Smart — Day 3</title>
+<title>Keep Building — Day 3</title>
 <link rel="stylesheet" href="colors_and_type.css">
 <style>
   :root{
@@ -123,7 +123,7 @@
   .checks .c .q{ font-family:var(--font-mono); font-size:30px; color:var(--color-primary-4); flex:0 0 auto; }
   .checks .c b{ font-weight:600; color:var(--ink); }
 
-  /* ── tedious → automate (preview) ── */
+  /* ── ship → notice → add (the loop) ── */
   .arrowline{ display:flex; align-items:center; gap:30px; margin-top:40px; flex-wrap:wrap; }
   .arrowline .pill{ font-size:34px; padding:18px 30px; border-radius:var(--radius-full); border:1px solid var(--border-hairline); background:#fff; color:var(--ink); }
   .arrowline .pill.old{ color:var(--fg-muted); }
@@ -140,18 +140,19 @@
 </style>
 <script type="application/json" id="speaker-notes">
 [
-"Quick open — plant the hook and keep moving, because today is only sixty minutes and I'm going to feel every one of them. By the end, the deal tracker you built last week stops being a dumb table and starts doing real work for you: it'll write your follow-up emails. I build one feature live. But the lesson hiding under that feature is the part I actually care about — so listen past the code. Let's go.",
-"Fast but concrete recap — name the actual things, because we lean on every one of them today. Week one was vibe coding: you learned to talk to Claude Code in the terminal, and turn a plain-English sentence into a working app. That little ritual — make a folder, run claude, paste the prompt — is the runbook, and we use it again in five minutes, so it should feel familiar. Week two you gave the app real data with Supabase, a database that remembers; you defined a schema, which is just the fields a deal has; and you put it live on the internet with Vercel, so it had a link you could send someone. So the muscle you've got is: build with a prompt, store in a database, ship to a URL. The one thing it still can't do is think — that's today.",
-"This is the preview, and honestly the most important slide in the hour, so don't rush it. I'm going to add a feature that saves time. But watch the move that comes BEFORE the code: I asked myself, what do I do over and over that's a pain? For someone in sales, it's follow-up emails — the same message, slightly different, for the fiftieth time. So I'm going to program that away. The example is made up, but this is exactly how it works in real life: you don't start from 'what can AI do,' you start from 'what's eating my time.' Noticing that — coming up with the idea — is the real skill. The AI can build almost anything; knowing what's worth building is the part that stays yours. Hold onto this, because at the very end I'm going to turn it around and ask YOU for ideas.",
-"One quick idea before we build, because it quietly reframes everything you're about to see. For two weeks the AI has stood OUTSIDE your app — you talk to it, it writes the code, it leaves, and what it leaves behind is as smart as a spreadsheet. Today the AI moves INSIDE the app and runs while your users are using it. That's the whole leap of week three: the same magic that BUILT your app becomes a PART of your app. And the thing you're dropping inside is simple — it's just text in, text out, a function you call over the internet, the same way the app already calls the database.",
-"Now a live moment — we rebuild last week's tracker from scratch, right here, so nobody's stuck. Two reasons: it gets anyone who didn't finish last week back to the same starting line, and watching the whole app reappear from a single prompt is the most reassuring thing I can show before we add something new. I'll go quick — the recording from weeks one and two has every step if you're behind, so don't scramble to copy it down, just watch. Paste, talk through the lines, and in about two minutes the app is back.",
-"The setup — and the entire point is how short it is, especially after last week. Go to AI Studio, click once, get a key — it's just a long password that says these requests are mine. Paste it into a file called dot-env, which is where secrets live. Then tell Claude to use the google-genai library to call Gemini. Free tier, no credit card to start. Hold it up against last week's token-and-MCP ceremony on purpose: that's it. That's the whole configuration story for giving your app a brain. One key. Say the library name clearly — google-genai.",
-"Here's what we build together, and I picked it precisely because it can't embarrass us live. A 'Draft follow-up' button on every deal: click it, and the app writes a short, friendly follow-up email for that exact company. It's instantly useful, it runs on data we already have, and there's no fact for it to get wrong — it's a first draft. The safe crowd-pleaser. Let's build it; I'll narrate as Claude works.",
-"While that builds, here's the shape underneath it — and it's the same shape for EVERY smart feature, which is why it's worth thirty seconds. Three moves. One: take data you already have — the deal's company, value, stage. Two: staple an instruction to it — 'write a friendly follow-up email.' That combined thing is the prompt. Three: the model reasons over it and hands back a draft, which you show. Name the data, name the instruction, name where it shows up. That's the recipe for the email — and for whatever you dream up later.",
-"This is the actual thing I type, and notice it's plain English, not code — I'm describing the feature to Claude the way I'd describe it to a coworker. Read it aloud and point at the pieces: the fields that go in, what I ask for, where the draft shows up, and — I'll say it twice — the key reads from dot-env. If you can say those three things in one sentence, you can build the feature. This is the template for anything you build after today.",
+"Quick open, then move — sixty minutes and I'll feel every one. Here's the reframe for today. Last week you shipped an app, and it's tempting to think that's the finish line. It isn't. Real apps are never done — you ship version one, then you add to it, and add again, basically forever. That's the actual job, and it's the fun part. Today I'll show you the whole loop by adding ONE feature to last week's deal tracker, start to finish. The feature I picked happens to use AI, which is a great new trick — but the lesson is the loop itself, so listen past the code.",
+"Fast but concrete recap — name the actual things, because we lean on every one of them today. Week one was vibe coding: you learned to talk to Claude Code in the terminal, and turn a plain-English sentence into a working app. That little ritual — make a folder, run claude, paste the prompt — is the runbook, and we use it again in five minutes, so it should feel familiar. Week two you gave the app real data with Supabase, a database that remembers; you defined a schema, which is just the fields a deal has; and you put it live on the internet with Vercel, so it had a link you could send someone. So you can build with a prompt, store in a database, and ship to a URL. You shipped a real thing. And here's the trap: it's easy to feel done. You're not — that's the whole point of today.",
+"This is the most important slide in the hour, so don't rush it. Shipping is not the finish line — it's the starting line. Every app you actually use is just version one plus a hundred small additions nobody saw coming on day one. So the loop is simple: ship it, live with it, and wait for the moment you catch yourself thinking 'ugh, this again' — then add the feature that kills that moment. Noticing what to add is the real skill. The AI can build almost anything you can describe; knowing WHAT'S worth adding is the part that stays yours. Hold onto this, because at the very end I turn it around and ask YOU what you'd add.",
+"Now a live moment — we rebuild last week's tracker from scratch, right here, so nobody's stuck. Two reasons: it gets anyone who didn't finish last week back to the same starting line, and watching the whole app reappear from a single prompt is the most reassuring thing I can show before we start adding to it. I'll go quick — the recording from weeks one and two has every step if you're behind, so don't scramble to copy it down, just watch. Paste, talk through the lines, and in about two minutes the app is back.",
+"Now we run the loop once, together — we add ONE feature. Here's how I picked it: for someone in sales, the tedious thing is follow-up emails — the same message, slightly different, for the fiftieth time. So we'll add a button that writes the draft. It happens to use AI, and that's the fun new trick worth naming out loud: for two weeks the AI stood OUTSIDE your app — it wrote the code and left. Now it moves INSIDE and runs while people use the app. The same magic that built it becomes a part of it. And what you drop in is simple — text in, text out, a function you call over the internet, the same way the app already calls the database.",
+"The setup — and the whole point is how short it is, especially after last week. Most features you add need no setup at all; this one needs exactly one thing. Go to AI Studio, click once, get a key — it's just a long password that says these requests are mine. Paste it into a file called dot-env, which is where secrets live. Then tell Claude to use the google-genai library to call Gemini. Free tier, no credit card to start. Hold it up against last week's token-and-MCP ceremony on purpose: that's it. That's the whole configuration story for giving your app a brain. One key. Say the library name clearly — google-genai.",
+"One more idea before we build, because it demystifies the whole thing. What IS an API? It's just a way for your code to ask a service for something over the internet — you send a request, you get a response back. And you're already using one: Supabase is an API. Your app asks it for the deals, it sends them back. An AI API is the exact same shape, except what you send is text and what you get back is text. Now here's the part that saves you real effort: Gemini, Claude, OpenAI — they all work basically the same way. Same idea; you mostly just swap the address and the key. We're using Gemini today for one boring reason — it has a free quota, no credit card. And at work, at Anduin, we don't hit each provider directly; we go through one gateway called LiteLLM that speaks to all of them, and you can grab a key for that later. So don't memorize Gemini specifically — learn the shape once and it transfers to every model you'll ever touch.",
+"Here's exactly what we're adding, and I picked it precisely because it can't embarrass us live. A 'Draft follow-up' button on every deal: click it, and the app writes a short, friendly follow-up email for that exact company. It's instantly useful, it runs on data we already have, and there's no fact for it to get wrong — it's a first draft. The safe crowd-pleaser. Let's build it; I'll narrate as Claude works.",
+"While that builds, here's the shape underneath it — and it's the same shape for EVERY AI feature, which is why it's worth thirty seconds. Three moves. One: take data you already have — the deal's company, value, stage. Two: staple an instruction to it — 'write a friendly follow-up email.' That combined thing is the prompt. Three: the model reasons over it and hands back a draft, which you show. Name the data, name the instruction, name where it shows up. That's the recipe for the email — and for whatever you add later.",
+"This is the actual thing I type, and notice it's plain English, not code — I'm describing the feature to Claude the way I'd describe it to a coworker. Read it aloud and point at the pieces: the fields that go in, what I ask for, where the draft shows up, and — I'll say it twice — the key reads from dot-env. If you can say those three things in one sentence, you can add the feature. This is the template for anything you build after today.",
 "Last beat on this feature, and it's the one piece of theory that earns its keep. Everything you've built so far is deterministic — ask the database for deal seven, you get deal seven, every single time. This is your first PROBABILISTIC part: it reasons, so it can be wrong, and if you ask twice you might get two answers. That's why it hands you a draft, not a fact — and why your job shifts from typist to editor. The AI wrote the feature; you read what it wrote. Did it actually feed the deal's data into the prompt? Is the key in dot-env and ignored by Git, not pasted into the code where it leaks? And does it do something sane when the model is slow or off? Glance before you trust.",
-"And this is where I hand it to you — depending on the clock. If we've got minutes left, start right now: pick something tedious in YOUR world and program it away. A few seeds are on the screen to get you unstuck, but the best feature in this room will be one nobody listed, because it scratches an itch only you have. If we're out of time — and we might be — that's the mission for next week: come back with one idea. Same skill as the preview: find what's eating your time, and build the thing that kills it.",
-"Land it. Three weeks: you learned to build, then to remember, then to think — and that last one cost exactly one API key. The tools are easy now. The hard, human part is noticing what's worth building. So between now and next week, watch yourself work and catch the moment you think 'ugh, this again.' That sigh is your next feature. Bring it back and we'll build it. Thanks, everyone."
+"And this is where I hand it to you — depending on the clock. You've now seen the whole loop once: notice something, add the feature. If we've got minutes left, run the loop yourself — pick something tedious or missing in YOUR world and add it. A few seeds are on the screen to get you unstuck, but the best feature in this room will be one nobody listed, because it scratches an itch only you have. If we're out of time — and we might be — that's the mission for next week: come back with one thing you'd add. Same skill as before: find what's eating your time, and build the thing that kills it.",
+"Land it. Three weeks: you learned to build, then to remember, then to keep adding — and that last feature cost exactly one API key. The tools are easy now. The hard, human part is noticing what's worth building next. So between now and next week, watch yourself work and catch the moment you think 'ugh, this again.' That sigh is your next feature. Bring it back and we'll build it. Thanks, everyone."
 ]
 </script>
 <script src="deck-stage.js"></script>
@@ -166,9 +167,9 @@
       <div class="meta" style="color:#fff;opacity:.9;">Vibe Coding · Day 3</div>
     </div>
     <div class="body center">
-      <p class="eyebrow">Adding AI to the app you already built</p>
-      <h1 class="statement" style="font-size:118px;color:#fff;">Make It Smart</h1>
-      <p class="subtitle">Last week the app learned to remember. Today it learns to think.</p>
+      <p class="eyebrow">Adding to the app you already shipped</p>
+      <h1 class="statement" style="font-size:118px;color:#fff;">Keep Building</h1>
+      <p class="subtitle">Launching isn't the end. You ship, then you add — one feature at a time.</p>
     </div>
   </section>
 
@@ -200,44 +201,32 @@
         </div>
       </div>
     </div>
-    <div class="foot"><span><b>Build with a prompt · store in a database · ship to a URL. Today: make it think.</b></span><span>02</span></div>
+    <div class="foot"><span><b>Build with a prompt · store in a database · ship to a URL. You shipped it — now you keep going.</b></span><span>02</span></div>
   </section>
 
-  <!-- 3 — PREVIEW / THE REAL SKILL -->
-  <section data-label="03 Preview">
+  <!-- 3 — THE LOOP / THE REAL SKILL -->
+  <section data-label="03 The loop">
     <div class="head">
       <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
-      <div class="meta">Before any code</div>
+      <div class="meta">What today is really about</div>
     </div>
     <div class="body center">
-      <p class="eyebrow">The real skill today</p>
-      <h2 class="title">Find what's tedious. Automate it.</h2>
-      <div class="arrowline">
-        <span class="pill old">writing the same follow-up email</span>
-        <span class="ar">→</span>
-        <span class="pill new">a button that writes it for you</span>
+      <p class="eyebrow">Shipping is the start, not the end</p>
+      <h2 class="title" style="margin-bottom:10px;">You don't finish an app. You keep adding to it.</h2>
+      <div class="flow">
+        <div class="step"><div class="st">ship</div><div class="sd">you did — last week</div></div>
+        <div class="sep">→</div>
+        <div class="step"><div class="st">notice</div><div class="sd">“ugh, this again”</div></div>
+        <div class="sep">→</div>
+        <div class="step"><div class="st">add</div><div class="sd">the feature that kills it</div></div>
       </div>
-      <p class="subtitle">The example's made up — but this is how it works in real life. You don't start from “what can AI do.” You start from “what's eating my time.”</p>
+      <p class="subtitle">Every app you love is just version one plus a hundred small additions. Knowing what to add next is the real skill — and it's usually the tedious thing.</p>
     </div>
-    <div class="foot"><span><b>The AI can build almost anything. Knowing what's worth building is on you.</b></span><span>03</span></div>
+    <div class="foot"><span><b>The AI can build almost anything. Knowing what's worth adding is on you.</b></span><span>03</span></div>
   </section>
 
-  <!-- 4 — THE LEAP (theory) -->
-  <section class="navy" data-label="04 Inside the app">
-    <div class="head">
-      <div class="brand"><img src="assets/logos/mark-logo-white.svg" alt=""><span>Anduin</span></div>
-      <div class="meta">The one idea</div>
-    </div>
-    <div class="body center">
-      <p class="eyebrow">What changes today</p>
-      <h2 class="statement">The AI moves <span class="blue">inside</span> the app.</h2>
-      <p class="subtitle">For two weeks it built your app from the outside, then left. Now it runs while people use it — and it's just text in, text out, like calling the database.</p>
-    </div>
-    <div class="foot"><span><b>Build-time → run-time.</b></span><span>04</span></div>
-  </section>
-
-  <!-- 5 — REBUILD LIVE -->
-  <section data-label="05 Rebuild live">
+  <!-- 4 — REBUILD LIVE -->
+  <section data-label="04 Rebuild live">
     <div class="head">
       <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
       <div class="meta">Live · so everyone's caught up</div>
@@ -247,7 +236,21 @@
       <h2 class="title" style="margin-bottom:34px;">Rebuild last week's app — live.</h2>
       <div class="prompt">build me a shared <span class="hl">deal tracker</span> that runs in the browser. each deal has a company, value, stage, owner, created &amp; updated dates. use <span class="hl">supabase</span> to store it. typescript and react. <span class="hl">no auth</span> for now.</div>
     </div>
-    <div class="foot"><span><b>Going fast — the recording has every step from Weeks 1 &amp; 2.</b></span><span>05</span></div>
+    <div class="foot"><span><b>Going fast — the recording has every step from Weeks 1 &amp; 2.</b></span><span>04</span></div>
+  </section>
+
+  <!-- 5 — TODAY'S EXAMPLE (the AI feature) -->
+  <section class="navy" data-label="05 Add one feature">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-white.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">We run the loop once, together</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">Today's example feature</p>
+      <h2 class="statement">Let's add one.<br>And make it <span class="blue">think.</span></h2>
+      <p class="subtitle">The one I picked happens to use AI — a new trick. The same model that built your app can now run <em>inside</em> it: text in, text out, like calling the database.</p>
+    </div>
+    <div class="foot"><span><b>Build-time → run-time. The AI moves inside the app.</b></span><span>05</span></div>
   </section>
 
   <!-- 6 — ONE KEY -->
@@ -271,31 +274,58 @@
         <div class="row"><span class="p">»</span> use <span class="hl">google-genai</span> to call Gemini</div>
       </div>
     </div>
-    <div class="foot"><span><b>Remember last week's setup? This is the whole thing this time.</b></span><span>06</span></div>
+    <div class="foot"><span><b>Most features need zero setup. This one needs exactly one key.</b></span><span>06</span></div>
   </section>
 
-  <!-- 7 — THE FEATURE -->
-  <section class="navy" data-label="07 The feature">
+  <!-- 7 — WHAT'S AN API -->
+  <section data-label="07 What's an API">
+    <div class="head">
+      <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
+      <div class="meta">Before we build · one concept</div>
+    </div>
+    <div class="body center">
+      <p class="eyebrow">What that key is actually for</p>
+      <h2 class="title" style="margin-bottom:6px;">An API is just your code calling a service.</h2>
+      <div class="points">
+        <div class="point">
+          <div class="num">REQUEST → RESPONSE</div>
+          <div class="t">Your code asks a service over the internet, and gets an answer back. <b style="font-weight:600;">Supabase was one already.</b></div>
+        </div>
+        <div class="point">
+          <div class="num">SAME SHAPE</div>
+          <div class="t">Gemini · Claude · OpenAI — send text, get text. Mostly you just swap the address and the key.</div>
+        </div>
+        <div class="point key">
+          <div class="num">WHY GEMINI</div>
+          <div class="t">Free quota, no card. At Anduin we use <b style="font-weight:600;">LiteLLM</b> — one key for all of them. Get one later.</div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span><b>Learn the shape once — it transfers to every model you'll ever use.</b></span><span>07</span></div>
+  </section>
+
+  <!-- 8 — THE FEATURE -->
+  <section class="navy" data-label="08 The feature">
     <div class="head">
       <div class="brand"><img src="assets/logos/mark-logo-white.svg" alt=""><span>Anduin</span></div>
       <div class="meta">We build this together</div>
     </div>
     <div class="body center">
-      <p class="eyebrow">The feature I'll build live</p>
+      <p class="eyebrow">The feature we're adding live</p>
       <h2 class="statement">Click a deal →<br>it <span class="blue">writes the email.</span></h2>
       <p class="subtitle">A first draft, not a fact — so there's nothing for it to get wrong. The safe one to demo.</p>
     </div>
-    <div class="foot"><span><b>Make It Smart</b></span><span>07</span></div>
+    <div class="foot"><span><b>Draft follow-up — today's worked example.</b></span><span>08</span></div>
   </section>
 
-  <!-- 8 — THE PATTERN -->
-  <section class="tint" data-label="08 The pattern">
+  <!-- 9 — THE PATTERN -->
+  <section class="tint" data-label="09 The pattern">
     <div class="head">
       <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
       <div class="meta">The shape you'll reuse</div>
     </div>
     <div class="body center">
-      <p class="eyebrow">Every smart feature, same recipe</p>
+      <p class="eyebrow">Every AI feature, same recipe</p>
       <h2 class="title" style="margin-bottom:8px;">Data + instruction → a draft.</h2>
       <div class="flow">
         <div class="step"><div class="st">the data</div><div class="sd">company · value · stage</div></div>
@@ -305,11 +335,11 @@
         <div class="step"><div class="st">the draft</div><div class="sd">it reasons, you show it</div></div>
       </div>
     </div>
-    <div class="foot"><span><b>Name the data · name the instruction · name where it shows up.</b></span><span>08</span></div>
+    <div class="foot"><span><b>Name the data · name the instruction · name where it shows up.</b></span><span>09</span></div>
   </section>
 
-  <!-- 9 — THE BUILD PROMPT -->
-  <section data-label="09 Build prompt">
+  <!-- 10 — THE BUILD PROMPT -->
+  <section data-label="10 Build prompt">
     <div class="head">
       <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
       <div class="meta">What I'll actually type</div>
@@ -319,11 +349,11 @@
       <h2 class="title" style="margin-bottom:34px;">The prompt I hand to Claude</h2>
       <div class="prompt">add a <span class="hl">“Draft follow-up”</span> button to each deal. on click, use <span class="hl">google-genai</span> to ask Gemini for a short, friendly follow-up email using that deal's <span class="hl">company, value, stage, owner</span>. show the draft in a box I can copy. read the key from <span class="hl">.env</span>.</div>
     </div>
-    <div class="foot"><span><b>Make It Smart</b></span><span>09</span></div>
+    <div class="foot"><span><b>Describe the feature like you'd describe it to a coworker.</b></span><span>10</span></div>
   </section>
 
-  <!-- 10 — DRAFT, NOT FACT (theory + judgment) -->
-  <section class="tint" data-label="10 Read the diff">
+  <!-- 11 — DRAFT, NOT FACT (theory + judgment) -->
+  <section class="tint" data-label="11 Read the diff">
     <div class="head">
       <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
       <div class="meta">Your first probabilistic part</div>
@@ -337,18 +367,18 @@
         <div class="c"><span class="q">03</span><div>Does it survive the model being <b>slow or wrong?</b></div></div>
       </div>
     </div>
-    <div class="foot"><span><b>The database looks it up. The model reasons it out. You're the editor now.</b></span><span>10</span></div>
+    <div class="foot"><span><b>The database looks it up. The model reasons it out. You're the editor now.</b></span><span>11</span></div>
   </section>
 
-  <!-- 11 — YOUR TURN / NEXT WEEK -->
-  <section data-label="11 Your turn">
+  <!-- 12 — YOUR TURN / NEXT WEEK -->
+  <section data-label="12 Your turn">
     <div class="head">
       <div class="brand"><img src="assets/logos/mark-logo-default.svg" alt=""><span>Anduin</span></div>
       <div class="meta">Now — or your mission for next week</div>
     </div>
     <div class="body center">
-      <p class="eyebrow">Back to the real skill</p>
-      <h2 class="title">Now you: kill your own busywork.</h2>
+      <p class="eyebrow">Now you run the loop</p>
+      <h2 class="title">Your turn: add the thing only you need.</h2>
       <div class="ideas">
         <div class="idea"><div class="nm">Smart add</div><div class="ds">Paste a messy email — the form fills itself in.</div></div>
         <div class="idea"><div class="nm">Ask your pipeline</div><div class="ds">“What should I chase this week?”</div></div>
@@ -358,18 +388,18 @@
         <div class="idea wild"><div class="nm">…your own</div><div class="ds">The one nobody listed. That's the good one.</div></div>
       </div>
     </div>
-    <div class="foot"><span><b>If there's time, start now. If not — bring one idea next week.</b></span><span>11</span></div>
+    <div class="foot"><span><b>If there's time, start now. If not — bring one idea next week.</b></span><span>12</span></div>
   </section>
 
-  <!-- 12 — WRAP -->
-  <section class="close" data-label="12 Wrap">
+  <!-- 13 — WRAP -->
+  <section class="close" data-label="13 Wrap">
     <div class="head">
       <div class="brand"><img src="assets/logos/mark-logo-white.svg" alt=""><span>Anduin</span></div>
       <div class="meta" style="color:#fff;opacity:.85;">Day 3 · wrap</div>
     </div>
     <div class="body center">
-      <p class="eyebrow">Build · remember · think</p>
-      <h2 class="statement">The hard part isn't the code.<br>It's noticing <span class="blue">what to build.</span></h2>
+      <p class="eyebrow">Build · remember · keep building</p>
+      <h2 class="statement">The hard part isn't the code.<br>It's noticing <span class="blue">what to add next.</span></h2>
       <p class="subtitle">This week, catch yourself thinking “ugh, this again.” That's your next feature — bring it back and we'll build it.</p>
     </div>
   </section>

@@ -320,12 +320,12 @@ for now.</code></pre>
       label: "Week 3",
       decks: [
         {
-          title: "Make It Smart — Day 3",
+          title: "Keep Building — Day 3",
           sub: "main deck",
-          path: "wk3/Make It Smart.html",
+          path: "wk3/Keep Building.html",
           notes: `
-            <h2>Make It Smart</h2>
-            <p class="empty">Adding an AI feature to the Week 2 deal tracker.</p>
+            <h2>Keep Building</h2>
+            <p class="empty">Shipping isn't the end — you keep adding features. Today's worked example: an AI "Draft follow-up" button on the Week 2 deal tracker.</p>
 
             <h3>The one prereq</h3>
             <ul>
@@ -341,7 +341,10 @@ for now.</code></pre>
               <li>Make sure <code>.env</code> is in <code>.gitignore</code> — never commit the key.</li>
             </ol>
 
-            <h3>Feature A — the build prompt</h3>
+            <h3>What's an API (the 30-second version)</h3>
+            <p>Your code asks a service over the internet and gets an answer back — <strong>Supabase was one already.</strong> An LLM API is the same shape: send text, get text. Gemini, Claude, and OpenAI all work basically the same way — you mostly just swap the address and the key. We use Gemini today only because it has a <strong>free quota</strong>. At Anduin we go through <strong>LiteLLM</strong> (one gateway / one key for every provider) — you can get a key for that later.</p>
+
+            <h3>The worked example — build prompt</h3>
             <pre><code>add a "Draft follow-up" button to each deal.
 when clicked, use the google-genai library to
 call Gemini with that deal's company, value,
