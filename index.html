@@ -408,6 +408,37 @@ box I can copy. read the key from .env.</code></pre>
     {
       label: "Bonus · Advanced",
       decks: [
+        {
+          title: "Dynamic Workflows",
+          sub: "deep dive — optional",
+          path: "bonus/dynamic-workflows/Dynamic Workflows.html",
+          notes: `
+            <h2>Dynamic Workflows</h2>
+            <p class="empty">Claude builds its own team of fresh sub-agents on the fly. 60-min workshop; the two demos carry the room.</p>
+
+            <h3>The one reframe</h3>
+            <p>Stop hand-prompting agents one turn at a time — <strong>design the loop that prompts them for you.</strong> That loop is a workflow: you describe the shape, Claude writes the harness.</p>
+
+            <h3>When to reach for one</h3>
+            <p>Only when the task is <strong>long · parallel · adversarial · taste-based</strong>. Everything else is cheaper as a normal conversation.</p>
+
+            <h3>Workshop setup</h3>
+            <p>Tell Claude once, up front: <em>"For every workflow today, use Haiku for all the sub-agents."</em> Keeps a roomful of agents cheap.</p>
+
+            <h3>The six patterns</h3>
+            <ul>
+              <li><strong>Classify-and-act</strong> — sort each item, route it</li>
+              <li><strong>Fan-out-and-synthesize</strong> — split → parallel → merge <em>(demo)</em></li>
+              <li><strong>Adversarial verification</strong> — a separate agent attacks each result <em>(demo)</em></li>
+              <li><strong>Generate-and-filter</strong> — make many, keep the best</li>
+              <li><strong>Tournament</strong> — agents compete, judge picks pairwise <em>(demo)</em></li>
+              <li><strong>Loop-until-done</strong> — repeat until a stop condition</li>
+            </ul>
+
+            <h3>Power-ups</h3>
+            <p><code>budget Nk tokens</code> · <code>/goal</code> · <code>/loop</code> · save with <code>s</code> → <code>~/.claude/workflows</code></p>
+          `,
+        },
         { title: "Git for Vibecoders", sub: "deep dive — optional", path: "bonus/Git for Vibecoders.html" },
       ],
     },

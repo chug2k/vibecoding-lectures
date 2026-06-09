@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dynamic Workflows — 60 min</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="deck-stage.js"></script>
+<style>
+  :root {
+    /* Type scale — projection-appropriate at 1920×1080 */
+    --type-hero: 156px;
+    --type-title: 84px;
+    --type-section: 64px;
+    --type-subtitle: 40px;
+    --type-lead: 36px;
+    --type-body: 30px;
+    --type-small: 26px;
+    --type-eyebrow: 24px;
+    --type-mono-big: 52px;
+    --type-mono: 36px;
+
+    /* Spacing */
+    --pad-top: 110px;
+    --pad-bottom: 100px;
+    --pad-x: 140px;
+    --gap-title: 56px;
+    --gap-item: 32px;
+
+    /* Colors */
+    --ink: var(--color-gray-9);
+    --ink-soft: var(--color-gray-8);
+    --muted: var(--color-gray-6);
+    --hairline: var(--color-gray-3);
+    --paper: var(--color-gray-1);
+    --accent: #48AFF0;
+    --accent-deep: var(--color-primary-4);
+    --terminal-bg: #0d1117;
+    --terminal-fg: #e6edf3;
+    --terminal-green: #7ee787;
+    --terminal-blue: #79c0ff;
+    --terminal-dim: #8b949e;
+    --terminal-purple: #d2a8ff;
+    --terminal-orange: #ffa657;
+  }
+
+  html, body { margin: 0; background: #000; }
+
+  deck-stage > section {
+    background: #fff;
+    color: var(--ink);
+    font-family: var(--font-display);
+    line-height: 1.4;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── persistent brand mark ──────────────────────────────────────── */
+  .brand-mark {
+    position: absolute; top: 64px; right: 80px;
+    display: flex; align-items: center; gap: 18px;
+    z-index: 5;
+  }
+  .brand-mark img { height: 28px; width: auto; display: block; }
+  .brand-mark .program {
+    padding-left: 18px;
+    border-left: 1px solid var(--hairline);
+    font-size: 18px; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .dark .brand-mark .program { color: rgba(255,255,255,0.6); border-left-color: rgba(255,255,255,0.18); }
+
+  /* ── shared chrome ──────────────────────────────────────────────── */
+  .slide-num {
+    position: absolute; right: 56px; bottom: 48px;
+    font-size: var(--type-small); color: var(--muted);
+    font-variant-numeric: tabular-nums; letter-spacing: 0.04em;
+  }
+  .dark .slide-num { color: var(--terminal-dim); }
+  .slide-eyebrow {
+    position: absolute; left: var(--pad-x); top: 72px;
+    font-size: var(--type-eyebrow); font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+  .dark .slide-eyebrow { color: var(--accent); }
+
+  /* ── frames ─────────────────────────────────────────────────────── */
+  .frame {
+    width: 100%; height: 100%;
+    padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
+    box-sizing: border-box;
+    display: flex; flex-direction: column;
+  }
+  .frame.center { justify-content: center; align-items: center; text-align: center; }
+  .frame.cl { justify-content: center; align-items: flex-start; }
+
+  /* ── type helpers ───────────────────────────────────────────────── */
+  h1.hero { margin: 0; font-size: var(--type-hero); line-height: 0.96; letter-spacing: -0.045em; font-weight: 600; color: var(--ink); }
+  h2.title { margin: 0 0 var(--gap-title); font-size: var(--type-title); line-height: 1.02; letter-spacing: -0.03em; font-weight: 600; color: var(--ink); }
+  .dark h2.title { color: #fff; }
+  .lead { font-size: var(--type-lead); line-height: 1.35; color: var(--ink-soft); font-weight: 400; letter-spacing: -0.005em; margin: 0; }
+  .dark .lead { color: #c2cdd9; }
+  .body { font-size: var(--type-body); line-height: 1.45; color: var(--ink-soft); font-weight: 400; margin: 0; }
+  .accent-text { color: var(--accent-deep); font-weight: 600; }
+
+  /* ── 01 · TITLE ─────────────────────────────────────────────────── */
+  .s-title { background: url('assets/cover-gradient.png') center/cover no-repeat, #eaf6ff; }
+  .s-title .frame { justify-content: flex-end; padding-bottom: 140px; }
+  .s-title .hero-brand {
+    display: inline-flex; align-items: center; gap: 22px;
+    padding: 14px 26px; background: #fff; border-radius: 999px;
+    box-shadow: 0 4px 18px -6px rgba(31,49,69,0.18), 0 1px 0 rgba(31,49,69,0.06) inset;
+    align-self: flex-start;
+  }
+  .s-title .hero-logo { height: 32px; width: auto; display: block; }
+  .s-title .hero-program {
+    padding-left: 22px; border-left: 1px solid var(--hairline);
+    font-size: 20px; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--accent-deep);
+  }
+  .s-title .kicker {
+    font-size: var(--type-eyebrow); font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 36px;
+  }
+  .s-title .frame > .spacer { flex: 1; }
+  .s-title .sub {
+    margin-top: 40px; font-size: var(--type-subtitle); color: var(--ink-soft);
+    max-width: 1240px; font-weight: 400; line-height: 1.3; letter-spacing: -0.005em;
+  }
+  .s-title .byline {
+    position: absolute; bottom: 80px; left: 140px; right: 140px;
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: var(--type-small); color: var(--ink-soft);
+  }
+  .s-title .byline b { font-weight: 600; color: var(--ink); }
+  .s-title .pill {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 12px 24px; border-radius: 999px;
+    background: rgba(255,255,255,0.7); border: 1px solid rgba(72,175,240,0.3);
+    backdrop-filter: blur(8px); font-size: var(--type-small);
+    color: var(--accent-deep); font-weight: 500;
+  }
+  .s-title .pill .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(72,175,240,0.2); }
+
+  /* ── 02 · VERSUS ────────────────────────────────────────────────── */
+  .s-versus .grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; min-height: 0; }
+  .vcard { border-radius: 18px; padding: 56px 52px; display: flex; flex-direction: column; gap: 28px; position: relative; overflow: hidden; }
+  .vcard .vtag { font-size: 24px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+  .vcard h3 { margin: 0; font-size: 52px; line-height: 1.06; letter-spacing: -0.025em; font-weight: 600; }
+  .vcard p { margin: 0; font-size: var(--type-body); line-height: 1.42; }
+  .vcard.old { background: var(--terminal-bg); color: #c2cdd9; border: 1px solid #1c232c; }
+  .vcard.old .vtag { color: var(--terminal-dim); }
+  .vcard.old h3 { color: #fff; }
+  .vcard.old .heads { display: flex; gap: 16px; margin-top: auto; }
+  .vcard.old .heads .blob { width: 76px; height: 76px; border-radius: 50%; background: #1c232c; border: 1px solid #2b3440; display: grid; place-items: center; font-size: 34px; }
+  .vcard.new { background: #fff; border: 1px solid var(--hairline); box-shadow: 0 18px 48px -22px rgba(31,49,69,0.18); }
+  .vcard.new .vtag { color: var(--accent-deep); }
+  .vcard.new h3 { color: var(--ink); }
+  .vcard.new p { color: var(--ink-soft); }
+  .vcard.new p b { color: var(--ink); font-weight: 600; }
+  .vcard.new .team { display: flex; gap: 12px; margin-top: auto; flex-wrap: wrap; }
+  .vcard.new .team .agent {
+    width: 58px; height: 58px; border-radius: 14px;
+    background: rgba(72,175,240,0.12); border: 1px solid rgba(72,175,240,0.4);
+    display: grid; place-items: center; color: var(--accent-deep);
+    font-family: var(--font-mono); font-size: 22px; font-weight: 600;
+  }
+
+  /* ── 03 · FAILURE MODES ─────────────────────────────────────────── */
+  .s-fail { background: var(--paper); }
+  .s-fail .lead { max-width: 1300px; margin-bottom: 52px; }
+  .s-fail .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; flex: 1; min-height: 0; }
+  .fcard { background: #fff; border: 1px solid var(--hairline); border-radius: 16px; padding: 44px 40px 40px; display: flex; flex-direction: column; gap: 20px; position: relative; }
+  .fcard .fnum { font-family: var(--font-mono); font-size: 26px; color: var(--accent); font-weight: 600; }
+  .fcard h3 { margin: 0; font-size: 40px; line-height: 1.08; letter-spacing: -0.02em; font-weight: 600; color: var(--ink); }
+  .fcard p { margin: 0; font-size: 27px; line-height: 1.4; color: var(--ink-soft); }
+  .fcard p b { color: var(--ink); font-weight: 600; }
+  .fcard .bar { position: absolute; left: 0; top: 44px; bottom: 44px; width: 4px; background: var(--accent); border-radius: 0 3px 3px 0; }
+  .s-fail .kicker-bottom { margin-top: 44px; font-size: 28px; color: var(--ink-soft); display: flex; align-items: center; gap: 16px; }
+  .s-fail .kicker-bottom .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .s-fail .kicker-bottom b { color: var(--ink); font-weight: 600; }
+
+  /* ── 04 · DESCRIBE THE SHAPE ────────────────────────────────────── */
+  .s-shape .lead { max-width: 1340px; margin-bottom: 48px; }
+  .s-shape .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .pcard { border: 1px solid var(--hairline); border-radius: 16px; background: #fff; padding: 40px 36px; display: flex; flex-direction: column; gap: 22px; min-height: 320px; }
+  .pcard .ptrigger {
+    font-family: var(--font-mono); font-size: 34px; line-height: 1.25;
+    color: var(--ink); background: var(--paper); border: 1px solid var(--hairline);
+    border-radius: 10px; padding: 18px 22px;
+  }
+  .pcard .ptrigger .accent-text { color: var(--accent-deep); }
+  .pcard .pdesc { font-size: 27px; line-height: 1.4; color: var(--ink-soft); margin: 0; }
+  .pcard.code-card { background: var(--terminal-bg); border-color: #1c232c; }
+  .pcard.code-card .ptrigger { background: #161c25; border-color: #2b3440; color: #fff; }
+  .pcard.code-card .ptrigger .mono-accent { color: var(--terminal-purple); }
+  .pcard.code-card .pdesc { color: #c2cdd9; }
+  .s-shape .footer-note {
+    margin-top: 48px; padding: 26px 34px; border-left: 4px solid var(--accent);
+    background: var(--paper); border-radius: 0 12px 12px 0;
+    font-size: 32px; color: var(--ink);
+  }
+  .s-shape .footer-note b { color: var(--accent-deep); font-weight: 600; }
+
+  /* ── 05 · SPLIT ─────────────────────────────────────────────────── */
+  .s-split .grid { flex: 1; display: grid; grid-template-columns: 1fr auto 1fr; gap: 48px; align-items: center; min-height: 0; }
+  .scol { display: flex; flex-direction: column; gap: 24px; }
+  .scol .label { font-size: 26px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-deep); display: flex; align-items: center; gap: 16px; }
+  .scol .label .ico { width: 52px; height: 52px; border-radius: 12px; background: rgba(72,175,240,0.12); border: 1px solid rgba(72,175,240,0.4); display: grid; place-items: center; font-family: var(--font-mono); font-size: 26px; color: var(--accent-deep); }
+  .scol h3 { margin: 0; font-size: 46px; line-height: 1.06; letter-spacing: -0.02em; font-weight: 600; color: var(--ink); }
+  .scol .traits { display: flex; flex-direction: column; gap: 16px; }
+  .scol .trait { font-size: 28px; line-height: 1.32; color: var(--ink-soft); padding-left: 36px; position: relative; }
+  .scol .trait.good::before { content: "+"; position: absolute; left: 0; color: var(--accent-deep); font-weight: 700; }
+  .scol .trait.bad::before { content: "−"; position: absolute; left: 2px; color: var(--muted); font-weight: 700; }
+  .scol .trait b { color: var(--ink); font-weight: 600; }
+  .s-split .divider { width: 1px; align-self: stretch; background: var(--hairline); position: relative; }
+  .s-split .divider .vs { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #fff; padding: 16px 0; font-size: 24px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  .s-split .closer { margin-top: 44px; font-size: 30px; color: var(--ink-soft); text-align: center; }
+  .s-split .closer b { color: var(--ink); font-weight: 600; }
+
+  /* ── 06 · WHEN NOT TO ───────────────────────────────────────────── */
+  .s-when { background: var(--terminal-bg); }
+  .s-when .frame { justify-content: center; }
+  .s-when .eyebrow-d { font-size: var(--type-eyebrow); font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 40px; }
+  .s-when h2 { margin: 0; font-size: 76px; line-height: 1.05; letter-spacing: -0.03em; font-weight: 500; color: #fff; max-width: 1500px; }
+  .s-when h2 b { font-weight: 600; }
+  .s-when .mantra { margin-top: 72px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .s-when .mantra .word {
+    font-size: 56px; font-weight: 600; letter-spacing: -0.02em; color: #fff;
+    padding: 18px 40px; border-radius: 14px;
+    background: linear-gradient(180deg, #161c25, #11161d); border: 1px solid #2b3440;
+  }
+  .s-when .mantra .word span { color: var(--accent); }
+  .s-when .sub { margin-top: 64px; font-size: 32px; color: #8b949e; max-width: 1400px; line-height: 1.4; }
+  .s-when .sub b { color: #c2cdd9; font-weight: 500; }
+
+  /* ── 07 · HAIKU SETUP ───────────────────────────────────────────── */
+  .s-haiku .grid { flex: 1; display: grid; grid-template-columns: 1.1fr 1fr; gap: 80px; align-items: center; min-height: 0; }
+  .s-haiku .quote-card {
+    background: var(--terminal-bg); border-radius: 18px; padding: 56px 56px;
+    border: 1px solid #1c232c; box-shadow: 0 28px 70px -28px rgba(13,17,23,0.45);
+  }
+  .s-haiku .quote-card .qmark { font-size: 28px; color: var(--accent); font-family: var(--font-mono); margin-bottom: 24px; letter-spacing: 0.1em; }
+  .s-haiku .quote-card .qtext { font-size: 46px; line-height: 1.28; color: #fff; font-weight: 500; letter-spacing: -0.015em; }
+  .s-haiku .quote-card .qtext b { color: var(--accent); font-weight: 600; }
+  .s-haiku .right { display: flex; flex-direction: column; gap: 28px; }
+  .s-haiku .right h2 { margin: 0; font-size: 56px; line-height: 1.04; letter-spacing: -0.025em; font-weight: 600; color: var(--ink); }
+  .s-haiku .right p { margin: 0; font-size: 30px; line-height: 1.42; color: var(--ink-soft); }
+  .s-haiku .right p b { color: var(--ink); font-weight: 600; }
+  .s-haiku .right .once { display: inline-flex; align-items: center; gap: 14px; align-self: flex-start; padding: 12px 24px; border-radius: 999px; background: rgba(72,175,240,0.12); color: var(--accent-deep); font-weight: 600; font-size: 26px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+  /* ── 08 · SIX PATTERNS ──────────────────────────────────────────── */
+  .s-patterns .lead { max-width: 1200px; margin-bottom: 44px; }
+  .s-patterns .grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; gap: 24px; flex: 1; min-height: 0; }
+  .patcard { border: 1px solid var(--hairline); border-radius: 16px; background: #fff; padding: 32px 34px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+  .patcard .pidx { font-family: var(--font-mono); font-size: 24px; color: var(--accent); font-weight: 600; }
+  .patcard h3 { margin: 0; font-size: 34px; line-height: 1.08; letter-spacing: -0.02em; font-weight: 600; color: var(--ink); }
+  .patcard .shape { margin-top: auto; font-size: 25px; line-height: 1.35; color: var(--ink-soft); }
+  .patcard.hot { background: linear-gradient(180deg, rgba(72,175,240,0.1), rgba(72,175,240,0.03)); border-color: rgba(72,175,240,0.4); }
+  .patcard.hot::after { content: "DEMO"; position: absolute; top: 30px; right: 32px; font-size: 18px; font-weight: 700; letter-spacing: 0.12em; color: var(--accent-deep); background: rgba(72,175,240,0.15); padding: 4px 12px; border-radius: 999px; }
+
+  /* ── 09 · TWO IDEAS ─────────────────────────────────────────────── */
+  .s-ideas .grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; min-height: 0; }
+  .icard { border: 1px solid var(--hairline); border-radius: 18px; background: #fff; padding: 56px 52px; display: flex; flex-direction: column; gap: 28px; box-shadow: 0 18px 48px -24px rgba(31,49,69,0.16); }
+  .icard .inum { font-family: var(--font-mono); font-size: 64px; line-height: 1; font-weight: 600; color: var(--accent); letter-spacing: -0.03em; }
+  .icard h3 { margin: 0; font-size: 48px; line-height: 1.06; letter-spacing: -0.02em; font-weight: 600; color: var(--ink); }
+  .icard p { margin: 0; font-size: 29px; line-height: 1.42; color: var(--ink-soft); }
+  .icard p b { color: var(--ink); font-weight: 600; }
+  .icard .diagram { margin-top: auto; padding-top: 28px; }
+  /* barrier diagram */
+  .barr { display: flex; align-items: center; gap: 14px; }
+  .barr .node { width: 50px; height: 50px; border-radius: 12px; background: rgba(72,175,240,0.12); border: 1px solid rgba(72,175,240,0.45); }
+  .barr .fan { display: flex; flex-direction: column; gap: 8px; }
+  .barr .fan .node { width: 44px; height: 36px; }
+  .barr .gate { width: 8px; align-self: stretch; background: var(--accent); border-radius: 4px; }
+  .barr .arrow { color: var(--muted); font-size: 28px; }
+  .barr .merged { width: 64px; height: 64px; border-radius: 14px; background: var(--accent); }
+  /* compare diagram */
+  .cmp { display: flex; align-items: center; gap: 18px; }
+  .cmp .box { width: 86px; height: 64px; border-radius: 12px; border: 1px solid var(--hairline); background: var(--paper); display: grid; place-items: center; font-family: var(--font-mono); font-size: 30px; font-weight: 600; color: var(--ink); }
+  .cmp .box.win { background: rgba(72,175,240,0.14); border-color: rgba(72,175,240,0.5); color: var(--accent-deep); }
+  .cmp .qq { font-family: var(--font-mono); font-size: 38px; color: var(--accent); font-weight: 600; }
+
+  /* ── 10–12 · PATTERN DETAIL ─────────────────────────────────────── */
+  .s-pat { background: var(--terminal-bg); }
+  .s-pat .pnum-eyebrow { position: absolute; left: var(--pad-x); top: 72px; font-size: var(--type-eyebrow); font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+  .s-pat .frame { justify-content: center; }
+  .s-pat .grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 88px; align-items: center; }
+  .s-pat h2 { margin: 0 0 28px; font-size: 72px; line-height: 1.02; letter-spacing: -0.03em; font-weight: 600; color: #fff; }
+  .s-pat .desc { font-size: 36px; line-height: 1.34; color: #c2cdd9; margin: 0 0 36px; }
+  .s-pat .desc b { color: #fff; font-weight: 600; }
+  .s-pat .desc em { font-style: normal; color: var(--accent); font-weight: 600; }
+  .s-pat .tip { display: flex; gap: 18px; align-items: flex-start; padding: 24px 28px; background: #161c25; border: 1px solid #2b3440; border-radius: 14px; font-size: 27px; line-height: 1.4; color: #c2cdd9; }
+  .s-pat .tip .tlabel { font-size: 20px; font-weight: 700; letter-spacing: 0.1em; color: var(--accent); flex-shrink: 0; padding-top: 4px; }
+  .s-pat .tip b { color: #fff; font-weight: 600; }
+
+  /* pattern diagram panel */
+  .diag-panel { background: linear-gradient(180deg, #11161d, #0b0f14); border: 1px solid #1c232c; border-radius: 18px; padding: 48px 44px; display: flex; flex-direction: column; gap: 0; box-shadow: 0 28px 70px -30px rgba(0,0,0,0.6); }
+  .agent-node {
+    display: flex; align-items: center; gap: 16px; padding: 18px 22px;
+    background: #161c25; border: 1px solid #2b3440; border-radius: 12px;
+    font-family: var(--font-mono); font-size: 25px; color: #e6edf3;
+  }
+  .agent-node .dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .agent-node .dot.blue { background: var(--accent); }
+  .agent-node .dot.green { background: var(--terminal-green); }
+  .agent-node .dot.purple { background: var(--terminal-purple); }
+  .agent-node .dot.red { background: #ff7b72; }
+  .agent-node.lead-node { background: rgba(72,175,240,0.12); border-color: rgba(72,175,240,0.4); color: #fff; }
+  .agent-node.result-node { background: rgba(126,231,135,0.1); border-color: rgba(126,231,135,0.35); }
+  .agent-node .sub { color: var(--terminal-dim); font-size: 21px; margin-left: auto; }
+  .connector { width: 2px; height: 26px; background: #2b3440; margin: 6px 0 6px 32px; }
+  .fan-row { display: flex; gap: 14px; }
+  .fan-row .agent-node { flex: 1; justify-content: center; padding: 16px 12px; font-size: 22px; }
+  .barrier-bar { margin: 14px 0; padding: 12px 0; text-align: center; border-top: 1px dashed #2b3440; border-bottom: 1px dashed #2b3440; font-family: var(--font-mono); font-size: 22px; color: var(--accent); letter-spacing: 0.06em; }
+  /* tournament bracket */
+  .bracket { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 10px; }
+  .bracket .seed { padding: 14px 16px; background: #161c25; border: 1px solid #2b3440; border-radius: 10px; font-family: var(--font-mono); font-size: 22px; color: #c2cdd9; text-align: center; }
+  .bracket .seed.win { background: rgba(72,175,240,0.14); border-color: rgba(72,175,240,0.5); color: #fff; }
+  .bracket .seed.champ { background: var(--accent); color: #06243a; font-weight: 600; border-color: var(--accent); }
+  .bracket .vs-mini { font-family: var(--font-mono); font-size: 20px; color: var(--terminal-dim); }
+  .bracket .stack { display: flex; flex-direction: column; gap: 10px; }
+
+  /* ── 13 · PICK ONE ──────────────────────────────────────────────── */
+  /* ── 02 · TWEET / REFRAME ───────────────────────────────────────── */
+  /* ── 03 · BUN PROOF ─────────────────────────────────────────────── */
+  .s-bun { background: var(--terminal-bg); }
+  .s-bun .frame { justify-content: center; }
+  .s-bun .eyebrow-b { font-size: var(--type-eyebrow); font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 40px; }
+  .s-bun h2 { margin: 0 0 26px; font-size: 80px; line-height: 1.0; letter-spacing: -0.03em; font-weight: 600; color: #fff; }
+  .s-bun h2 b { color: var(--accent); }
+  .s-bun .sub { font-size: 33px; line-height: 1.42; color: #c2cdd9; max-width: 1560px; margin: 0 0 56px; }
+  .s-bun .sub b { color: #fff; font-weight: 600; }
+  .s-bun .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .s-bun .stat { border: 1px solid #2b3440; border-radius: 16px; background: linear-gradient(180deg, #161c25, #11161d); padding: 36px 34px 38px; display: flex; flex-direction: column; gap: 16px; }
+  .s-bun .stat .num { font-size: 58px; line-height: 1; font-weight: 600; letter-spacing: -0.03em; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .s-bun .stat .num.sm { font-size: 46px; }
+  .s-bun .stat .lab { font-size: 25px; line-height: 1.34; color: #c2cdd9; }
+  .s-bun .stat .lab b { color: #fff; font-weight: 600; }
+  .s-bun .foot { margin-top: 44px; display: flex; align-items: center; gap: 16px; font-size: 25px; color: #8b949e; flex-wrap: wrap; }
+  .s-bun .foot code { font-family: var(--font-mono); font-size: 23px; color: var(--accent); background: #161c25; border: 1px solid #2b3440; border-radius: 8px; padding: 5px 14px; }
+  .s-bun .foot .sep { color: #2b3440; }
+  .s-bun .foot b { color: #c2cdd9; font-weight: 500; }
+
+  .s-tweet { background: url('assets/soft-backdrop.png') center/cover no-repeat, var(--paper); }
+  .s-tweet .frame { justify-content: center; align-items: center; }
+  .s-tweet .eyebrow-t { font-size: var(--type-eyebrow); font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-deep); margin-bottom: 52px; }
+  .tweet-card { width: 1240px; background: #fff; border: 1px solid var(--hairline); border-radius: 24px; padding: 56px 64px; box-shadow: 0 28px 80px -30px rgba(31,49,69,0.24); }
+  .tweet-card .head { display: flex; align-items: center; gap: 22px; margin-bottom: 36px; }
+  .tweet-card .avatar { width: 88px; height: 88px; border-radius: 50%; background: linear-gradient(140deg, #5bb8f3, #2A5CC4); flex-shrink: 0; display: grid; place-items: center; color: #fff; font-size: 36px; font-weight: 600; }
+  .tweet-card .who { display: flex; flex-direction: column; gap: 6px; }
+  .tweet-card .who .name { font-size: 31px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 12px; }
+  .tweet-card .who .name .verified { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 17px; display: inline-grid; place-items: center; }
+  .tweet-card .who .handle { font-size: 25px; color: var(--muted); }
+  .tweet-card .body { font-size: 46px; line-height: 1.34; color: var(--ink); letter-spacing: -0.015em; }
+  .tweet-card .body b { color: var(--accent-deep); font-weight: 600; }
+  .tweet-card .body .p2 { margin-top: 26px; }
+  .tweet-card .meta { margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--hairline); display: flex; gap: 52px; font-size: 24px; color: var(--muted); }
+  .tweet-card .meta b { color: var(--ink); font-weight: 600; }
+  .s-tweet .bridge { margin-top: 52px; font-size: 36px; line-height: 1.35; color: var(--ink-soft); text-align: center; max-width: 1240px; letter-spacing: -0.01em; }
+  .s-tweet .bridge b { color: var(--accent-deep); font-weight: 600; }
+
+  /* ── 14 · REAL PROMPTS ──────────────────────────────────────────── */
+  .s-prompts { background: var(--paper); }
+  .s-prompts .title { margin-bottom: 44px; }
+  .s-prompts .plist { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; min-height: 0; }
+  .rpcard { background: #fff; border: 1px solid var(--hairline); border-radius: 16px; padding: 36px 40px; display: flex; flex-direction: column; gap: 20px; justify-content: space-between; }
+  .rpcard .rptext { font-family: var(--font-mono); font-size: 28px; line-height: 1.42; color: var(--ink); }
+  .rpcard .rptext b { color: var(--accent-deep); font-weight: 600; }
+  .rpcard .rptag { font-size: 21px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-deep); }
+  .s-prompts .rp-proof { margin-top: 40px; font-size: 28px; color: var(--ink-soft); display: flex; align-items: center; gap: 16px; }
+  .s-prompts .rp-proof .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .s-prompts .rp-proof b { color: var(--ink); font-weight: 600; }
+  .s-prompts .rp-proof .src { color: var(--muted); font-style: italic; }
+
+  /* ── 17 · TWO KINDS OF MIND ─────────────────────────────────────── */
+  .s-minds { background: var(--terminal-bg); }
+  .s-minds .frame { justify-content: center; }
+  .s-minds .eyebrow-m { font-size: var(--type-eyebrow); font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 44px; }
+  .s-minds h2 { margin: 0 0 56px; font-size: 60px; line-height: 1.08; letter-spacing: -0.025em; font-weight: 500; color: #fff; max-width: 1600px; }
+  .s-minds h2 b { color: var(--accent); font-weight: 600; }
+  .s-minds .twin { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
+  .s-minds .mind { border-radius: 18px; padding: 48px 52px; border: 1px solid #2b3440; background: linear-gradient(180deg, #161c25, #11161d); display: flex; flex-direction: column; gap: 26px; }
+  .s-minds .mind .mtag { font-size: 24px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+  .s-minds .mind h3 { margin: 0; font-size: 52px; line-height: 1; letter-spacing: -0.02em; font-weight: 600; color: #fff; }
+  .s-minds .mind .chips { display: flex; flex-wrap: wrap; gap: 12px; }
+  .s-minds .mind .mchip { font-family: var(--font-mono); font-size: 25px; padding: 10px 20px; border-radius: 999px; border: 1px solid #2b3440; color: #c2cdd9; }
+  .s-minds .mind .but { margin-top: auto; padding-top: 24px; border-top: 1px solid #2b3440; font-size: 27px; line-height: 1.4; color: #8b949e; }
+  .s-minds .mind.computer .mtag { color: var(--accent); }
+  .s-minds .mind.computer .mchip { border-color: rgba(72,175,240,0.4); color: #cae6fb; }
+  .s-minds .mind.people .mtag { color: var(--terminal-purple); }
+  .s-minds .mind.people .mchip { border-color: rgba(210,168,255,0.4); color: #e8d8ff; }
+  .s-minds .minds-closer { margin-top: 52px; font-size: 32px; line-height: 1.4; color: #c2cdd9; text-align: center; max-width: 1500px; align-self: center; }
+  .s-minds .minds-closer b { color: #fff; font-weight: 600; }
+
+  .s-pick { background: var(--paper); }
+  .s-pick .lead { max-width: 1300px; margin-bottom: 52px; }
+  .s-pick .chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .s-pick .chip {
+    background: #fff; border: 1px solid var(--hairline); border-radius: 14px;
+    padding: 34px 30px; display: flex; flex-direction: column; gap: 12px;
+    min-height: 150px;
+  }
+  .s-pick .chip .ctitle { font-size: 32px; line-height: 1.1; font-weight: 600; letter-spacing: -0.015em; color: var(--ink); }
+  .s-pick .chip .cpat { font-size: 21px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-deep); margin-top: auto; }
+  .s-pick .footnote { margin-top: 52px; font-size: 30px; color: var(--ink-soft); display: flex; align-items: center; gap: 16px; }
+  .s-pick .footnote .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .s-pick .footnote b { color: var(--ink); font-weight: 600; }
+
+  /* ── 14 · POWER-UPS ─────────────────────────────────────────────── */
+  .s-power .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; flex: 1; min-height: 0; }
+  .powcard { border: 1px solid var(--hairline); border-radius: 16px; background: #fff; padding: 40px 44px; display: flex; align-items: center; gap: 36px; }
+  .powcard .cmd { font-family: var(--font-mono); font-size: 42px; font-weight: 500; color: var(--accent-deep); white-space: nowrap; flex-shrink: 0; min-width: 300px; }
+  .powcard .cmd .dim { color: var(--muted); }
+  .powcard .pdesc { font-size: 29px; line-height: 1.36; color: var(--ink-soft); border-left: 1px solid var(--hairline); padding-left: 36px; }
+  .powcard .pdesc b { color: var(--ink); font-weight: 600; }
+  .s-power .combo { margin-top: 36px; padding: 28px 36px; background: var(--terminal-bg); border-radius: 14px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 28px; color: #c2cdd9; }
+  .s-power .combo .clabel { color: var(--accent); font-weight: 600; letter-spacing: 0.06em; }
+  .s-power .combo .sep { color: var(--accent); }
+  .s-power .combo b { color: #fff; font-weight: 500; }
+
+  /* ── 15 · WHAT TO KEEP ──────────────────────────────────────────── */
+  .s-keep { background: url('assets/cover-gradient.png') center/cover no-repeat, #eaf6ff; }
+  .s-keep .frame { justify-content: center; align-items: flex-start; }
+  .s-keep .eyebrow-k { font-size: var(--type-eyebrow); font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-deep); margin-bottom: 48px; }
+  .s-keep h1 {
+    margin: 0; font-size: 82px; line-height: 1.12; letter-spacing: -0.025em;
+    font-weight: 500; color: var(--ink); max-width: 1560px;
+  }
+  .s-keep h1 b { font-weight: 600; color: var(--accent-deep); }
+  .s-keep .signoff { margin-top: 80px; display: flex; align-items: center; gap: 22px; font-size: var(--type-body); color: var(--ink); }
+  .s-keep .signoff b { font-weight: 600; }
+  .s-keep .signoff .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+</style>
+
+<script type="application/json" id="speaker-notes">
+[
+  "Cold open. Don't read the slide — fire the warm-up demo (name a coffee shop, separate judge picks the top 3) so they see the machinery in two minutes. The demos carry the room; slides are the spine.",
+  "Open cold on this tweet — don't lecture, let them read it, then say it back plainly: stop hand-prompting agents one turn at a time; design the loop that prompts them for you. That loop is a workflow. Claude writes the harness; you just describe the shape. Everything today hangs off this one reframe.",
+  "Before we touch mechanics, proof this isn't a toy. Bun — a hugely popular JavaScript runtime, hundreds of thousands of lines — was ported from Zig to Rust almost entirely by Claude orchestrating itself with a dynamic workflow: a subagent per module, an adversarial reviewer on each, then merge. 6,755 commits in one PR, passes the full test suite on every platform, smaller binary, as fast or faster, and it even fixed old memory leaks. Bun's own creator merged it. The branch was literally named claude/phase-a-port. That's the ceiling of what we're playing with — you won't do this in 60 minutes, but it shows the shape scales all the way up.",
+  "The agents aren't smarter. Same model, just fresh and narrow, so they can't get tired or distracted by the other 49 items.",
+  "A fresh team, run by code that counts and never forgets, removes all three.",
+  "You describe the shape — 'make many, then judge' — and Claude writes the code. The whole skill is seeing the shape.",
+  "A workflow lets each do its job. Claude decides where the line goes.",
+  "The most important slide. Gut check: would one smart person doing this in a single sitting cut corners, grade themselves too kindly, or lose the thread?",
+  "We're experimenting, so cost matters more than polish. Workflows spawn a lot of agents — Haiku keeps a roomful of people cheap.",
+  "The photograph slide. Leave it up a beat. Everything else is a mix of these.",
+  "These two show up in every pattern. Worth saying once, clearly.",
+  "Demo: 'research 6 PM tools, one agent each, then synthesize a pick for a non-technical team.' Point out the burst of parallel agents, then the barrier that waits for all of them.",
+  "Demo: fact-check the seeded draft. The memorable beat — Everest is 8,848.86 m, not 8,849. A separate, attacking checker catches what a skim misses. Linger here.",
+  "Demo: 6 cover-letter openers, judged pairwise. Note the judge gives reasons A beat B, never '8/10.'",
+  "Slow down and read two of these out loud — they're real prompts from the Anthropic post. The texture is the point: people just describe the job and name the shape in plain English ('run a tournament', 'tear it apart from three angles'). The pattern hides in the verb. Then hand it to them.",
+  "The heart of the session. Workflows are often more useful for non-coding work. Name the shape first, then the prompt writes itself.",
+  "The combo: a saved fact-checker, budgeted, with a /goal, on a /loop. Build the shape once.",
+  "This is the part I actually believe past the hype. Harness engineering is the exciting wrapper of this moment — real and worth learning now. But the durable skill underneath is knowing the two kinds of mind: a computer is deterministic, exact, instant, perfect memory, zero judgment; people and LLMs reason and have taste but are a little stochastic and forget. A workflow just routes each job to the mind built for it. Learn that line and every new tool makes sense.",
+  "End on cost discipline, not hype. The keeper skill is seeing the shape and judging honestly whether the fleet was worth it."
+]
+</script>
+
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- ── 01 · Title ──────────────────────────────────────────────── -->
+  <section data-label="01 Title" class="s-title">
+    <div class="frame">
+      <div class="hero-brand">
+        <img class="hero-logo" src="assets/anduin-full.svg" alt="Anduin">
+        <span class="hero-program">Fast Track</span>
+      </div>
+      <div class="spacer"></div>
+      <div class="kicker">Week 2 · Vibe Coding Workshop · 60 min</div>
+      <h1 class="hero">Dynamic Workflows.</h1>
+      <p class="sub">Claude builds its own team of agents, on the fly —<br>fresh minds, narrow jobs, combined into one answer.</p>
+    </div>
+    <div class="byline">
+      <span><b>Charles Lee</b> · CoderSchool</span>
+      <span><span class="pill"><span class="dot"></span>Two demos carry the room</span></span>
+    </div>
+  </section>
+
+  <!-- ── 02 · One tired head vs. a fresh team ───────────────────────── -->
+  <!-- ── 02 · The reframe (tweet) ──────────────────────────────────── -->
+  <section data-label="02 The reframe" class="s-tweet">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="eyebrow-t">The reframe · start here</div>
+      <div class="tweet-card">
+        <div class="head">
+          <div class="avatar">PS</div>
+          <div class="who">
+            <span class="name">Peter Steinberger <span class="verified">&#10003;</span></span>
+            <span class="handle">@steipete · Jun 8</span>
+          </div>
+        </div>
+        <div class="body">
+          Here's your monthly reminder that you shouldn't be <b>prompting</b> coding agents anymore.
+          <div class="p2">You should be <b>designing loops</b> that prompt your agents.</div>
+        </div>
+        <div class="meta">
+          <span><b>1.5K</b> Replies</span>
+          <span><b>2.3K</b> Reposts</span>
+          <span><b>17K</b> Likes</span>
+          <span><b>6.2M</b> Views</span>
+        </div>
+      </div>
+      <p class="bridge">That loop is a <b>workflow</b>. You describe the shape; Claude writes the harness and runs the fleet.</p>
+    </div>
+    <div class="slide-num">02 / 19</div>
+  </section>
+
+  <!-- ── 03 · One tired head vs. a fresh team ───────────────────────── -->
+  <!-- ── 03 · Bun proof ─────────────────────────────────────── -->
+  <section data-label="03 Proof Bun rewritten in Rust" class="s-bun dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="eyebrow-b">Proof it's real · the ceiling, not the floor</div>
+      <h2>Claude rewrote all of Bun — in <b>Rust</b>.</h2>
+      <p class="sub">Bun is a hugely popular JavaScript runtime — hundreds of thousands of lines. Claude ported the whole thing from Zig with a dynamic workflow: <b>a subagent per module, an adversarial reviewer on each, then merge.</b></p>
+      <div class="stats">
+        <div class="stat"><div class="num">6,755</div><div class="lab">commits merged in <b>one</b> pull request</div></div>
+        <div class="stat"><div class="num sm">Zig → Rust</div><div class="lab">the <b>entire runtime</b> — same architecture</div></div>
+        <div class="stat"><div class="num sm">3–8 MB</div><div class="lab"><b>smaller</b> binary · as fast or faster</div></div>
+        <div class="stat"><div class="num sm">ALL</div><div class="lab">tests pass, <b>every platform</b> — plus old memory leaks fixed</div></div>
+      </div>
+      <div class="foot"><code>claude/phase-a-port</code><span class="sep">/</span><b>the branch name says it all</b><span class="sep">/</span><span>merged by Bun's creator · oven-sh/bun #30412 · May 2026</span></div>
+    </div>
+    <div class="slide-num">03 / 19</div>
+  </section>
+
+  <!-- ── 04 · One tired head vs. a fresh team ─────────────────── -->
+  <section data-label="04 One tired head vs a fresh team" class="s-versus">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The core idea</div>
+      <h2 class="title">One tired head vs. a fresh team.</h2>
+      <div class="grid">
+        <div class="vcard old">
+          <div class="vtag">Normal Claude</div>
+          <h3>One conversation plans <em>and</em> does everything.</h3>
+          <p>The same head that maps out 50 items also grinds through all 50 — getting tired, distracted, and forgetful along the way.</p>
+          <div class="heads"><div class="blob">🥱</div></div>
+        </div>
+        <div class="vcard new">
+          <div class="vtag">A workflow</div>
+          <h3>Spins up a team of fresh sub-agents.</h3>
+          <p>Each one a <b>clean context</b> with <b>one narrow job</b>. They run, then their work gets combined. Same model — just fresh and focused.</p>
+          <div class="team">
+            <div class="agent">a1</div><div class="agent">a2</div><div class="agent">a3</div>
+            <div class="agent">a4</div><div class="agent">a5</div><div class="agent">+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">04 / 19</div>
+  </section>
+
+  <!-- ── 03 · Three failure modes ──────────────────────────────────── -->
+  <section data-label="05 Three failure modes" class="s-fail">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Why bother</div>
+      <h2 class="title">A single long conversation goes wrong three ways.</h2>
+      <div class="grid">
+        <div class="fcard">
+          <div class="bar"></div>
+          <div class="fnum">01</div>
+          <h3>Laziness</h3>
+          <p>Does <b>8 of 50</b> items well, then quietly starts cutting corners.</p>
+        </div>
+        <div class="fcard">
+          <div class="bar"></div>
+          <div class="fnum">02</div>
+          <h3>Self-preferential bias</h3>
+          <p>Grades <b>its own work</b> too kindly. It's invested in being right.</p>
+        </div>
+        <div class="fcard">
+          <div class="bar"></div>
+          <div class="fnum">03</div>
+          <h3>Goal drift</h3>
+          <p>Forgets the <b>constraint you set up top</b> — each compaction is lossy.</p>
+        </div>
+      </div>
+      <div class="kicker-bottom"><span class="dot"></span><div>A fresh team, run by <b>code that counts and never forgets</b>, removes all three.</div></div>
+    </div>
+    <div class="slide-num">05 / 19</div>
+  </section>
+
+  <!-- ── 04 · You describe the shape ───────────────────────────────── -->
+  <section data-label="06 You describe the shape" class="s-shape">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">How you trigger one</div>
+      <h2 class="title">You describe the shape. Claude builds the harness.</h2>
+      <div class="grid">
+        <div class="pcard">
+          <div class="ptrigger">"<span class="accent-text">Use a workflow</span> to…"</div>
+          <p class="pdesc">The plain way in. Describe the job and the shape; Claude wires up the agents.</p>
+        </div>
+        <div class="pcard">
+          <div class="ptrigger">"<span class="accent-text">Quick workflow</span>…"</div>
+          <p class="pdesc">Small and fast. A lightweight fleet for a quick, bounded task.</p>
+        </div>
+        <div class="pcard code-card">
+          <div class="ptrigger"><span class="mono-accent">ultracode</span></div>
+          <p class="pdesc">Lean into heavy orchestration when the task really warrants a big team.</p>
+        </div>
+      </div>
+      <div class="footer-note"><b>You never write JavaScript.</b> You describe the shape — "make many, then judge" — and Claude writes the code.</div>
+    </div>
+    <div class="slide-num">06 / 19</div>
+  </section>
+
+  <!-- ── 05 · The split ────────────────────────────────────────────── -->
+  <section data-label="07 The split model vs code" class="s-split">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The split</div>
+      <h2 class="title">Model vs. code — each does one job.</h2>
+      <div class="grid">
+        <div class="scol">
+          <div class="label"><span class="ico">M</span>Model</div>
+          <h3>Flexible.</h3>
+          <div class="traits">
+            <div class="trait good">Reads, judges, weighs <b>taste</b></div>
+            <div class="trait bad">But <b>lazy, biased, forgetful</b></div>
+          </div>
+        </div>
+        <div class="divider"><span class="vs">vs</span></div>
+        <div class="scol">
+          <div class="label"><span class="ico">{ }</span>Code</div>
+          <h3>Exact.</h3>
+          <div class="traits">
+            <div class="trait good"><b>Counts, repeats, never forgets</b></div>
+            <div class="trait bad">But can't judge anything</div>
+          </div>
+        </div>
+      </div>
+      <div class="closer">A workflow lets each do its job. <b>Claude decides where the line goes.</b></div>
+    </div>
+    <div class="slide-num">07 / 19</div>
+  </section>
+
+  <!-- ── 06 · When NOT to use one ──────────────────────────────────── -->
+  <section data-label="08 When not to use one" class="s-when dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="eyebrow-d">The most important slide</div>
+      <h2>Workflows cost a lot more tokens.<br>Reach for one only when the task is:</h2>
+      <div class="mantra">
+        <div class="word">long<span> ·</span></div>
+        <div class="word">parallel<span> ·</span></div>
+        <div class="word">adversarial<span> ·</span></div>
+        <div class="word">taste-based</div>
+      </div>
+      <p class="sub">For everything else, just ask normally. <b>Gut check: would one smart person doing this in a single sitting cut corners, grade themselves too kindly, or lose the thread?</b></p>
+    </div>
+    <div class="slide-num">08 / 19</div>
+  </section>
+
+  <!-- ── 07 · Run on Haiku ─────────────────────────────────────────── -->
+  <section data-label="09 Workshop setup run on Haiku" class="s-haiku">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Workshop setup · tell Claude once, up front</div>
+      <div class="grid">
+        <div class="quote-card">
+          <div class="qmark">// say this before your first workflow</div>
+          <div class="qtext">"For every workflow today, use <b>Haiku</b> for all the sub-agents."</div>
+        </div>
+        <div class="right">
+          <span class="once">One time · up front</span>
+          <h2>We're experimenting, so cost beats polish.</h2>
+          <p>Workflows spawn <b>a lot</b> of agents. Haiku keeps a roomful of people cheap — so you can run freely and learn the shapes.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">09 / 19</div>
+  </section>
+
+  <!-- ── 08 · The six patterns ─────────────────────────────────────── -->
+  <section data-label="10 The six patterns" class="s-patterns">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The whole map</div>
+      <h2 class="title">The six patterns.</h2>
+      <div class="grid">
+        <div class="patcard">
+          <div class="pidx">01</div>
+          <h3>Classify-and-act</h3>
+          <div class="shape">Sort each item, route it.</div>
+        </div>
+        <div class="patcard hot">
+          <div class="pidx">02</div>
+          <h3>Fan-out-and-synthesize</h3>
+          <div class="shape">Split → parallel → merge.</div>
+        </div>
+        <div class="patcard hot">
+          <div class="pidx">03</div>
+          <h3>Adversarial verification</h3>
+          <div class="shape">A separate agent attacks each result.</div>
+        </div>
+        <div class="patcard">
+          <div class="pidx">04</div>
+          <h3>Generate-and-filter</h3>
+          <div class="shape">Make many, keep the best.</div>
+        </div>
+        <div class="patcard hot">
+          <div class="pidx">05</div>
+          <h3>Tournament</h3>
+          <div class="shape">Agents compete, judge picks pairwise.</div>
+        </div>
+        <div class="patcard">
+          <div class="pidx">06</div>
+          <h3>Loop-until-done</h3>
+          <div class="shape">Repeat until a stop condition.</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">10 / 19</div>
+  </section>
+
+  <!-- ── 09 · Two ideas ────────────────────────────────────────────── -->
+  <section data-label="11 Two ideas that make them work" class="s-ideas">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Two ideas in every pattern</div>
+      <h2 class="title">Two ideas that make them work.</h2>
+      <div class="grid">
+        <div class="icard">
+          <div class="inum">01</div>
+          <h3>Parallel, then barrier.</h3>
+          <p>Agents run <b>at once</b>; then one step <b>waits for all of them</b> and merges the results.</p>
+          <div class="diagram">
+            <div class="barr">
+              <div class="node"></div>
+              <div class="arrow">→</div>
+              <div class="fan"><div class="node"></div><div class="node"></div><div class="node"></div></div>
+              <div class="gate"></div>
+              <div class="arrow">→</div>
+              <div class="merged"></div>
+            </div>
+          </div>
+        </div>
+        <div class="icard">
+          <div class="inum">02</div>
+          <h3>Comparison beats scoring.</h3>
+          <p>"Is <b>A</b> better than <b>B</b>?" is far more reliable than "rate this <b>1–10</b>."</p>
+          <div class="diagram">
+            <div class="cmp">
+              <div class="box win">A</div>
+              <div class="qq">&gt;</div>
+              <div class="box">B</div>
+              <div class="arrow" style="color:var(--muted);font-size:28px;margin:0 8px">vs</div>
+              <div class="box" style="opacity:.5">7/10</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">11 / 19</div>
+  </section>
+
+  <!-- ── 10 · Fan-out-and-synthesize ───────────────────────────────── -->
+  <section data-label="12 Pattern Fan-out-and-synthesize" class="s-pat dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="pnum-eyebrow">Pattern 02 · Demo</div>
+    <div class="frame">
+      <div class="grid">
+        <div class="left">
+          <h2>Fan-out-and-synthesize.</h2>
+          <p class="desc">Split a big job into many independent ones → <em>run all at once</em> → one step <b>merges</b>.</p>
+          <div class="tip"><span class="tlabel">DEMO</span><div>"Research 6 PM tools, <b>one agent each</b>, then synthesize a pick for a non-technical team." Watch the burst of parallel agents, then the barrier that waits for all of them.</div></div>
+        </div>
+        <div class="diag-panel">
+          <div class="agent-node lead-node"><span class="dot blue"></span>orchestrator<span class="sub">splits the job</span></div>
+          <div class="connector"></div>
+          <div class="fan-row">
+            <div class="agent-node"><span class="dot blue"></span>tool 1</div>
+            <div class="agent-node"><span class="dot blue"></span>tool 2</div>
+            <div class="agent-node"><span class="dot blue"></span>tool 3</div>
+          </div>
+          <div class="fan-row" style="margin-top:14px">
+            <div class="agent-node"><span class="dot blue"></span>tool 4</div>
+            <div class="agent-node"><span class="dot blue"></span>tool 5</div>
+            <div class="agent-node"><span class="dot blue"></span>tool 6</div>
+          </div>
+          <div class="barrier-bar">⎯ barrier · wait for all 6 ⎯</div>
+          <div class="agent-node result-node"><span class="dot green"></span>synthesize → one pick</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">12 / 19</div>
+  </section>
+
+  <!-- ── 11 · Adversarial verification ─────────────────────────────── -->
+  <section data-label="13 Pattern Adversarial verification" class="s-pat dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="pnum-eyebrow">Pattern 03 · Demo</div>
+    <div class="frame">
+      <div class="grid">
+        <div class="left">
+          <h2>Adversarial verification.</h2>
+          <p class="desc">One agent makes claims → a <b>separate</b> skeptic per claim tries to <em>disprove</em> it.</p>
+          <div class="tip"><span class="tlabel">DEMO</span><div>Fact-check the seeded draft. The beat: <b>Everest is 8,848.86 m, not 8,849.</b> A separate, attacking checker catches what a skim misses. Tell it: default to "unclear," don't be generous.</div></div>
+        </div>
+        <div class="diag-panel">
+          <div class="agent-node lead-node"><span class="dot purple"></span>writer<span class="sub">makes claims</span></div>
+          <div class="connector"></div>
+          <div class="fan-row">
+            <div class="agent-node" style="flex-direction:column;align-items:flex-start;gap:8px">
+              <span><span class="dot red" style="display:inline-block;margin-right:10px"></span>claim → skeptic</span>
+              <span style="color:var(--terminal-dim);font-size:20px;margin-left:24px">"prove it false"</span>
+            </div>
+          </div>
+          <div class="fan-row" style="margin-top:14px">
+            <div class="agent-node" style="flex-direction:column;align-items:flex-start;gap:8px">
+              <span><span class="dot red" style="display:inline-block;margin-right:10px"></span>claim → skeptic</span>
+              <span style="color:var(--terminal-dim);font-size:20px;margin-left:24px">"default to unclear"</span>
+            </div>
+          </div>
+          <div class="barrier-bar">⎯ each claim, its own attacker ⎯</div>
+          <div class="agent-node result-node"><span class="dot green"></span>verified · flagged · unclear</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">13 / 19</div>
+  </section>
+
+  <!-- ── 12 · Tournament ───────────────────────────────────────────── -->
+  <section data-label="14 Pattern Tournament" class="s-pat dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="pnum-eyebrow">Pattern 05 · Demo</div>
+    <div class="frame">
+      <div class="grid">
+        <div class="left">
+          <h2>Tournament.</h2>
+          <p class="desc">Agents compete → a judge compares <b>two at a time</b> → a bracket produces <em>one winner</em>.</p>
+          <div class="tip"><span class="tlabel">DEMO</span><div>6 cover-letter openers, judged pairwise. The judge gives <b>reasons A beat B</b> — never "8/10." Best for taste calls where you can't write a rubric.</div></div>
+        </div>
+        <div class="diag-panel">
+          <div class="bracket">
+            <div class="stack">
+              <div class="seed win">opener A</div>
+              <div class="seed">opener B</div>
+              <div class="seed">opener C</div>
+              <div class="seed win">opener D</div>
+            </div>
+            <div class="vs-mini">vs</div>
+            <div class="stack">
+              <div class="seed win">A</div>
+              <div class="seed">D</div>
+            </div>
+            <div class="vs-mini">vs</div>
+            <div class="stack">
+              <div class="seed champ">A wins</div>
+            </div>
+          </div>
+          <div class="barrier-bar" style="margin-top:28px">⎯ judge: "A beats B because…" ⎯</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">14 / 19</div>
+  </section>
+
+  <!-- ── 13 · Pick one and try it ──────────────────────────────────── -->
+  <!-- ── 14 · Real prompts in the wild ─────────────────────────────── -->
+  <section data-label="15 Real prompts in the wild" class="s-prompts">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">What real ones sound like</div>
+      <h2 class="title">You just describe the job — and name the shape.</h2>
+      <div class="plist">
+        <div class="rpcard">
+          <div class="rptext">"This test fails 1 in 50 runs. Set up a workflow to reproduce it — form competing theories, and <b>don't stop until one survives the evidence</b>."</div>
+          <div class="rptag">Loop-until-done · root-cause</div>
+        </div>
+        <div class="rpcard">
+          <div class="rptext">"Take my business plan and run a workflow where agents <b>tear it apart</b> from an investor's, a customer's, and a competitor's view."</div>
+          <div class="rptag">Adversarial · critique panel</div>
+        </div>
+        <div class="rpcard">
+          <div class="rptext">"Here's a folder of 80 resumes — rank them for the backend role and <b>double-check the top ten</b>."</div>
+          <div class="rptag">Sort + verify</div>
+        </div>
+        <div class="rpcard">
+          <div class="rptext">"I need a name for this CLI tool. Brainstorm a bunch of options and <b>run a tournament</b> to pick the top 3."</div>
+          <div class="rptag">Generate · tournament</div>
+        </div>
+      </div>
+      <div class="rp-proof"><span class="dot"></span><div><b>The pattern hides in the verb:</b> &ldquo;reproduce,&rdquo; &ldquo;tear it apart,&rdquo; &ldquo;run a tournament&rdquo; — name it, the prompt writes itself. <span class="src">— Anthropic, &ldquo;A harness for every task&rdquo;</span></div></div>
+    </div>
+    <div class="slide-num">15 / 19</div>
+  </section>
+
+  <!-- ── 15 · Pick one and try it ──────────────────────────────────── -->
+  <section data-label="16 Pick one and try it" class="s-pick">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Your turn</div>
+      <h2 class="title">Pick one. Run it on your own material.</h2>
+      <div class="chips">
+        <div class="chip"><div class="ctitle">Deep research</div><div class="cpat">Fan-out</div></div>
+        <div class="chip"><div class="ctitle">Fact-check a draft</div><div class="cpat">Adversarial</div></div>
+        <div class="chip"><div class="ctitle">Sort at scale</div><div class="cpat">Classify-and-act</div></div>
+        <div class="chip"><div class="ctitle">Triage</div><div class="cpat">Classify-and-act</div></div>
+        <div class="chip"><div class="ctitle">Root-cause</div><div class="cpat">Loop-until-done</div></div>
+        <div class="chip"><div class="ctitle">Critique panel</div><div class="cpat">Generate-and-filter</div></div>
+        <div class="chip"><div class="ctitle">Migration</div><div class="cpat">Classify-and-act</div></div>
+        <div class="chip"><div class="ctitle">Evals</div><div class="cpat">Tournament</div></div>
+      </div>
+      <div class="footnote"><span class="dot"></span><div>Workflows are often <b>more useful for non-coding work</b>. Name the shape first — then the prompt writes itself.</div></div>
+    </div>
+    <div class="slide-num">16 / 19</div>
+  </section>
+
+  <!-- ── 14 · Power-ups ────────────────────────────────────────────── -->
+  <section data-label="17 Power-ups" class="s-power">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Power-ups</div>
+      <h2 class="title">Four ways to level a workflow up.</h2>
+      <div class="grid">
+        <div class="powcard"><div class="cmd">budget <span class="dim">Nk tokens</span></div><div class="pdesc">Cap the cost. Hard ceiling on how much the fleet can spend.</div></div>
+        <div class="powcard"><div class="cmd">/goal</div><div class="pdesc">Define <b>"done"</b> so it can't quit early.</div></div>
+        <div class="powcard"><div class="cmd">/loop</div><div class="pdesc">Re-run on a schedule. Set it and walk away.</div></div>
+        <div class="powcard"><div class="cmd">save with <span class="dim">s</span></div><div class="pdesc">Lands in <b>~/.claude/workflows</b> → share via a skill.</div></div>
+      </div>
+      <div class="combo"><span class="clabel">THE COMBO</span><b>saved fact-checker</b><span class="sep">+</span><b>budgeted</b><span class="sep">+</span><b>/goal</b><span class="sep">+</span><b>/loop</b><span style="color:var(--terminal-dim);margin-left:8px">— build the shape once.</span></div>
+    </div>
+    <div class="slide-num">17 / 19</div>
+  </section>
+
+  <!-- ── 15 · What to keep ─────────────────────────────────────────── -->
+  <!-- ── 17 · Two kinds of mind ────────────────────────────────────── -->
+  <section data-label="18 Two kinds of mind" class="s-minds dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="eyebrow-m">Past the hype · what actually lasts</div>
+      <h2>Harness engineering is this year's excitement. <b>What lasts is knowing which mind to hand a job to.</b></h2>
+      <div class="twin">
+        <div class="mind computer">
+          <div class="mtag">The computer</div>
+          <h3>Deterministic.</h3>
+          <div class="chips">
+            <span class="mchip">exact</span><span class="mchip">blazingly fast</span><span class="mchip">perfect memory</span>
+          </div>
+          <div class="but">Does precisely what it's told — and brings zero judgment.</div>
+        </div>
+        <div class="mind people">
+          <div class="mtag">People &amp; LLMs</div>
+          <h3>Stochastic.</h3>
+          <div class="chips">
+            <span class="mchip">reasoning</span><span class="mchip">thoughtful</span><span class="mchip">a bit random</span><span class="mchip">imperfect memory</span>
+          </div>
+          <div class="but">Handle ambiguity and taste — but tire, drift, and forget.</div>
+        </div>
+      </div>
+      <div class="minds-closer">A workflow just routes each job to the mind built for it. <b>Learn that line, and every tool that comes next makes sense.</b></div>
+    </div>
+    <div class="slide-num">18 / 19</div>
+  </section>
+
+  <!-- ── 18 · What to keep ─────────────────────────────────────────── -->
+  <section data-label="19 What to keep" class="s-keep">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="eyebrow-k">What to keep</div>
+      <h1>Reach for a workflow when the task is <b>long, parallel, adversarial, or taste-based.</b> For everything else, a normal conversation is cheaper and just as good.</h1>
+      <div class="signoff"><span class="dot"></span><span>The keeper skill: <b>see the shape</b>, and judge honestly whether the fleet was worth it.</span></div>
+    </div>
+    <div class="slide-num">19 / 19</div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>
