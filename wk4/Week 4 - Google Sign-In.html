@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vibe Coding — Week 4 · Google Sign-In</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="../deck-stage.js"></script>
+<style>
+  deck-stage:not(:defined){visibility:hidden;}
+  :root {
+    /* Type scale — projection-appropriate at 1920×1080 */
+    --type-hero: 148px;
+    --type-title: 80px;
+    --type-section: 64px;
+    --type-subtitle: 40px;
+    --type-lead: 36px;
+    --type-body: 30px;
+    --type-small: 26px;
+    --type-eyebrow: 24px;
+    --type-mono-big: 44px;
+    --type-mono: 32px;
+
+    /* Spacing */
+    --pad-top: 110px;
+    --pad-bottom: 100px;
+    --pad-x: 140px;
+    --gap-title: 52px;
+    --gap-item: 32px;
+
+    /* Colors (workshop accent — design-system tokens) */
+    --ink: var(--color-gray-9);
+    --ink-soft: var(--color-gray-8);
+    --muted: var(--color-gray-6);
+    --hairline: var(--color-gray-3);
+    --paper: var(--color-gray-1);
+    --accent: #48AFF0;
+    --accent-deep: var(--color-primary-4);
+    --terminal-bg: #0d1117;
+    --terminal-fg: #e6edf3;
+    --terminal-green: #7ee787;
+    --terminal-blue: #79c0ff;
+    --terminal-dim: #8b949e;
+  }
+
+  html, body { margin: 0; background: #000; }
+
+  deck-stage > section {
+    background: #fff;
+    color: var(--ink);
+    font-family: var(--font-display);
+    line-height: 1.4;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── persistent Anduin Fast Track brand mark ────────────────────── */
+  .brand-mark {
+    position: absolute; top: 64px; right: 80px;
+    display: flex; align-items: center; gap: 18px;
+    z-index: 5;
+  }
+  .brand-mark img { height: 28px; width: auto; display: block; }
+  .brand-mark .program {
+    padding-left: 18px;
+    border-left: 1px solid var(--hairline);
+    font-size: 18px; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── shared slide chrome ────────────────────────────────────────── */
+  .slide-num {
+    position: absolute; right: 56px; bottom: 48px;
+    font-size: var(--type-small); color: var(--muted);
+    font-variant-numeric: tabular-nums; letter-spacing: 0.04em;
+  }
+  .slide-eyebrow {
+    position: absolute; left: var(--pad-x); top: 72px;
+    font-size: var(--type-eyebrow); font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+
+  /* ── frames ─────────────────────────────────────────────────────── */
+  .frame {
+    width: 100%; height: 100%;
+    padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
+    box-sizing: border-box;
+    display: flex; flex-direction: column;
+  }
+  .frame.center { justify-content: center; align-items: center; text-align: center; }
+
+  /* ── type helpers ───────────────────────────────────────────────── */
+  h1.hero {
+    margin: 0; font-size: var(--type-hero);
+    line-height: 0.96; letter-spacing: -0.045em;
+    font-weight: 600; color: var(--ink);
+  }
+  h2.title {
+    margin: 0 0 var(--gap-title);
+    font-size: var(--type-title); line-height: 1.02;
+    letter-spacing: -0.03em; font-weight: 600; color: var(--ink);
+  }
+  .lead {
+    font-size: var(--type-lead); line-height: 1.35;
+    color: var(--ink-soft); font-weight: 400;
+    letter-spacing: -0.005em; margin: 0;
+  }
+  .lead b { color: var(--ink); font-weight: 600; }
+  .small {
+    font-size: var(--type-small); line-height: 1.45;
+    color: var(--muted); margin: 0;
+  }
+
+  /* ── terminal / code card ───────────────────────────────────────── */
+  .terminal {
+    background: var(--terminal-bg); color: var(--terminal-fg);
+    border-radius: 14px; padding: 28px 36px 32px;
+    font-family: var(--font-mono);
+    box-shadow: 0 24px 60px -20px rgba(13,17,23,0.4),
+                0 2px 0 rgba(255,255,255,0.04) inset;
+    border: 1px solid #1c232c;
+  }
+  .terminal-bar {
+    display: flex; align-items: center; gap: 8px;
+    margin: -8px -16px 20px; padding-bottom: 16px;
+    border-bottom: 1px solid #1c232c;
+  }
+  .terminal-bar .dot { width: 14px; height: 14px; border-radius: 50%; }
+  .terminal-bar .dot.r { background: #ff5f57; }
+  .terminal-bar .dot.y { background: #febc2e; }
+  .terminal-bar .dot.g { background: #28c840; }
+  .terminal-bar .label {
+    margin-left: 16px; color: var(--terminal-dim);
+    font-size: 24px; letter-spacing: 0.04em;
+  }
+  .terminal pre {
+    margin: 0; font-family: var(--font-mono);
+    font-size: var(--type-mono); line-height: 1.5;
+    color: var(--terminal-fg); white-space: pre;
+  }
+  .terminal .k { color: #ff7b72; }
+  .terminal .s { color: #a5d6ff; }
+  .terminal .f { color: #d2a8ff; }
+  .terminal .c { color: #8b949e; font-style: italic; }
+  .terminal .v { color: #79c0ff; }
+
+  /* ── screenshot card ────────────────────────────────────────────── */
+  .shot {
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid var(--hairline);
+    background: #fff;
+    box-shadow: 0 24px 60px -28px rgba(13,17,23,0.25);
+  }
+  .shot img { width: 100%; height: auto; display: block; }
+  .shot-caption {
+    font-size: 22px; color: var(--muted); text-align: center;
+    letter-spacing: 0.04em; margin: 0;
+  }
+
+  /* ── numbered steps (module slides) ─────────────────────────────── */
+  .steps {
+    display: flex; flex-direction: column; gap: 26px;
+    counter-reset: mod-step;
+  }
+  .steps .step {
+    counter-increment: mod-step;
+    display: grid; grid-template-columns: 56px 1fr;
+    gap: 24px; align-items: baseline;
+    font-size: 30px; line-height: 1.4; color: var(--ink-soft);
+  }
+  .steps .step::before {
+    content: counter(mod-step);
+    width: 44px; height: 44px; border-radius: 10px;
+    background: rgba(72,175,240,0.15);
+    border: 1px solid rgba(72,175,240,0.4);
+    display: grid; place-items: center;
+    color: var(--accent-deep); font-weight: 600;
+    font-size: 24px;
+  }
+  .steps .step b { color: var(--ink); font-weight: 600; }
+  .steps .step code {
+    font-family: var(--font-mono); font-size: 26px;
+    background: var(--paper); border: 1px solid var(--hairline);
+    border-radius: 6px; padding: 2px 12px; color: var(--accent-deep);
+    white-space: nowrap;
+  }
+
+  /* warn / tip callout */
+  .callout {
+    padding: 24px 30px;
+    background: #fff7e0; border: 1px solid #f4d971;
+    border-radius: 12px;
+    font-size: 26px; line-height: 1.4; color: #6a4f08;
+    display: flex; align-items: flex-start; gap: 18px;
+  }
+  .callout .tag {
+    font-weight: 700; color: #8a5a00;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    font-size: 22px; flex-shrink: 0; padding-top: 2px;
+  }
+  .callout b { color: #4a3905; font-weight: 700; }
+  .callout.tip {
+    background: rgba(72,175,240,0.08); border-color: rgba(72,175,240,0.4);
+    color: var(--ink-soft);
+  }
+  .callout.tip .tag { color: var(--accent-deep); }
+  .callout.tip b { color: var(--ink); }
+  .callout code {
+    font-family: var(--font-mono); font-size: 24px;
+    background: #fff; border: 1px solid var(--hairline);
+    border-radius: 6px; padding: 1px 10px; white-space: nowrap;
+  }
+
+  /* shared module-slide grid */
+  .mod-grid {
+    flex: 1; display: grid; grid-template-columns: 1fr 1.1fr;
+    gap: 72px; align-items: center; min-height: 0; margin-top: 8px;
+  }
+  .mod-grid .left { display: flex; flex-direction: column; gap: 40px; }
+  .mod-grid .right {
+    display: flex; flex-direction: column; gap: 16px;
+    min-height: 0; justify-content: center;
+  }
+
+  /* ── 01 · title ─────────────────────────────────────────────────── */
+  .s-title { background: url('assets/cover-gradient.png') center/cover no-repeat, #eaf6ff; }
+  .s-title .frame { justify-content: flex-end; padding-bottom: 150px; }
+  .s-title .hero-brand {
+    display: inline-flex; align-items: center; gap: 22px;
+    padding: 14px 26px;
+    background: #fff; border-radius: 999px;
+    box-shadow: 0 4px 18px -6px rgba(31,49,69,0.18),
+                0 1px 0 rgba(31,49,69,0.06) inset;
+    align-self: flex-start;
+  }
+  .s-title .hero-logo { height: 32px; width: auto; display: block; }
+  .s-title .hero-program {
+    padding-left: 22px;
+    border-left: 1px solid var(--hairline);
+    font-size: 20px; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+  .s-title .kicker {
+    font-size: var(--type-eyebrow); font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 36px;
+  }
+  .s-title .sub {
+    margin-top: 40px; font-size: var(--type-subtitle);
+    color: var(--ink-soft); max-width: 1300px; font-weight: 400;
+    line-height: 1.3; letter-spacing: -0.005em;
+  }
+  .s-title .byline {
+    position: absolute; bottom: 80px; left: 140px; right: 140px;
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: var(--type-small); color: var(--ink-soft);
+  }
+  .s-title .byline b { font-weight: 600; color: var(--ink); }
+
+  /* ── preamble slides (02–04): lede + 3-card row ─────────────────── */
+  .lede-big {
+    font-size: 50px; line-height: 1.18; max-width: 1560px;
+    font-weight: 500; letter-spacing: -0.02em; color: var(--ink);
+    margin: 0 0 64px;
+  }
+  .lede-big em { font-style: normal; color: var(--accent-deep); font-weight: 600; }
+  .cards3 {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  .cards3 .card {
+    padding: 44px 44px 48px;
+    border: 1px solid var(--hairline); border-radius: 16px;
+    background: var(--paper);
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .cards3 .card .topic {
+    font-size: 22px; font-weight: 600;
+    color: var(--accent-deep); letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .cards3 .card h3 {
+    margin: 0; font-size: 40px; line-height: 1.12;
+    font-weight: 600; letter-spacing: -0.02em; color: var(--ink);
+  }
+  .cards3 .card p {
+    margin: 0; font-size: 27px; line-height: 1.42; color: var(--ink-soft);
+  }
+  .cards3 .card p b { color: var(--ink); font-weight: 600; }
+
+  /* ── 02 · the problem: before / after panels ────────────────────── */
+  .s-problem .panels {
+    flex: 1; display: grid; grid-template-columns: 1fr 1fr;
+    gap: 36px; align-items: stretch; min-height: 0; margin-top: 8px;
+  }
+  .s-problem .panel {
+    border: 1px solid var(--hairline); border-radius: 16px;
+    background: var(--paper);
+    padding: 52px 56px;
+    display: flex; flex-direction: column; gap: 12px;
+    justify-content: center;
+  }
+  .s-problem .panel .tag {
+    font-size: 22px; font-weight: 600; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 28px;
+  }
+  .s-problem .panel ul {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 34px;
+  }
+  .s-problem .panel li {
+    font-size: 32px; line-height: 1.34;
+    color: var(--ink); font-weight: 400; letter-spacing: -0.005em;
+    padding-left: 42px; position: relative;
+  }
+  .s-problem .panel li::before {
+    content: ""; position: absolute; left: 0; top: 19px;
+    width: 24px; height: 3px; background: var(--muted);
+    border-radius: 2px;
+  }
+  .s-problem .panel li b { font-weight: 600; }
+  .s-problem .panel.after { background: var(--ink); border-color: var(--ink); }
+  .s-problem .panel.after .tag { color: var(--accent); }
+  .s-problem .panel.after li { color: #e6edf3; }
+  .s-problem .panel.after li b { color: #fff; }
+  .s-problem .panel.after li::before { background: var(--accent); }
+
+  /* ── 03 · oauth flow diagram ────────────────────────────────────── */
+  .s-flow { background: var(--paper); }
+  .s-flow .lead { max-width: 1500px; margin-bottom: 64px; }
+  .s-flow .flow {
+    display: grid;
+    grid-template-columns: 1fr 90px 1fr 90px 1fr 90px 1fr;
+    align-items: stretch; gap: 0;
+  }
+  .s-flow .node {
+    background: #fff; border: 1px solid var(--hairline);
+    border-radius: 16px; padding: 34px 36px 38px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .s-flow .node .who {
+    font-size: 22px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .s-flow .node h3 {
+    margin: 0; font-size: 36px; line-height: 1.12;
+    font-weight: 600; letter-spacing: -0.02em; color: var(--ink);
+  }
+  .s-flow .node p {
+    margin: 0; font-size: 24px; line-height: 1.38; color: var(--ink-soft);
+  }
+  .s-flow .node.google { border-color: rgba(72,175,240,0.55); border-width: 2px; }
+  .s-flow .node.google .who { color: var(--accent-deep); }
+  .s-flow .node.last { background: var(--ink); border-color: var(--ink); }
+  .s-flow .node.last .who { color: var(--accent); }
+  .s-flow .node.last h3 { color: #fff; }
+  .s-flow .node.last p { color: #c2cdd9; }
+  .s-flow .hop {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px;
+  }
+  .s-flow .hop .n {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(72,175,240,0.15);
+    border: 1px solid rgba(72,175,240,0.4);
+    display: grid; place-items: center;
+    color: var(--accent-deep); font-weight: 600; font-size: 24px;
+  }
+  .s-flow .hop .arrow { font-size: 36px; color: var(--accent); line-height: 1; }
+  .s-flow .lock {
+    margin-top: 60px; padding: 28px 36px;
+    background: #fff; border: 1px solid var(--hairline);
+    border-radius: 14px;
+    font-size: 29px; line-height: 1.4; color: var(--ink-soft);
+    display: flex; gap: 22px; align-items: baseline;
+  }
+  .s-flow .lock .tag {
+    flex-shrink: 0;
+    font-size: 22px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent-deep);
+  }
+  .s-flow .lock b { color: var(--ink); font-weight: 600; }
+
+  /* ── 04 · moving parts table ────────────────────────────────────── */
+  .s-parts .lead { max-width: 1500px; margin-bottom: 56px; }
+  .s-parts table {
+    border-collapse: collapse; width: 100%;
+  }
+  .s-parts th {
+    text-align: left; padding: 18px 32px;
+    font-size: 22px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 2px solid var(--ink);
+  }
+  .s-parts td {
+    padding: 26px 32px;
+    border-bottom: 1px solid var(--hairline);
+    font-size: 28px; line-height: 1.35; color: var(--ink-soft);
+    vertical-align: top;
+  }
+  .s-parts td.piece { font-weight: 600; color: var(--ink); white-space: nowrap; }
+  .s-parts td.where { color: var(--muted); white-space: nowrap; }
+  .s-parts td b { color: var(--ink); font-weight: 600; }
+  .s-parts tr.hot td { background: rgba(72,175,240,0.07); }
+  .s-parts tr.hot td.piece { color: var(--accent-deep); }
+  .s-parts td code {
+    font-family: var(--font-mono); font-size: 24px;
+    background: var(--paper); border: 1px solid var(--hairline);
+    border-radius: 6px; padding: 1px 10px; white-space: nowrap;
+  }
+
+  /* ── 05 · module map ────────────────────────────────────────────── */
+  .s-map .lead { max-width: 1500px; margin-bottom: 56px; }
+  .s-map .grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 28px;
+  }
+  .s-map .card {
+    padding: 38px 36px 42px;
+    border: 1px solid var(--hairline); border-radius: 16px;
+    background: #fff;
+    display: flex; flex-direction: column; gap: 16px;
+    position: relative;
+  }
+  .s-map .card .idx {
+    width: 52px; height: 52px; border-radius: 12px;
+    background: rgba(72,175,240,0.15);
+    border: 1px solid rgba(72,175,240,0.4);
+    display: grid; place-items: center;
+    color: var(--accent-deep); font-weight: 600; font-size: 26px;
+  }
+  .s-map .card .topic {
+    margin-top: 6px;
+    font-size: 22px; font-weight: 600;
+    color: var(--muted); letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .s-map .card h3 {
+    margin: 0; font-size: 34px; line-height: 1.14;
+    font-weight: 600; letter-spacing: -0.02em; color: var(--ink);
+  }
+  .s-map .card p {
+    margin: 0; font-size: 24px; line-height: 1.4; color: var(--ink-soft);
+  }
+  .s-map .footnote {
+    margin-top: 56px; padding: 26px 34px;
+    background: var(--paper); border: 1px solid var(--hairline);
+    border-radius: 14px;
+    font-size: 28px; line-height: 1.4; color: var(--ink-soft);
+    display: flex; align-items: baseline; gap: 18px;
+  }
+  .s-map .footnote .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0;
+    align-self: center;
+  }
+  .s-map .footnote b { color: var(--ink); font-weight: 600; }
+
+  /* ── 12 · code slide ────────────────────────────────────────────── */
+  .s-code .grid {
+    flex: 1; display: grid; grid-template-columns: 1.15fr 1fr;
+    gap: 72px; align-items: center; min-height: 0;
+  }
+  .s-code .terminal { font-size: var(--type-mono); }
+  .s-code .notes { display: flex; flex-direction: column; gap: 40px; }
+  .s-code .note {
+    padding-left: 28px; position: relative;
+    border-left: 3px solid var(--accent);
+    font-size: 28px; line-height: 1.42; color: var(--ink-soft);
+  }
+  .s-code .note b { color: var(--ink); font-weight: 600; }
+  .s-code .note code {
+    font-family: var(--font-mono); font-size: 24px;
+    background: var(--paper); border: 1px solid var(--hairline);
+    border-radius: 6px; padding: 1px 10px; white-space: nowrap;
+  }
+
+  /* ── 13 · verify ────────────────────────────────────────────────── */
+  .s-verify .grid {
+    flex: 1; display: grid; grid-template-columns: 1.1fr 1fr;
+    gap: 80px; align-items: center; min-height: 0;
+  }
+  .s-verify .checks { display: flex; flex-direction: column; gap: 34px; }
+  .s-verify .check {
+    display: grid; grid-template-columns: 56px 1fr;
+    gap: 24px; align-items: baseline;
+    font-size: 31px; line-height: 1.4; color: var(--ink-soft);
+  }
+  .s-verify .check::before {
+    content: "✓";
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(72,175,240,0.15);
+    border: 1px solid rgba(72,175,240,0.4);
+    display: grid; place-items: center;
+    color: var(--accent-deep); font-weight: 700; font-size: 26px;
+  }
+  .s-verify .check b { color: var(--ink); font-weight: 600; }
+  .s-verify .check code {
+    font-family: var(--font-mono); font-size: 26px;
+    background: var(--paper); border: 1px solid var(--hairline);
+    border-radius: 6px; padding: 1px 10px; white-space: nowrap;
+  }
+  .s-verify .blocked {
+    padding: 44px 48px; background: var(--ink);
+    color: #e6edf3; border-radius: 16px;
+  }
+  .s-verify .blocked .tag {
+    font-size: 22px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .s-verify .blocked h3 {
+    margin: 0 0 20px; font-size: 42px; line-height: 1.16;
+    font-weight: 500; letter-spacing: -0.015em; color: #fff;
+  }
+  .s-verify .blocked p {
+    margin: 0; font-size: 26px; line-height: 1.45; color: #c2cdd9;
+  }
+  .s-verify .blocked p b { color: #fff; font-weight: 600; }
+
+  /* ── 14 · troubleshooting ───────────────────────────────────────── */
+  .s-trouble { background: var(--paper); }
+  .s-trouble .lead { max-width: 1500px; margin-bottom: 52px; }
+  .s-trouble table { border-collapse: separate; border-spacing: 0; width: 100%; }
+  .s-trouble th {
+    text-align: left; padding: 16px 30px;
+    font-size: 22px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 2px solid var(--ink);
+  }
+  .s-trouble td {
+    padding: 24px 30px;
+    border-bottom: 1px solid var(--hairline);
+    font-size: 27px; line-height: 1.38; color: var(--ink-soft);
+    background: #fff; vertical-align: top;
+  }
+  .s-trouble td b { color: var(--ink); font-weight: 600; }
+  .s-trouble td.err {
+    font-family: var(--font-mono); font-size: 24px;
+    color: var(--accent-deep); font-weight: 500;
+  }
+  .s-trouble td code {
+    font-family: var(--font-mono); font-size: 23px;
+    background: var(--paper); border: 1px solid var(--hairline);
+    border-radius: 6px; padding: 1px 8px; white-space: nowrap;
+  }
+
+  /* ── 15 · wrap ──────────────────────────────────────────────────── */
+  .s-wrap { background: var(--paper); }
+  .s-wrap .frame { justify-content: center; align-items: flex-start; }
+  .s-wrap h1 {
+    margin: 0; font-size: 116px; line-height: 1.04;
+    letter-spacing: -0.04em; font-weight: 600; color: var(--ink);
+    max-width: 1640px;
+  }
+  .s-wrap h1 em { font-style: normal; color: var(--accent-deep); }
+  .s-wrap .sub {
+    margin-top: 60px; font-size: var(--type-subtitle);
+    color: var(--ink-soft); max-width: 1480px;
+    line-height: 1.32; letter-spacing: -0.005em;
+  }
+  .s-wrap .sub b { color: var(--ink); font-weight: 600; }
+  .s-wrap .signoff {
+    margin-top: 84px; display: flex; align-items: center; gap: 24px;
+    font-size: var(--type-body); color: var(--ink);
+  }
+  .s-wrap .signoff b { font-weight: 600; }
+  .s-wrap .signoff .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- ── 01 · Title ────────────────────────────────────────────────── -->
+  <section data-label="01 Title" class="s-title">
+    <div class="frame">
+      <div class="hero-brand">
+        <img class="hero-logo" src="assets/anduin-full.svg" alt="Anduin">
+        <span class="hero-program">Fast Track</span>
+      </div>
+      <div style="flex: 1;"></div>
+      <div class="kicker">Week 4 · Vibe Coding Workshop</div>
+      <h1 class="hero">Sign in with Google.</h1>
+      <p class="sub">Until now, your apps treated every visitor the same.<br>Today they learn who's using them — with one button, no passwords, Anduin-only.</p>
+    </div>
+    <div class="byline">
+      <span><b>Charles Lee</b> · CoderSchool</span>
+      <span>June 11, 2026</span>
+    </div>
+  </section>
+
+  <!-- ── 02 · The problem ──────────────────────────────────────────── -->
+  <section data-label="02 Apps that can't tell people apart" class="s-problem">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Where we are · After weeks 1–2</div>
+      <h2 class="title">Your apps can't tell people apart.</h2>
+      <div class="panels">
+        <div class="panel">
+          <div class="tag">Today · No login</div>
+          <ul>
+            <li><b>Anyone with the link walks straight in.</b> Your app, your data — open to whoever finds the URL.</li>
+            <li><b>Everyone sees the same everything.</b> One shared pile of data for all visitors.</li>
+            <li><b>There is no &ldquo;me.&rdquo;</b> &ldquo;My tasks&rdquo; or &ldquo;my drafts&rdquo; can't exist when every visitor is the same anonymous stranger.</li>
+          </ul>
+        </div>
+        <div class="panel after">
+          <div class="tag">After today · Google sign-in</div>
+          <ul>
+            <li><b>People sign in</b> with the Google account they already have.</li>
+            <li><b>The app knows who's using it</b> — and can treat each person differently.</li>
+            <li><b>Outsiders are turned away at the door</b> — only Anduin accounts get in.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">02 / 17</div>
+  </section>
+
+  <!-- ── 03 · What authentication is ───────────────────────────────── -->
+  <section data-label="03 Authentication in plain terms" class="s-auth">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The idea · Authentication</div>
+      <p class="lede-big">Authentication is how an app learns — and can trust — <em>who's using it.</em><br>Every private or personal thing software does is built on that one answer.</p>
+      <div class="cards3">
+        <div class="card">
+          <div class="topic">Ownership</div>
+          <h3>Things can be yours.</h3>
+          <p>Your tasks, your drafts, your settings — <b>data tied to your account</b>, invisible to everyone else.</p>
+        </div>
+        <div class="card">
+          <div class="topic">Permissions</div>
+          <h3>Rules about who sees what.</h3>
+          <p>Once the app knows who you are, it can decide what you may see and do. <b>That's the foundation for everything we build next.</b></p>
+        </div>
+        <div class="card">
+          <div class="topic">Accountability</div>
+          <h3>Actions have names on them.</h3>
+          <p>Who created this? Who changed that? With real users, <b>the app can answer.</b></p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">03 / 17</div>
+  </section>
+
+  <!-- ── 04 · Why Google ───────────────────────────────────────────── -->
+  <section data-label="04 Why we borrow Google's login" class="s-why">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The approach · Why Google</div>
+      <p class="lede-big">We could build our own username-and-password system.<br><em>Almost nobody should.</em></p>
+      <div class="cards3">
+        <div class="card">
+          <div class="topic">The liability</div>
+          <h3>Passwords are a security job.</h3>
+          <p>Storing them safely, resets, phishing, breaches — <b>get one detail wrong and you've leaked everyone's password.</b></p>
+        </div>
+        <div class="card">
+          <div class="topic">The shortcut</div>
+          <h3>Google already solved it.</h3>
+          <p>World-class security, two-factor, breach detection — and <b>every Anduin person already has the account.</b></p>
+        </div>
+        <div class="card">
+          <div class="topic">The bonus</div>
+          <h3>It can lock to Anduin.</h3>
+          <p>One setting tells Google to <b>refuse anyone outside anduintransact.com</b> — before they ever reach your app.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">04 / 17</div>
+  </section>
+
+  <!-- ── 03 · OAuth flow ───────────────────────────────────────────── -->
+  <section data-label="03 How the sign-in dance works" class="s-flow">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Concept · OAuth</div>
+      <h2 class="title">How the sign-in dance works.</h2>
+      <p class="lead">Your app hands the user to Google, Google verifies them, and Supabase turns the answer into a session. <b>Your app never sees a password.</b></p>
+      <div class="flow">
+        <div class="node">
+          <div class="who">Your app</div>
+          <h3>localhost:3000</h3>
+          <p>User clicks the &ldquo;Sign in with Google&rdquo; button.</p>
+        </div>
+        <div class="hop"><div class="n">1</div><div class="arrow">→</div></div>
+        <div class="node google">
+          <div class="who">Google</div>
+          <h3>Account chooser</h3>
+          <p>Verifies the user — and that they're in <b>anduintransact.com</b>.</p>
+        </div>
+        <div class="hop"><div class="n">2</div><div class="arrow">→</div></div>
+        <div class="node">
+          <div class="who">Supabase</div>
+          <h3>/auth/v1/callback</h3>
+          <p>Exchanges Google's one-time code for a session and a user row.</p>
+        </div>
+        <div class="hop"><div class="n">3</div><div class="arrow">→</div></div>
+        <div class="node last">
+          <div class="who">Your app</div>
+          <h3>Signed in</h3>
+          <p>Session + real user. <span style="white-space: nowrap;">auth.uid() now works.</span></p>
+        </div>
+      </div>
+      <div class="lock">
+        <span class="tag">The lock</span>
+        <span>The org restriction lives at step <b>2</b>. With the consent screen set to <b>Internal</b>, Google turns away anyone outside the Workspace — an outsider never even reaches Supabase.</span>
+      </div>
+    </div>
+    <div class="slide-num">05 / 17</div>
+  </section>
+
+  <!-- ── 04 · Moving parts ─────────────────────────────────────────── -->
+  <section data-label="04 Five values that must match" class="s-parts">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Concept · The moving parts</div>
+      <h2 class="title">Five values that must match.</h2>
+      <p class="lead">Everything you'll do today is connecting these five. When something breaks, it's almost always one of them not matching.</p>
+      <table>
+        <thead>
+          <tr><th>Piece</th><th>Lives in</th><th>What it's for</th></tr>
+        </thead>
+        <tbody>
+          <tr class="hot">
+            <td class="piece">User type</td>
+            <td class="where">Google</td>
+            <td><b>Internal</b> = only your Workspace can sign in. This is the lever that locks the app to Anduin.</td>
+          </tr>
+          <tr>
+            <td class="piece">Callback URL</td>
+            <td class="where">Supabase</td>
+            <td>Where Google sends the user back: <code>https://&lt;ref&gt;.supabase.co/auth/v1/callback</code></td>
+          </tr>
+          <tr>
+            <td class="piece">Client ID</td>
+            <td class="where">Google → Supabase</td>
+            <td>Public identifier for your app. Fine to be seen.</td>
+          </tr>
+          <tr>
+            <td class="piece">Client Secret</td>
+            <td class="where">Google → Supabase</td>
+            <td>Private proof the request is really from your app. <b>Shown once.</b></td>
+          </tr>
+          <tr>
+            <td class="piece">Redirect URI</td>
+            <td class="where">Google</td>
+            <td>Allow-list of return addresses. Must contain the callback URL <b>byte-for-byte</b>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="slide-num">06 / 17</div>
+  </section>
+
+  <!-- ── 05 · Module map ───────────────────────────────────────────── -->
+  <section data-label="05 The route" class="s-map">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The plan · ~25 minutes</div>
+      <h2 class="title">The route: four short modules.</h2>
+      <p class="lead">Mostly clicking through two dashboards. The code at the end is one line.</p>
+      <div class="grid">
+        <div class="card">
+          <div class="idx">1</div>
+          <div class="topic">Supabase</div>
+          <h3>Get the callback URL</h3>
+          <p>Enable the Google provider, copy the address Google will return to.</p>
+        </div>
+        <div class="card">
+          <div class="idx">2</div>
+          <div class="topic">Google Cloud</div>
+          <h3>Create the credentials</h3>
+          <p>Project under the org, consent screen set to Internal, one OAuth client.</p>
+        </div>
+        <div class="card">
+          <div class="idx">3</div>
+          <div class="topic">Supabase</div>
+          <h3>Connect them</h3>
+          <p>Paste the Client ID + Secret back in, set your app's URLs.</p>
+        </div>
+        <div class="card">
+          <div class="idx">4</div>
+          <div class="topic">Your code</div>
+          <h3>Trigger &amp; verify</h3>
+          <p>One line of code, then prove the lock actually works.</p>
+        </div>
+      </div>
+      <div class="footnote">
+        <span class="dot"></span>
+        <span><b>Your lesson doc has every click and every screenshot.</b> Keep it open next to these slides — the slides are the map, the doc is the turn-by-turn.</span>
+      </div>
+    </div>
+    <div class="slide-num">07 / 17</div>
+  </section>
+
+  <!-- ── 06 · Module 1 ─────────────────────────────────────────────── -->
+  <section data-label="06 Enable Google, copy the callback" class="s-mod1">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Module 1 · Supabase</div>
+      <h2 class="title">Enable Google. Copy the callback.</h2>
+      <div class="mod-grid">
+        <div class="left">
+          <div class="steps">
+            <div class="step"><div><b>Authentication → Sign In / Providers → Google</b>, toggle <b>Enable Sign in with Google</b> on. Leave the ID + Secret fields empty for now.</div></div>
+            <div class="step"><div>At the bottom of the panel, hit <b>Copy</b> on the <b>Callback URL</b> — and leave this tab open.</div></div>
+          </div>
+          <div class="callout">
+            <div class="tag">Don't retype</div>
+            <div>Use the Copy button. This value has to match <b>byte-for-byte</b> in Google later — a stray character here is the #1 failure of the day.</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="shot"><img src="assets/lesson/01_supabase_google_provider.png" alt="Supabase Google provider panel"></div>
+          <div class="shot" style="max-width: 620px; align-self: center;"><img src="assets/lesson/02_callback_url.png" alt="Callback URL field with Copy button"></div>
+          <p class="shot-caption">Supabase → Authentication → Sign In / Providers → Google</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">08 / 17</div>
+  </section>
+
+  <!-- ── 07 · Module 2: project ────────────────────────────────────── -->
+  <section data-label="07 Create a project under the org" class="s-mod2a">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Module 2 · Google Cloud</div>
+      <h2 class="title">Create a project — under the org.</h2>
+      <div class="mod-grid">
+        <div class="left">
+          <div class="steps">
+            <div class="step"><div>Open <b>console.cloud.google.com</b> signed in with your <b>work account</b>.</div></div>
+            <div class="step"><div>Project picker → <b>New project</b>. Name it anything — ours is <code>supabase-auth-lesson</code>.</div></div>
+            <div class="step"><div>Check that <b>Organization</b> says <b>anduintransact.com</b> — that's what unlocks &ldquo;Internal&rdquo; later.</div></div>
+          </div>
+          <div class="callout">
+            <div class="tag">Gotcha</div>
+            <div>Signed into several Google accounts? The console loves opening under your <b>personal</b> one — no org, sometimes a &ldquo;project limit&rdquo; error. Switch accounts top-right first.</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="shot"><img src="assets/lesson/03_new_project_form.png" alt="Google Cloud new project form with organization anduintransact.com"></div>
+          <p class="shot-caption">New Project — Organization &amp; Parent: anduintransact.com</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">09 / 17</div>
+  </section>
+
+  <!-- ── 08 · Module 2: Internal ───────────────────────────────────── -->
+  <section data-label="08 Set the audience to Internal" class="s-mod2b">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Module 2 · Google Cloud</div>
+      <h2 class="title">Set the audience to Internal.</h2>
+      <div class="mod-grid">
+        <div class="left">
+          <p class="lead">The consent screen wizard has four short parts. <b>This radio button is the whole org restriction</b> — everything else is filling in names and emails.</p>
+          <div class="steps">
+            <div class="step"><div><b>Google Auth Platform → Get started.</b> App name + support email. <b>The name can't contain &ldquo;Google&rdquo;</b> — it gets rejected.</div></div>
+            <div class="step"><div>Audience → <b>Internal</b>: &ldquo;Only available to users within your organization.&rdquo;</div></div>
+            <div class="step"><div>Contact info, agree, <b>Create</b>. Done — no test users, no verification review.</div></div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="shot"><img src="assets/lesson/04c_audience_internal_selected.png" alt="Audience step with Internal selected"></div>
+          <p class="shot-caption">Audience → Internal. External is for public apps — not today.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">10 / 17</div>
+  </section>
+
+  <!-- ── 09 · Module 2: client ─────────────────────────────────────── -->
+  <section data-label="09 Create the OAuth client" class="s-mod2c">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Module 2 · Google Cloud</div>
+      <h2 class="title">Create the OAuth client.</h2>
+      <div class="mod-grid">
+        <div class="left">
+          <div class="steps">
+            <div class="step"><div><b>Clients → Create client</b>, application type <b>Web application</b>.</div></div>
+            <div class="step"><div>Authorized JavaScript origin: <code>http://localhost:3000</code> — where your app runs.</div></div>
+            <div class="step"><div>Authorized redirect URI: <b>paste the Supabase callback</b> from Module 1. Exactly as copied.</div></div>
+          </div>
+          <div class="callout">
+            <div class="tag">The fumble step</div>
+            <div>The redirect URI must match the callback <b>byte-for-byte</b> — even a trailing slash earns you <b>redirect_uri_mismatch</b>. Paste, don't type.</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="shot"><img src="assets/lesson/08_redirect_uri.png" alt="Redirect URI with the Supabase callback pasted"></div>
+          <p class="shot-caption">Redirect URI = the Supabase callback URL, pasted</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">11 / 17</div>
+  </section>
+
+  <!-- ── 10 · Module 2: credentials ────────────────────────────────── -->
+  <section data-label="10 Copy both credentials" class="s-mod2d">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Module 2 · Google Cloud</div>
+      <h2 class="title">Copy both credentials.</h2>
+      <div class="mod-grid">
+        <div class="left">
+          <div class="steps">
+            <div class="step"><div>Click <b>Create</b>. A dialog shows your <b>Client ID</b> and <b>Client Secret</b>.</div></div>
+            <div class="step"><div>Copy both — or hit <b>Download JSON</b>. They go into Supabase next.</div></div>
+          </div>
+          <div class="callout">
+            <div class="tag">Shown once</div>
+            <div>Close the dialog and Google <b>never shows the secret again</b>. If you lose it, you don't hunt for it — open the client and generate a new one.</div>
+          </div>
+          <div class="callout tip">
+            <div class="tag">Notice</div>
+            <div>The dialog itself says it: <b>&ldquo;OAuth access is restricted to users within your organization.&rdquo;</b> Internal is doing its job.</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="shot"><img src="assets/lesson/09_clients_after.png" alt="Clients list showing the new Web client"></div>
+          <p class="shot-caption">Clients → Web client 1, with its Client ID</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">12 / 17</div>
+  </section>
+
+  <!-- ── 11 · Module 3 ─────────────────────────────────────────────── -->
+  <section data-label="11 Paste them into Supabase" class="s-mod3">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Module 3 · Back in Supabase</div>
+      <h2 class="title">Paste them into Supabase.</h2>
+      <div class="mod-grid">
+        <div class="left">
+          <div class="steps">
+            <div class="step"><div>Back in the Google provider panel: <b>Client ID</b> into <i>Client IDs</i>, <b>Secret</b> into <i>Client Secret</i> → <b>Save</b>.</div></div>
+            <div class="step"><div><b>Authentication → URL Configuration</b>: Site URL <code>http://localhost:3000</code>.</div></div>
+            <div class="step"><div>Add a Redirect URL of <code>http://localhost:3000/**</code>.</div></div>
+          </div>
+          <div class="callout tip">
+            <div class="tag">Why the **</div>
+            <div>The wildcard lets Supabase send users back to <b>any page</b> of your app — <code>/dashboard</code>, not just the front door.</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="shot"><img src="assets/lesson/11_supabase_url_config.png" alt="Supabase URL configuration with site URL and redirect wildcard"></div>
+          <p class="shot-caption">Supabase → Authentication → URL Configuration</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">13 / 17</div>
+  </section>
+
+  <!-- ── 12 · Module 4: code ───────────────────────────────────────── -->
+  <section data-label="12 One line of code" class="s-code">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Module 4 · Your code</div>
+      <h2 class="title">Then: one line of code.</h2>
+      <div class="grid">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="label">app.js — the sign-in button</span>
+          </div>
+          <pre><span class="k">await</span> supabase.auth.<span class="f">signInWithOAuth</span>({
+  provider: <span class="s">'google'</span>,
+  options: {
+    redirectTo: <span class="v">window</span>.location.origin,
+    queryParams: { hd: <span class="s">'anduintransact.com'</span> },
+  },
+})</pre>
+        </div>
+        <div class="notes">
+          <div class="note"><b>Everything before this was configuration.</b> Wire this call to your &ldquo;Sign in with Google&rdquo; button — Supabase builds the Google URL and runs the whole dance for you.</div>
+          <div class="note"><code>hd</code> just <b>filters the account chooser</b> to Anduin accounts. It's a courtesy, not the lock.</div>
+          <div class="note"><b>The lock is Internal</b> — the radio button from Module 2. Google enforces it server-side, no matter what the user does.</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">14 / 17</div>
+  </section>
+
+  <!-- ── 13 · Verify ───────────────────────────────────────────────── -->
+  <section data-label="13 Verify it works" class="s-verify">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Module 4 · The proof</div>
+      <h2 class="title">Verify it works.</h2>
+      <div class="grid">
+        <div class="checks">
+          <div class="check"><div>Click the button — the <b>Google account chooser</b> appears, showing your <b>@anduintransact.com</b> account.</div></div>
+          <div class="check"><div>Pick it — you land <b>back in your app, signed in</b>.</div></div>
+          <div class="check"><div>A new user appears under <b>Supabase → Authentication → Users</b>, and <code>auth.getUser()</code> returns them.</div></div>
+        </div>
+        <div class="blocked">
+          <div class="tag">The fourth check · do this one</div>
+          <h3>Now try a personal Gmail.</h3>
+          <p>Google blocks it with an authorization error <b>before it ever reaches your app</b>. That error is not a bug — it's the whole point of today. If an outsider gets through, something's wrong.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">15 / 17</div>
+  </section>
+
+  <!-- ── 14 · Troubleshooting ──────────────────────────────────────── -->
+  <section data-label="14 When it breaks" class="s-trouble">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Debugging · Leave this slide up</div>
+      <h2 class="title">When it breaks: check the match.</h2>
+      <p class="lead">Every error below is one of the five values not matching. The symptom points straight at which one.</p>
+      <table>
+        <thead>
+          <tr><th>What you see</th><th>Which value</th><th>Fix</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="err">redirect_uri_mismatch</td>
+            <td><b>Redirect URI</b></td>
+            <td>Re-copy the callback from Supabase, re-paste into Google. Watch for a trailing slash.</td>
+          </tr>
+          <tr>
+            <td class="err">&ldquo;Internal&rdquo; isn't offered</td>
+            <td><b>User type</b></td>
+            <td>Your GCP project isn't under the org — wrong Google account. Recreate it signed in with work.</td>
+          </tr>
+          <tr>
+            <td class="err">invalid client / secret</td>
+            <td><b>Client ID + Secret</b></td>
+            <td>Re-paste both into Supabase. Lost the secret? Generate a new one in Google.</td>
+          </tr>
+          <tr>
+            <td class="err">signs in, bounces to wrong page</td>
+            <td><b>Supabase URLs</b></td>
+            <td>Set Site URL and add <code>http://localhost:3000/**</code> in URL Configuration.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="slide-num">16 / 17</div>
+  </section>
+
+  <!-- ── 15 · Wrap ─────────────────────────────────────────────────── -->
+  <section data-label="15 Wrap" class="s-wrap">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The takeaway</div>
+      <h1>Your apps now have<br><em>real users.</em></h1>
+      <p class="sub">Google does the checking. Supabase does the bookkeeping. Your app just asks <b>&ldquo;who is this?&rdquo;</b> — and what each user can see and do is something you control. That was the last missing piece: <b>you're ready to build.</b></p>
+      <div class="signoff">
+        <span><b>Housekeeping:</b></span>
+        <span>delete throwaway OAuth clients &amp; practice GCP projects when you're done</span>
+        <span class="dot"></span>
+        <span>Charles · Anduin Slack</span>
+      </div>
+    </div>
+    <div class="slide-num">17 / 17</div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>

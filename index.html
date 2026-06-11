@@ -406,6 +406,52 @@ box I can copy. read the key from .env.</code></pre>
       ],
     },
     {
+      label: "Week 4",
+      decks: [
+        {
+          title: "Google Sign-In — Day 4",
+          sub: "main deck",
+          path: "wk4/Week 4 - Google Sign-In.html",
+          notes: `
+            <h2>Google Sign-In</h2>
+            <p class="empty">Your apps learn who's using them — one button, no passwords, Anduin-only. The lesson doc has every click; these are the landmarks.</p>
+
+            <h3>The route (~25 min)</h3>
+            <ol>
+              <li><strong>Supabase</strong> — enable the Google provider, copy the <strong>Callback URL</strong> (use the Copy button — it must match byte-for-byte later)</li>
+              <li><strong>Google Cloud</strong> — <a href="https://console.cloud.google.com" target="_blank" rel="noopener">console.cloud.google.com</a> with your <strong>work account</strong>: new project under the org, audience <strong>Internal</strong>, OAuth client (Web application) with the callback as redirect URI</li>
+              <li><strong>Supabase</strong> — paste Client ID + Secret, set Site URL <code>http://localhost:3000</code> and Redirect URL <code>http://localhost:3000/**</code></li>
+              <li><strong>Your code</strong> — one line, then verify</li>
+            </ol>
+
+            <h3>The one line of code</h3>
+            <pre><code>await supabase.auth.signInWithOAuth({
+  provider: 'google',
+  options: {
+    redirectTo: window.location.origin,
+    queryParams: { hd: 'anduintransact.com' },
+  },
+})</code></pre>
+            <p><code>hd</code> only filters the account chooser — <strong>the lock is the Internal setting</strong>, enforced by Google server-side.</p>
+
+            <h3>Verify</h3>
+            <ul>
+              <li>Sign in with your @anduintransact.com account → lands back signed in, user appears under Supabase → Authentication → Users</li>
+              <li><strong>Then try a personal Gmail</strong> — Google blocks it before it reaches your app. That error is the point.</li>
+            </ul>
+
+            <h3>When it breaks</h3>
+            <ul>
+              <li><code>redirect_uri_mismatch</code> → re-copy the callback from Supabase into Google (watch trailing slashes)</li>
+              <li>"Internal" isn't offered → project isn't under the org; recreate it signed in with work</li>
+              <li>invalid client / secret → re-paste both into Supabase (lost the secret? generate a new one)</li>
+              <li>signs in but bounces wrong → fix Site URL + <code>/**</code> redirect in URL Configuration</li>
+            </ul>
+          `,
+        },
+      ],
+    },
+    {
       label: "Bonus · Advanced",
       decks: [
         {
