@@ -1,0 +1,217 @@
+/*
+  Anduin Design System — colors & type
+  ------------------------------------
+  Tokens pulled from the production Anduin CSS bundle (anduin.design/app.css).
+  All colors are OKLCH for perceptual uniformity; scales run 1 (lightest) → 5 (darkest),
+  except gray which runs 0 (white) → 9 (near-black).
+
+  Two brand fonts:
+    --font-display   Poppins           (used on slides, marketing titles)
+    --font-sans      system-ui stack   (used across the app — 13px body default)
+    --font-mono      monospace         (code)
+*/
+
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("./fonts/Poppins-400.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 500; font-display: swap;
+  src: url("./fonts/Poppins-500.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("./fonts/Poppins-600.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("./fonts/Poppins-700.woff2") format("woff2"); }
+
+:root {
+  /* ── Color — gray (0=white → 9=ink) ───────────────────────────── */
+  --color-gray-0: oklch(1 0 0);                    /* #ffffff white */
+  --color-gray-1: oklch(0.9846 0.0017 247.84);     /* page / faint bg  */
+  --color-gray-2: oklch(0.9515 0.0046 258.32);     /* hover fill       */
+  --color-gray-3: oklch(0.9336 0.0058 264.53);     /* borders (hairline) */
+  --color-gray-4: oklch(0.8618 0.0141 258.35);     /* muted border     */
+  --color-gray-5: oklch(0.7073 0.0268 263.28);     /* placeholder      */
+  --color-gray-6: oklch(0.6528 0.0316 266.24);     /* secondary text   */
+  --color-gray-7: oklch(0.5371 0.0337 264.24);     /* helper text      */
+  --color-gray-8: oklch(0.3544 0.0326 260.94);     /* body text (default) */
+  --color-gray-9: oklch(0.2776 0.0341 255.81);     /* headings / ink   */
+  --color-white: var(--color-gray-0);
+
+  /* ── Color — primary (brand blue) ─────────────────────────────── */
+  --color-primary-1: oklch(0.9474 0.0256 221.57);  /* tint / callout bg */
+  --color-primary-2: oklch(0.8652 0.066 236.86);
+  --color-primary-3: oklch(0.7219 0.1335 240.15);  /* ~logo mark */
+  --color-primary-4: oklch(0.5679 0.1784 254.76);  /* primary action */
+  --color-primary-5: oklch(0.4682 0.1548 255.23);  /* pressed / ink */
+
+  /* ── Color — danger / success / warning ───────────────────────── */
+  --color-danger-1:  oklch(0.9437 0.0174 17.47);
+  --color-danger-2:  oklch(0.8643 0.0573 18.32);
+  --color-danger-3:  oklch(0.712 0.1517 21.64);
+  --color-danger-4:  oklch(0.5948 0.2165 26.91);
+  --color-danger-5:  oklch(0.531 0.2147 28.91);
+
+  --color-success-1: oklch(0.9276 0.0541 150.91);
+  --color-success-2: oklch(0.8592 0.1078 149.75);
+  --color-success-3: oklch(0.6953 0.1711 149.14);
+  --color-success-4: oklch(0.6149 0.1634 148.21);
+  --color-success-5: oklch(0.5075 0.136 146.46);
+
+  --color-warning-1: oklch(0.9549 0.0496 88.08);
+  --color-warning-2: oklch(0.912 0.0811 83.56);
+  --color-warning-3: oklch(0.8282 0.1628 78.73);
+  --color-warning-4: oklch(0.7325 0.1512 75.97);
+  --color-warning-5: oklch(0.5329 0.1098 82);
+
+  /* Semantic aliases — components consume these; themes override here. */
+  --color-semantic-gray-0: var(--color-gray-0);
+  --color-semantic-gray-1: var(--color-gray-1);
+  --color-semantic-gray-2: var(--color-gray-2);
+  --color-semantic-gray-3: var(--color-gray-3);
+  --color-semantic-gray-4: var(--color-gray-4);
+  --color-semantic-gray-5: var(--color-gray-5);
+  --color-semantic-gray-6: var(--color-gray-6);
+  --color-semantic-gray-7: var(--color-gray-7);
+  --color-semantic-gray-8: var(--color-gray-8);
+  --color-semantic-gray-9: var(--color-gray-9);
+  --color-semantic-primary-1: var(--color-primary-1);
+  --color-semantic-primary-2: var(--color-primary-2);
+  --color-semantic-primary-3: var(--color-primary-3);
+  --color-semantic-primary-4: var(--color-primary-4);
+  --color-semantic-primary-5: var(--color-primary-5);
+  --color-semantic-danger-4:  var(--color-danger-4);
+  --color-semantic-success-4: var(--color-success-4);
+  --color-semantic-warning-4: var(--color-warning-4);
+
+  /* Brand-mark hex (for SVG / PPT compatibility)   */
+  --brand-mark-blue: #48AFF0;   /* exact color of the logo mark     */
+  --brand-ink-navy:  #1F3145;   /* Anduin Transactions wordmark ink */
+  --app-bg:          #f5f9fc;   /* the stock site body background   */
+
+  /* ── Type — fonts ─────────────────────────────────────────────── */
+  --font-sans:    system-ui, -apple-system, Roboto, Oxygen, Cantarell, Ubuntu, "Segoe UI", sans-serif;
+  --font-display: "Poppins", var(--font-sans);
+  --font-mono:    "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ── Type — sizes (literal px from production tokens) ─────────── */
+  --text-9:  9px;
+  --text-10: 10px;
+  --text-11: 11px;
+  --text-13: 13px;   /* body default */
+  --text-15: 15px;
+  --text-17: 17px;
+  --text-20: 20px;
+  --text-23: 23px;
+  --text-26: 26px;
+  --text-30: 30px;
+  --text-35: 35px;
+
+  /* ── Type — line heights ──────────────────────────────────────── */
+  --leading-16: 16px;
+  --leading-20: 20px;   /* body */
+  --leading-24: 24px;
+  --leading-28: 28px;
+  --leading-32: 32px;
+  --leading-40: 40px;
+  --leading-44: 44px;
+
+  /* ── Type — weights ───────────────────────────────────────────── */
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* ── Spacing (literal px — Tailwind-style names) ──────────────── */
+  --spacing-px:  1px;
+  --spacing-0:   0;
+  --spacing-2:   2px;
+  --spacing-4:   4px;
+  --spacing-6:   6px;
+  --spacing-8:   8px;
+  --spacing-12:  12px;
+  --spacing-16:  16px;
+  --spacing-20:  20px;
+  --spacing-24:  24px;
+  --spacing-28:  28px;
+  --spacing-32:  32px;
+  --spacing-40:  40px;
+  --spacing-48:  48px;
+  --spacing-56:  56px;
+  --spacing-64:  64px;
+  --spacing-128: 128px;
+  --spacing-256: 256px;
+  --spacing-480: 480px;
+  --spacing-512: 512px;
+  --spacing-640: 640px;
+  --spacing-768: 768px;
+  --spacing-1024: 1024px;
+  --spacing-1536: 1536px;
+
+  /* ── Radius ──────────────────────────────────────────────────── */
+  --radius-0:   0;
+  --radius-2:   2px;
+  --radius-3:   3px;
+  --radius-4:   4px;   /* inputs, buttons (default) */
+  --radius-6:   6px;
+  --radius-8:   8px;   /* cards, popovers */
+  --radius-12:  12px;
+  --radius-16:  16px;
+  --radius-20:  20px;
+  --radius-24:  24px;
+  --radius-full: 9999px;
+
+  /* ── Outline width (focus rings) ─────────────────────────────── */
+  --outline-width-1: 1px;
+  --outline-width-2: 2px;
+  --outline-width-3: 3px;
+  --outline-width-4: 4px;
+
+  /* ── Shadow — Anduin is a low-shadow system ──────────────────── */
+  --shadow-button:  0 1px 0 0 oklch(0.95 0.005 260 / 0.6);            /* pressed edge on filled button */
+  --shadow-popover: 0 4px 12px -2px oklch(0 0 0 / 0.08), 0 1px 3px 0 oklch(0 0 0 / 0.06);
+  --shadow-dialog:  0 20px 48px -12px oklch(0 0 0 / 0.18), 0 4px 12px -2px oklch(0 0 0 / 0.1);
+  --shadow-card:    0 1px 2px 0 oklch(0 0 0 / 0.04);                 /* flat/quiet card (rare) */
+
+  /* ── Semantic roles ──────────────────────────────────────────── */
+  --fg-default:   var(--color-gray-8);
+  --fg-strong:    var(--color-gray-9);
+  --fg-muted:     var(--color-gray-7);
+  --fg-subtle:    var(--color-gray-6);
+  --fg-placeholder: var(--color-gray-5);
+  --fg-link:      #2b95d6;
+  --bg-page:      var(--app-bg);
+  --bg-surface:   var(--color-gray-0);
+  --bg-hover:     var(--color-gray-2);
+  --border-hairline: var(--color-gray-3);
+  --border-default:  var(--color-gray-4);
+}
+
+/* ──────────────────────────────────────────────────────────────
+   Base reset — the bits of @layer base that set typography.
+   Match Anduin's body: 13px / 20px, ink on #f5f9fc.
+   ────────────────────────────────────────────────────────────── */
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-13);
+  line-height: var(--leading-20);
+  color: var(--fg-default);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 { font-size: 32px; line-height: 36px; font-weight: 400; }
+h2 { font-size: 24px; line-height: 32px; font-weight: 400; }
+h3 { font-size: 20px; line-height: 24px; font-weight: 500; }
+h4 { font-size: 16px; line-height: 20px; font-weight: 600; }
+h5 { font-size: 13px; line-height: 20px; font-weight: 600; }
+h6 { font-size: 12px; line-height: 20px; font-weight: 600; }
+
+a           { color: var(--fg-link); text-decoration: none; }
+a:hover     { text-decoration: underline; }
+::placeholder { color: var(--fg-placeholder); }
+
+/* Poppins is reserved for slide/marketing display type — NOT in-app chrome. */
+.display,
+.slide-display,
+.anduin-display {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.01em;
+}
