@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <title>Vibe Coding — Anduin Fast Track</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/png" href="assets/favicon.png">
 <style>
   :root {
     --bg: #f4f6fa;
@@ -22,10 +23,11 @@
     --shadow-sm: 0 1px 2px rgba(20,33,51,0.04), 0 1px 3px rgba(20,33,51,0.06);
     --shadow-md: 0 6px 22px -10px rgba(20,33,51,0.18);
     --radius: 14px;
-    --wrap: 980px;
+    --wrap: 1080px;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
+  html { scroll-behavior: smooth; }
   body {
     font: 15px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     background: var(--bg);
@@ -144,6 +146,19 @@
   .site-footer { border-top: 1px solid var(--border); background: var(--surface); }
   .site-footer .wrap { padding: 22px 24px; color: var(--muted); font-size: 13px; display: flex; gap: 8px; flex-wrap: wrap; }
 
+  /* ───────────────────────── Home: quick TOC rail ───────────────────────── */
+  .home-grid { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; align-items: start; }
+  .home-main { min-width: 0; }
+  .module { scroll-margin-top: 84px; }
+  .toc { position: sticky; top: 84px; align-self: start; }
+  .toc-title { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding: 4px 12px 10px; }
+  .toc a { display: flex; align-items: center; gap: 11px; padding: 8px 12px; border-radius: 9px; text-decoration: none; color: var(--ink-soft); font-size: 13.5px; font-weight: 600; }
+  .toc a:hover { background: var(--surface); color: var(--ink); }
+  .toc a.active { background: var(--accent-soft); color: var(--accent-deep); }
+  .toc a .n { width: 22px; height: 22px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; font-size: 11px; font-weight: 700; color: var(--muted); flex-shrink: 0; }
+  .toc a.active .n { background: var(--accent); color: #fff; border-color: transparent; }
+  @media (max-width: 900px) { .home-grid { grid-template-columns: 1fr; } .toc { display: none; } }
+
   /* ───────────────────────── Lesson view ───────────────────────── */
   #lesson { height: 100%; display: flex; flex-direction: column; background: #0e1116; }
   .lesson-bar {
@@ -243,16 +258,18 @@
       </div>
     </header>
 
-    <section class="hero">
-      <div class="wrap">
-        <div class="eyebrow">Anduin Fast Track · Workshop</div>
-        <h1>Vibe Coding</h1>
-        <p>Go from zero to shipping real apps — just by describing what you want to an AI coding agent. Work through the modules in order; each one builds on the last.</p>
-        <div class="stats" id="heroStats"></div>
+    <div class="wrap home-grid">
+      <aside class="toc" id="toc" aria-label="Course modules"></aside>
+      <div class="home-main">
+        <section class="hero">
+          <div class="eyebrow">Anduin Fast Track · Workshop</div>
+          <h1>Vibe Coding</h1>
+          <p>Go from zero to shipping real apps — just by describing what you want to an AI coding agent. Work through the modules in order; each one builds on the last.</p>
+          <div class="stats" id="heroStats"></div>
+        </section>
+        <main class="modules" id="modules"></main>
       </div>
-    </section>
-
-    <main class="wrap modules" id="modules"></main>
+    </div>
 
     <footer class="site-footer">
       <div class="wrap">
@@ -551,6 +568,7 @@ box I can copy. read the key from .env.</code></pre>
   const homeView = document.getElementById("home");
   const lessonView = document.getElementById("lesson");
   const modulesEl = document.getElementById("modules");
+  const tocEl = document.getElementById("toc");
   const heroStats = document.getElementById("heroStats");
   const viewer = document.getElementById("viewer");
   const crumb = document.getElementById("crumb");
@@ -573,6 +591,7 @@ box I can copy. read the key from .env.</code></pre>
     WEEKS.forEach((wk, i) => {
       const mod = document.createElement("section");
       mod.className = "module";
+      mod.id = "mod-" + i;
 
       const numLabel = wk.bonus ? "★" : String(i + 1);
       let html =
@@ -620,6 +639,41 @@ box I can copy. read the key from .env.</code></pre>
       mod.innerHTML = html;
       modulesEl.appendChild(mod);
     });
+    buildToc();
+  }
+
+  // ── Quick TOC (left rail on the course home) ──────────────────────
+  function buildToc() {
+    tocEl.innerHTML =
+      `<div class="toc-title">Modules</div>` +
+      WEEKS.map((wk, i) =>
+        `<a href="#mod-${i}" data-target="mod-${i}"><span class="n">${wk.bonus ? "★" : i + 1}</span><span class="tl">${wk.label}</span></a>`
+      ).join("");
+
+    const links = [...tocEl.querySelectorAll("a")];
+    links.forEach((a) => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const el = document.getElementById(a.dataset.target);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+
+    // Scroll-spy: highlight whichever module sits at the top right now.
+    function spy() {
+      if (homeView.hidden) return;
+      let active = 0;
+      WEEKS.forEach((_, i) => {
+        const el = document.getElementById("mod-" + i);
+        if (el && el.getBoundingClientRect().top <= 100) active = i;
+      });
+      // At the very bottom there isn't room to scroll the last module up — force it.
+      if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) active = links.length - 1;
+      links.forEach((a, i) => a.classList.toggle("active", i === active));
+    }
+    window.addEventListener("scroll", spy, { passive: true });
+    window.addEventListener("resize", spy, { passive: true });
+    spy();
   }
 
   // ── Open a lesson ─────────────────────────────────────────────────
