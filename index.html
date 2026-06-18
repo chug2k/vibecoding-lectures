@@ -470,6 +470,35 @@ box I can copy. read the key from .env.</code></pre>
       ],
     },
     {
+      label: "Week 5",
+      summary: "Level up your coding agent itself — give it a real software-development process so it plans, tests, and ships like an engineer.",
+      decks: [
+        {
+          title: "Superpowers",
+          sub: "main deck",
+          desc: "Upgrade your coding agent itself — a free plugin that makes it plan, test, and ship like an engineer.",
+          path: "wk5/Superpowers.html",
+          notes: `
+            <h2>Superpowers</h2>
+            <p class="empty">Walkthrough of <a href="https://github.com/obra/superpowers" target="_blank" rel="noopener">github.com/obra/superpowers</a> — a free plugin that gives your coding agent a real software-development process. ~45-min bonus session.</p>
+
+            <h3>The one reframe</h3>
+            <p>The agent <strong>stops jumping into code.</strong> It checks for a relevant skill before any task and follows it — mandatory workflows, not suggestions. That one habit is the whole product.</p>
+
+            <h3>The pipeline (7 stages)</h3>
+            <p><strong>Brainstorm → Worktree → Plan → Build (subagents) → Test-first → Review → Finish.</strong> You sign off at the checkpoints; the rest runs itself — sometimes for hours.</p>
+
+            <h3>Install (one line)</h3>
+            <p><code>/plugin install superpowers@claude-plugins-official</code> — then just start building. Also works in Cursor, Codex, Gemini CLI, Copilot CLI, and more.</p>
+
+            <h3>When to reach for it</h3>
+            <p><strong>Real, multi-file features</strong> where correctness matters and you want long autonomous runs. <strong>Skip it</strong> for one-line tweaks — the process is heavier than the task.</p>
+          `,
+        },
+        { title: "LP Onboarding Copilot", sub: "supplemental — live app", desc: "A live sample app for this module — open and try it.", path: "https://week5-superpowers.vercel.app/", external: true },
+      ],
+    },
+    {
       label: "Bonus · Advanced",
       summary: "Optional deep dives for getting more out of your coding agent.",
       bonus: true,
@@ -504,28 +533,6 @@ box I can copy. read the key from .env.</code></pre>
 
             <h3>Power-ups</h3>
             <p><code>budget Nk tokens</code> · <code>/goal</code> · <code>/loop</code> · save with <code>s</code> → <code>~/.claude/workflows</code></p>
-          `,
-        },
-        {
-          title: "Superpowers",
-          sub: "deep dive — optional",
-          desc: "Give your agent a real software-development process (a free plugin).",
-          path: "bonus/superpowers/Superpowers.html",
-          notes: `
-            <h2>Superpowers</h2>
-            <p class="empty">Walkthrough of <a href="https://github.com/obra/superpowers" target="_blank" rel="noopener">github.com/obra/superpowers</a> — a free plugin that gives your coding agent a real software-development process. ~45-min bonus session.</p>
-
-            <h3>The one reframe</h3>
-            <p>The agent <strong>stops jumping into code.</strong> It checks for a relevant skill before any task and follows it — mandatory workflows, not suggestions. That one habit is the whole product.</p>
-
-            <h3>The pipeline (7 stages)</h3>
-            <p><strong>Brainstorm → Worktree → Plan → Build (subagents) → Test-first → Review → Finish.</strong> You sign off at the checkpoints; the rest runs itself — sometimes for hours.</p>
-
-            <h3>Install (one line)</h3>
-            <p><code>/plugin install superpowers@claude-plugins-official</code> — then just start building. Also works in Cursor, Codex, Gemini CLI, Copilot CLI, and more.</p>
-
-            <h3>When to reach for it</h3>
-            <p><strong>Real, multi-file features</strong> where correctness matters and you want long autonomous runs. <strong>Skip it</strong> for one-line tweaks — the process is heavier than the task.</p>
           `,
         },
         { title: "Git for Vibecoders", sub: "deep dive — optional", desc: "Version control, explained for people who vibe-code.", path: "bonus/Git for Vibecoders.html" },
