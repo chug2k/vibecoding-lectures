@@ -2,301 +2,307 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Vibe Coding — Lectures</title>
+<title>Vibe Coding — Anduin Fast Track</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
   :root {
-    --bg: #0b0b0f;
-    --panel: #14141b;
-    --panel-hi: #1d1d27;
-    --border: #2a2a36;
-    --text: #e8e8ee;
-    --muted: #8a8a97;
-    --accent: #7c5cff;
-    --accent-hi: #9a82ff;
+    --bg: #f4f6fa;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --border: #e5e9f0;
+    --border-strong: #d3dae6;
+    --ink: #1b2430;
+    --ink-soft: #3f4a59;
+    --muted: #6b7686;
+    --faint: #9aa4b2;
+    --accent: #1f7fc4;
+    --accent-deep: #18689f;
+    --accent-soft: #e8f3fb;
+    --accent-ring: rgba(31,127,196,0.35);
+    --shadow-sm: 0 1px 2px rgba(20,33,51,0.04), 0 1px 3px rgba(20,33,51,0.06);
+    --shadow-md: 0 6px 22px -10px rgba(20,33,51,0.18);
+    --radius: 14px;
+    --wrap: 980px;
   }
   * { box-sizing: border-box; }
-  html, body { height: 100%; margin: 0; }
+  html, body { margin: 0; height: 100%; }
   body {
-    --sidebar-w: 260px;
-    font: 14px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     background: var(--bg);
-    color: var(--text);
-    display: grid;
-    grid-template-columns: var(--sidebar-w) 1fr;
-    grid-template-rows: 100%;
-    transition: grid-template-columns 0.2s ease;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
   }
-  body.sidebar-hidden { --sidebar-w: 0px; }
+  a { color: inherit; }
+  .wrap { width: 100%; max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+  .view[hidden] { display: none !important; }
 
-  aside.sidebar {
-    background: var(--panel);
-    border-right: 1px solid var(--border);
-    overflow: hidden;
-    padding: 18px 14px;
+  /* ───────────────────────── Home: header ───────────────────────── */
+  .site-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 20;
   }
-  body.sidebar-hidden aside.sidebar {
-    padding-left: 0;
-    padding-right: 0;
-    border-right: 0;
+  .header-inner {
+    display: flex; align-items: center; gap: 14px;
+    height: 64px;
   }
-  .brand {
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 0.2px;
-    margin: 4px 6px 18px;
+  .brand { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+  .brand img { height: 24px; width: auto; display: block; }
+  .brand .divider { width: 1px; height: 22px; background: var(--border-strong); }
+  .brand .program {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--accent-deep);
   }
-  .brand small {
-    display: block;
-    color: var(--muted);
-    font-weight: 400;
-    font-size: 11px;
-    margin-top: 2px;
-  }
+  .header-spacer { flex: 1; }
+  .header-meta { color: var(--muted); font-size: 13px; }
 
-  .week {
-    margin-bottom: 14px;
+  /* ───────────────────────── Home: hero ───────────────────────── */
+  .hero { padding: 52px 0 30px; }
+  .hero .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--accent-deep); margin-bottom: 14px;
   }
-  .week-label {
-    color: var(--muted);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    padding: 4px 6px;
+  .hero h1 {
+    margin: 0; font-size: 42px; line-height: 1.08; letter-spacing: -0.02em;
+    font-weight: 700; color: var(--ink); max-width: 760px;
   }
-  .deck {
-    display: block;
-    padding: 9px 10px;
-    border-radius: 7px;
-    color: var(--text);
-    text-decoration: none;
-    cursor: pointer;
-    font-size: 13px;
-    border: 1px solid transparent;
-    margin-top: 4px;
+  .hero p {
+    margin: 16px 0 0; font-size: 18px; line-height: 1.5;
+    color: var(--ink-soft); max-width: 680px;
   }
-  .deck:hover { background: var(--panel-hi); }
-  .deck.active {
-    background: var(--panel-hi);
-    border-color: var(--accent);
-    color: var(--accent-hi);
+  .hero .stats {
+    margin-top: 24px; display: flex; gap: 26px; flex-wrap: wrap;
+    color: var(--muted); font-size: 14px;
   }
-  .deck .sub {
-    color: var(--muted);
-    font-size: 11px;
-    margin-top: 2px;
-  }
+  .hero .stats b { color: var(--ink); font-weight: 600; }
+  .hero .stats .dot { color: var(--border-strong); }
 
-  /* Recording link — visually distinct from slide decks. */
-  .recording {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 7px 10px;
-    margin-top: 4px;
-    border-radius: 7px;
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 12px;
-    border: 1px solid transparent;
-  }
-  .recording:hover {
-    background: var(--panel-hi);
-    color: var(--text);
-  }
-  .recording .play {
-    color: var(--accent-hi);
-    font-size: 10px;
-    line-height: 1;
-  }
-  .recording .ext {
-    margin-left: auto;
-    color: var(--muted);
-    font-size: 11px;
-  }
-
-  main {
-    position: relative;
-    background: #000;
+  /* ───────────────────────── Home: modules ───────────────────────── */
+  .modules { padding: 8px 0 64px; display: flex; flex-direction: column; gap: 22px; }
+  .module {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm);
     overflow: hidden;
   }
-  iframe {
-    width: 100%;
-    height: 100%;
-    border: 0;
-    display: block;
+  .module-head {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 22px 24px 18px;
+    border-bottom: 1px solid var(--border);
   }
-  .placeholder {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-    font-size: 13px;
-    flex-direction: column;
-    gap: 8px;
+  .module-num {
+    flex-shrink: 0; width: 40px; height: 40px; border-radius: 11px;
+    background: var(--accent-soft); color: var(--accent-deep);
+    display: grid; place-items: center; font-weight: 700; font-size: 16px;
   }
-  [hidden] { display: none !important; }
+  .module-num.bonus { background: #f1edfb; color: #6b4bc9; }
+  .module-head .mh-text { min-width: 0; }
+  .module-eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .module-title { margin: 3px 0 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
+  .module-summary { margin: 4px 0 0; color: var(--ink-soft); font-size: 14.5px; }
 
-  .sidebar-toggle {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 11;
-    background: rgba(20,20,27,0.85);
-    backdrop-filter: blur(8px);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.2s;
-    font-family: inherit;
-    padding: 0;
+  .lessons { display: flex; flex-direction: column; }
+  .lesson {
+    display: flex; align-items: center; gap: 15px;
+    padding: 15px 24px; cursor: pointer;
+    border-top: 1px solid var(--border);
+    text-decoration: none; color: inherit;
+    transition: background 0.12s;
   }
-  .sidebar-toggle:hover { opacity: 1; background: var(--panel-hi); }
-  .placeholder kbd {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 2px 6px;
-    font-size: 11px;
+  .lessons .lesson:first-child { border-top: 0; }
+  .lesson:hover { background: var(--surface-2); }
+  .lesson .ic {
+    flex-shrink: 0; width: 38px; height: 38px; border-radius: 10px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    display: grid; place-items: center; color: var(--accent);
   }
+  .lesson .ic svg { width: 19px; height: 19px; }
+  .lesson.is-recording .ic { color: var(--accent-deep); background: var(--accent-soft); border-color: transparent; }
+  .lesson .body { flex: 1; min-width: 0; }
+  .lesson .row1 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .lesson .title { font-weight: 600; font-size: 15.5px; color: var(--ink); }
+  .lesson:hover .title { color: var(--accent-deep); }
+  .lesson .kind {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--muted); background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: 999px; padding: 2px 9px;
+  }
+  .lesson .desc { color: var(--muted); font-size: 13.5px; margin-top: 2px; }
+  .lesson .chips { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .chip {
+    font-size: 12px; color: var(--muted);
+    display: inline-flex; align-items: center; gap: 5px;
+    border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px;
+    background: var(--surface);
+  }
+  .chip svg { width: 13px; height: 13px; }
+  .lesson .go { color: var(--faint); flex-shrink: 0; }
+  .lesson:hover .go { color: var(--accent); }
 
-  .topbar {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-    display: flex;
-    gap: 6px;
-    z-index: 10;
-    opacity: 0.6;
-    transition: opacity 0.2s;
-  }
-  .topbar:hover { opacity: 1; }
-  .topbar a, .topbar button {
-    background: rgba(20,20,27,0.85);
-    backdrop-filter: blur(8px);
-    color: var(--text);
-    text-decoration: none;
-    padding: 5px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    font-size: 12px;
-    cursor: pointer;
-    font-family: inherit;
-  }
-  .topbar a:hover, .topbar button:hover { background: var(--panel-hi); }
-  .topbar button.has-notes { border-color: var(--accent); color: var(--accent-hi); }
+  .site-footer { border-top: 1px solid var(--border); background: var(--surface); }
+  .site-footer .wrap { padding: 22px 24px; color: var(--muted); font-size: 13px; display: flex; gap: 8px; flex-wrap: wrap; }
 
+  /* ───────────────────────── Lesson view ───────────────────────── */
+  #lesson { height: 100%; display: flex; flex-direction: column; background: #0e1116; }
+  .lesson-bar {
+    flex-shrink: 0; height: 56px; display: flex; align-items: center; gap: 14px;
+    padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--border);
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 7px;
+    text-decoration: none; color: var(--ink-soft); font-weight: 600; font-size: 14px;
+    padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border);
+  }
+  .back:hover { background: var(--surface-2); color: var(--accent-deep); border-color: var(--border-strong); }
+  .crumb { font-size: 14px; color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .crumb b { color: var(--ink); font-weight: 600; }
+  .crumb .sep { margin: 0 8px; color: var(--faint); }
+  .bar-spacer { flex: 1; }
+  .bar-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    text-decoration: none; cursor: pointer; font: inherit; font-size: 13px; font-weight: 500;
+    color: var(--ink-soft); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px;
+  }
+  .bar-btn:hover { background: var(--surface-2); border-color: var(--border-strong); }
+  .bar-btn.accent { color: var(--accent-deep); border-color: var(--accent-ring); background: var(--accent-soft); }
+  .bar-btn svg { width: 14px; height: 14px; }
+
+  .stage { position: relative; flex: 1; min-height: 0; background: #000; }
+  #viewer { width: 100%; height: 100%; border: 0; display: block; }
+
+  .lesson-nav {
+    flex-shrink: 0; display: flex; gap: 12px; align-items: stretch;
+    padding: 12px 16px; background: var(--surface); border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    flex: 1; min-width: 0; text-align: left; cursor: pointer; font: inherit;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 9px 16px; color: var(--ink); display: flex; flex-direction: column; gap: 1px;
+  }
+  .nav-btn:hover:not(:disabled) { border-color: var(--accent-ring); background: var(--accent-soft); }
+  .nav-btn:disabled { opacity: 0.4; cursor: default; }
+  .nav-btn.next { text-align: right; align-items: flex-end; }
+  .nav-btn .lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .nav-btn .tt { font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+  /* Resources / notes drawer */
   .notes {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 420px;
-    max-width: 60vw;
-    background: var(--panel);
-    border-left: 1px solid var(--border);
-    overflow-y: auto;
-    padding: 50px 22px 22px;
-    z-index: 5;
-    transform: translateX(100%);
-    transition: transform 0.2s ease;
-    box-shadow: -8px 0 24px rgba(0,0,0,0.4);
+    position: absolute; top: 0; right: 0; bottom: 0; width: 440px; max-width: 86vw;
+    background: var(--surface); border-left: 1px solid var(--border);
+    overflow-y: auto; padding: 24px 26px 40px; z-index: 5;
+    transform: translateX(100%); transition: transform 0.22s ease;
+    box-shadow: -10px 0 30px rgba(14,17,22,0.18);
   }
   .notes.open { transform: translateX(0); }
-  .notes h2 {
-    margin: 0 0 4px;
-    font-size: 16px;
-  }
-  .notes h3 {
-    margin: 20px 0 6px;
-    font-size: 13px;
-    color: var(--accent-hi);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .notes p { margin: 6px 0; color: var(--text); line-height: 1.5; }
-  .notes a { color: var(--accent-hi); word-break: break-all; }
-  .notes ul { margin: 4px 0; padding-left: 20px; }
-  .notes li { margin: 4px 0; line-height: 1.5; }
+  .notes .notes-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .notes .notes-head .t { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .notes .close { cursor: pointer; border: 0; background: transparent; color: var(--muted); font-size: 20px; line-height: 1; padding: 4px; }
+  .notes .close:hover { color: var(--ink); }
+  .notes h2 { margin: 4px 0 4px; font-size: 19px; color: var(--ink); letter-spacing: -0.01em; }
+  .notes h3 { margin: 22px 0 7px; font-size: 12px; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .notes p { margin: 7px 0; color: var(--ink-soft); line-height: 1.55; }
+  .notes a { color: var(--accent-deep); word-break: break-word; }
+  .notes ul, .notes ol { margin: 6px 0; padding-left: 20px; }
+  .notes li { margin: 5px 0; line-height: 1.55; color: var(--ink-soft); }
+  .notes strong { color: var(--ink); }
   .notes pre {
-    background: #0a0a10;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 10px 12px;
-    overflow-x: auto;
-    font-size: 12px;
-    margin: 8px 0;
-    color: #d5d5e0;
+    background: #0e1116; border: 1px solid #1f2733; border-radius: 8px;
+    padding: 12px 14px; overflow-x: auto; font-size: 12.5px; margin: 8px 0; color: #d8e0ea;
   }
   .notes code {
-    background: #0a0a10;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 1px 5px;
-    font-size: 12px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 1px 5px; font-size: 12.5px;
   }
   .notes pre code { background: transparent; border: 0; padding: 0; }
   .notes .empty { color: var(--muted); font-style: italic; }
+
+  @media (max-width: 720px) {
+    .hero h1 { font-size: 32px; }
+    .hero { padding: 36px 0 22px; }
+    .lesson .chips { display: none; }
+    .nav-btn .tt { max-width: 38vw; }
+  }
 </style>
 </head>
 <body>
-  <aside class="sidebar">
-    <div class="brand">
-      Vibe Coding
-      <small>Lecture viewer</small>
-    </div>
-    <div id="weeks"></div>
-  </aside>
 
-  <main>
-    <button id="sidebarToggle" class="sidebar-toggle" type="button" title="Toggle sidebar (\)" aria-label="Toggle sidebar">☰</button>
-    <div class="topbar" id="topbar" hidden>
-      <a id="recordingLink" target="_blank" rel="noopener" hidden>▶ Recording ↗</a>
-      <button id="notesToggle" type="button">Notes</button>
-      <a id="openNew" target="_blank" rel="noopener">Open in new tab ↗</a>
+  <!-- ════════════════════════ HOME ════════════════════════ -->
+  <div id="home" class="view">
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="#" aria-label="Vibe Coding home">
+          <img src="assets/anduin-full.svg" alt="Anduin">
+          <span class="divider"></span>
+          <span class="program">Fast Track</span>
+        </a>
+        <span class="header-spacer"></span>
+        <span class="header-meta">Vibe Coding Workshop</span>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="wrap">
+        <div class="eyebrow">Anduin Fast Track · Workshop</div>
+        <h1>Vibe Coding</h1>
+        <p>Go from zero to shipping real apps — just by describing what you want to an AI coding agent. Work through the modules in order; each one builds on the last.</p>
+        <div class="stats" id="heroStats"></div>
+      </div>
+    </section>
+
+    <main class="wrap modules" id="modules"></main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <span>Vibe Coding — Anduin Fast Track</span>
+        <span class="dot">·</span>
+        <span>Questions? Charles on Anduin Slack</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ════════════════════════ LESSON ════════════════════════ -->
+  <div id="lesson" class="view" hidden>
+    <div class="lesson-bar">
+      <a class="back" href="#">← Course</a>
+      <div class="crumb" id="crumb"></div>
+      <span class="bar-spacer"></span>
+      <a id="recLink" class="bar-btn accent" target="_blank" rel="noopener" hidden></a>
+      <button id="notesBtn" class="bar-btn" type="button" hidden>Resources</button>
+      <a id="openNew" class="bar-btn" target="_blank" rel="noopener">Open ↗</a>
     </div>
-    <div class="placeholder" id="placeholder">
-      <div>Pick a lecture from the sidebar.</div>
-      <div><kbd>←</kbd> <kbd>→</kbd> navigate slides once a deck is loaded</div>
+    <div class="stage">
+      <iframe id="viewer" allowfullscreen></iframe>
+      <aside id="notes" class="notes"></aside>
     </div>
-    <iframe id="viewer" hidden allowfullscreen></iframe>
-    <aside class="notes" id="notes"></aside>
-  </main>
+    <nav class="lesson-nav">
+      <button id="prevBtn" class="nav-btn prev" type="button"></button>
+      <button id="nextBtn" class="nav-btn next" type="button"></button>
+    </nav>
+  </div>
 
 <script>
-  // Edit this list to add weeks / decks.
-  //
-  // RECORDINGS: each week may have an optional `recordings` array. Each entry is
-  // { label, url } — e.g. { label: "Batch 2", url: "https://drive.google.com/..." }.
-  // To add a recording later, just drop a new entry into the relevant week's
-  // `recordings` array. They open in a new tab and show up both in the sidebar
-  // (under that week) and as a "▶ Recording" button in the topbar when any deck
-  // from that week is loaded. Multiple batches per week are supported out of the box.
+  // ── Curriculum data ───────────────────────────────────────────────
+  // Each week (module) has a label, a one-line summary, optional recordings,
+  // and decks (lessons). A deck = { title, sub, path, [desc], [notes], [external] }.
   const WEEKS = [
     {
       label: "Week 1",
+      summary: "Build and ship your first working app — just by describing it to an AI coding agent.",
       recordings: [
         { label: "Batch 2", url: "https://drive.google.com/file/d/1OW3MMeeV9aJqKuIADgZCVuh9Q2Pl9vpm/view" },
       ],
       decks: [
-        { title: "Vibe Coding — Day 1", sub: "main deck", path: "wk1/Vibe Coding.html" },
-        { title: "Day 1 Recap", sub: "summary, gotchas & report card", path: "wk1/recap.html" },
-        { title: "Dashboard demo", sub: "supplemental", path: "wk1/dashboard.html" },
+        { title: "Vibe Coding — Day 1", sub: "main deck", desc: "The core loop: describe what you want, let the agent build it, iterate. Your first app by the end.", path: "wk1/Vibe Coding.html" },
+        { title: "Day 1 Recap", sub: "recap", desc: "Summary, common gotchas, and a report card from the live session.", path: "wk1/recap.html" },
+        { title: "Dashboard demo", sub: "supplemental", desc: "A worked example you can open and poke at.", path: "wk1/dashboard.html" },
       ],
     },
     {
       label: "Week 2",
+      summary: "Give your app a real database and put it on the internet.",
       recordings: [
         { label: "Batch 2", url: "https://drive.google.com/file/d/1xCuq_XtaYvHYu9BTWAOY1rGYW9QTOevJ/view" },
       ],
@@ -304,6 +310,7 @@
         {
           title: "Databases & Deployment — Day 2",
           sub: "main deck",
+          desc: "Wire your app to a Supabase database and deploy it so anyone can use it.",
           path: "wk2/Databases and Deployment.html",
           notes: `
             <h2>Databases &amp; Deployment</h2>
@@ -341,30 +348,19 @@ data. build in typescript and react. no auth
 for now.</code></pre>
           `,
         },
-        {
-          title: "What is Node.js?",
-          sub: "supplemental — background",
-          path: "wk2/what-is-nodejs.html",
-        },
-        {
-          title: "Setup cheat sheet",
-          sub: "supplemental — Node + Supabase MCP",
-          path: "wk2/cheatsheet.html",
-        },
-        {
-          title: "Deal Tracker demo",
-          sub: "supplemental — live app",
-          path: "https://deal-tracker-nu-bice.vercel.app/",
-          external: true,
-        },
+        { title: "What is Node.js?", sub: "supplemental — background", desc: "Background: the runtime your tools and apps run on.", path: "wk2/what-is-nodejs.html" },
+        { title: "Setup cheat sheet", sub: "supplemental", desc: "Node + Supabase MCP setup, step by step.", path: "wk2/cheatsheet.html" },
+        { title: "Deal Tracker demo", sub: "live app", desc: "The live app we build in this module.", path: "https://deal-tracker-nu-bice.vercel.app/", external: true },
       ],
     },
     {
       label: "Week 3",
+      summary: "Keep shipping — add an AI feature to the app you already built.",
       decks: [
         {
           title: "Keep Building — Day 3",
           sub: "main deck",
+          desc: "Add an AI “Draft follow-up” button by calling an LLM API from your app.",
           path: "wk3/Keep Building.html",
           notes: `
             <h2>Keep Building</h2>
@@ -410,10 +406,12 @@ box I can copy. read the key from .env.</code></pre>
     },
     {
       label: "Week 4",
+      summary: "Add real users — sign in with Google, locked to Anduin.",
       decks: [
         {
           title: "Google Sign-In — Day 4",
           sub: "main deck",
+          desc: "Add one-button Google sign-in with Supabase, restricted to Anduin accounts.",
           path: "wk4/Week 4 - Google Sign-In.html",
           notes: `
             <h2>Google Sign-In</h2>
@@ -456,10 +454,13 @@ box I can copy. read the key from .env.</code></pre>
     },
     {
       label: "Bonus · Advanced",
+      summary: "Optional deep dives for getting more out of your coding agent.",
+      bonus: true,
       decks: [
         {
           title: "Dynamic Workflows",
           sub: "deep dive — optional",
+          desc: "Have Claude build its own team of fresh sub-agents to tackle big tasks.",
           path: "bonus/dynamic-workflows/Dynamic Workflows.html",
           notes: `
             <h2>Dynamic Workflows</h2>
@@ -491,6 +492,7 @@ box I can copy. read the key from .env.</code></pre>
         {
           title: "Superpowers",
           sub: "deep dive — optional",
+          desc: "Give your agent a real software-development process (a free plugin).",
           path: "bonus/superpowers/Superpowers.html",
           notes: `
             <h2>Superpowers</h2>
@@ -509,146 +511,198 @@ box I can copy. read the key from .env.</code></pre>
             <p><strong>Real, multi-file features</strong> where correctness matters and you want long autonomous runs. <strong>Skip it</strong> for one-line tweaks — the process is heavier than the task.</p>
           `,
         },
-        { title: "Git for Vibecoders", sub: "deep dive — optional", path: "bonus/Git for Vibecoders.html" },
+        { title: "Git for Vibecoders", sub: "deep dive — optional", desc: "Version control, explained for people who vibe-code.", path: "bonus/Git for Vibecoders.html" },
       ],
     },
   ];
 
-  const weeksEl = document.getElementById("weeks");
+  // ── Icons ─────────────────────────────────────────────────────────
+  const ICON = {
+    lecture: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M12 17v3M8.5 20h7"/></svg>',
+    recap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.1"/><circle cx="4.5" cy="12" r="1.1"/><circle cx="4.5" cy="18" r="1.1"/></svg>',
+    resource: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>',
+    demo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 16 16 8M9 8h7v7"/></svg>',
+    deepdive: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.4 5.6L20 11l-5.6 2.4L12 19l-2.4-5.6L4 11l5.6-2.4z"/></svg>',
+    play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>',
+    doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>',
+    arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+    ext: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 16 16 8M9 8h7v7"/></svg>',
+  };
+
+  function kindOf(d) {
+    if (d.external) return "Demo";
+    const s = (d.sub || "").toLowerCase();
+    if (s.includes("recap")) return "Recap";
+    if (s.includes("main deck")) return "Lecture";
+    if (s.includes("deep dive")) return "Deep dive";
+    if (s.includes("supplemental")) return "Resource";
+    return "Lesson";
+  }
+  function iconFor(kind) {
+    return ({ "Lecture": ICON.lecture, "Recap": ICON.recap, "Resource": ICON.resource, "Demo": ICON.demo, "Deep dive": ICON.deepdive })[kind] || ICON.lecture;
+  }
+
+  // ── Lookups + ordered lesson list (for prev/next) ─────────────────
+  const deckByPath = {}, weekByPath = {};
+  WEEKS.forEach((w) => w.decks.forEach((d) => { deckByPath[d.path] = d; weekByPath[d.path] = w; }));
+  const order = WEEKS.flatMap((w) => w.decks.filter((d) => !d.external).map((d) => d.path));
+
+  // ── Elements ──────────────────────────────────────────────────────
+  const homeView = document.getElementById("home");
+  const lessonView = document.getElementById("lesson");
+  const modulesEl = document.getElementById("modules");
+  const heroStats = document.getElementById("heroStats");
   const viewer = document.getElementById("viewer");
-  const placeholder = document.getElementById("placeholder");
-  const topbar = document.getElementById("topbar");
+  const crumb = document.getElementById("crumb");
   const openNew = document.getElementById("openNew");
+  const recLink = document.getElementById("recLink");
+  const notesBtn = document.getElementById("notesBtn");
   const notesEl = document.getElementById("notes");
-  const notesToggle = document.getElementById("notesToggle");
-  const recordingLink = document.getElementById("recordingLink");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
 
-  const deckByPath = {};
-  const weekByPath = {};
-  WEEKS.forEach((w) => w.decks.forEach((d) => {
-    deckByPath[d.path] = d;
-    weekByPath[d.path] = w;
-  }));
+  // ── Render the course home ────────────────────────────────────────
+  function renderHome() {
+    const lessonCount = WEEKS.reduce((n, w) => n + w.decks.length, 0);
+    heroStats.innerHTML =
+      `<span><b>${WEEKS.length}</b> modules</span><span class="dot">·</span>` +
+      `<span><b>${lessonCount}</b> lessons</span><span class="dot">·</span>` +
+      `<span>Self-paced</span>`;
 
-  notesToggle.addEventListener("click", () => {
-    notesEl.classList.toggle("open");
-  });
+    modulesEl.innerHTML = "";
+    WEEKS.forEach((wk, i) => {
+      const mod = document.createElement("section");
+      mod.className = "module";
 
-  const sidebarToggle = document.getElementById("sidebarToggle");
-  const SIDEBAR_KEY = "vc.sidebarHidden";
-  function setSidebar(hidden) {
-    document.body.classList.toggle("sidebar-hidden", hidden);
-    try { localStorage.setItem(SIDEBAR_KEY, hidden ? "1" : "0"); } catch (_) {}
-  }
-  sidebarToggle.addEventListener("click", () => {
-    setSidebar(!document.body.classList.contains("sidebar-hidden"));
-  });
-  // Restore preference.
-  try {
-    if (localStorage.getItem(SIDEBAR_KEY) === "1") setSidebar(true);
-  } catch (_) {}
-  // Keyboard shortcut: `\` toggles the sidebar.
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "\\" && !e.metaKey && !e.ctrlKey && !e.altKey) {
-      const t = e.target;
-      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
-      e.preventDefault();
-      setSidebar(!document.body.classList.contains("sidebar-hidden"));
-    }
-  });
+      const numLabel = wk.bonus ? "★" : String(i + 1);
+      let html =
+        `<div class="module-head">` +
+          `<div class="module-num${wk.bonus ? " bonus" : ""}">${numLabel}</div>` +
+          `<div class="mh-text">` +
+            `<div class="module-eyebrow">${wk.label}</div>` +
+            (wk.summary ? `<div class="module-summary">${wk.summary}</div>` : "") +
+          `</div>` +
+        `</div>` +
+        `<div class="lessons">`;
 
-  function render() {
-    weeksEl.innerHTML = "";
-    WEEKS.forEach((wk) => {
-      const wrap = document.createElement("div");
-      wrap.className = "week";
-      const label = document.createElement("div");
-      label.className = "week-label";
-      label.textContent = wk.label;
-      wrap.appendChild(label);
       wk.decks.forEach((d) => {
-        const a = document.createElement("a");
-        a.className = "deck";
-        a.dataset.path = d.path;
-        const externalBadge = d.external ? ' <span class="sub" style="display:inline">↗</span>' : '';
-        a.innerHTML = `<div>${d.title}${externalBadge}</div><div class="sub">${d.sub}</div>`;
-        if (d.external) {
-          a.href = d.path;
-          a.target = "_blank";
-          a.rel = "noopener";
-        } else {
-          a.addEventListener("click", (e) => {
-            e.preventDefault();
-            load(d.path);
-          });
-        }
-        wrap.appendChild(a);
+        const kind = kindOf(d);
+        const chips = [];
+        if (d.notes && d.notes.trim()) chips.push(`<span class="chip">${ICON.doc} Notes</span>`);
+        if (d.external) chips.push(`<span class="chip">${ICON.ext} Opens externally</span>`);
+        const tag = d.external ? ` data-ext="1" href="${d.path}" target="_blank" rel="noopener"` : ` href="#${encodeURI(d.path)}"`;
+        html +=
+          `<a class="lesson" data-path="${encodeURIComponent(d.path)}"${tag}>` +
+            `<span class="ic">${iconFor(kind)}</span>` +
+            `<span class="body">` +
+              `<span class="row1"><span class="title">${d.title}</span><span class="kind">${kind}</span></span>` +
+              (d.desc ? `<span class="desc">${d.desc}</span>` : "") +
+            `</span>` +
+            (chips.length ? `<span class="chips">${chips.join("")}</span>` : "") +
+            `<span class="go">${ICON.arrow}</span>` +
+          `</a>`;
       });
+
       (wk.recordings || []).forEach((rec) => {
-        const r = document.createElement("a");
-        r.className = "recording";
-        r.href = rec.url;
-        r.target = "_blank";
-        r.rel = "noopener";
-        r.innerHTML = `<span class="play">▶</span><span>Recording${rec.label ? " · " + rec.label : ""}</span><span class="ext">↗</span>`;
-        wrap.appendChild(r);
+        html +=
+          `<a class="lesson is-recording" href="${rec.url}" target="_blank" rel="noopener">` +
+            `<span class="ic">${ICON.play}</span>` +
+            `<span class="body">` +
+              `<span class="row1"><span class="title">Session recording${rec.label ? " · " + rec.label : ""}</span><span class="kind">Recording</span></span>` +
+              `<span class="desc">Watch the full live session.</span>` +
+            `</span>` +
+            `<span class="chips"><span class="chip">${ICON.ext} Google Drive</span></span>` +
+            `<span class="go">${ICON.arrow}</span>` +
+          `</a>`;
       });
-      weeksEl.appendChild(wrap);
+
+      html += `</div>`;
+      mod.innerHTML = html;
+      modulesEl.appendChild(mod);
     });
   }
 
-  function load(path) {
-    document.querySelectorAll(".deck").forEach((el) => {
-      el.classList.toggle("active", el.dataset.path === path);
-    });
-    placeholder.hidden = true;
-    viewer.hidden = false;
-    topbar.hidden = false;
+  // ── Open a lesson ─────────────────────────────────────────────────
+  function openLesson(path) {
+    const deck = deckByPath[path];
+    if (!deck) return showHome();
+    const wk = weekByPath[path];
+
+    homeView.hidden = true;
+    lessonView.hidden = false;
+    window.scrollTo(0, 0);
+
     const url = encodeURI(path);
     viewer.src = url;
     openNew.href = url;
 
-    const deck = deckByPath[path];
-    const hasNotes = !!(deck && deck.notes && deck.notes.trim());
-    notesEl.innerHTML = hasNotes ? deck.notes : "";
-    notesToggle.hidden = !hasNotes;
-    notesToggle.classList.toggle("has-notes", hasNotes);
-    notesEl.classList.remove("open");
+    crumb.innerHTML = `${wk.label}<span class="sep">›</span><b>${deck.title}</b>`;
 
-    // Surface the week's most recent recording (last in the array) in the topbar.
-    const week = weekByPath[path];
-    const recs = (week && week.recordings) || [];
+    const hasNotes = !!(deck.notes && deck.notes.trim());
+    notesBtn.hidden = !hasNotes;
+    notesEl.classList.remove("open");
+    if (hasNotes) {
+      notesEl.innerHTML =
+        `<div class="notes-head"><span class="t">Resources</span>` +
+        `<button class="close" type="button" aria-label="Close" id="notesClose">×</button></div>` + deck.notes;
+      const c = document.getElementById("notesClose");
+      if (c) c.addEventListener("click", () => notesEl.classList.remove("open"));
+    } else {
+      notesEl.innerHTML = "";
+    }
+
+    const recs = (wk && wk.recordings) || [];
     const rec = recs[recs.length - 1];
     if (rec) {
-      recordingLink.href = rec.url;
-      recordingLink.textContent = `▶ Recording${rec.label ? " · " + rec.label : ""} ↗`;
-      recordingLink.hidden = false;
+      recLink.href = rec.url;
+      recLink.innerHTML = `${ICON.play}<span>Recording${rec.label ? " · " + rec.label : ""}</span>`;
+      recLink.hidden = false;
     } else {
-      recordingLink.hidden = true;
+      recLink.hidden = true;
     }
-    // Refocus iframe so arrow-key navigation in the deck works immediately.
-    viewer.addEventListener("load", () => {
-      try { viewer.contentWindow.focus(); } catch (_) {}
-      // Sync deck hash to our URL so deep links work.
-      try {
-        const innerLoc = viewer.contentWindow.location;
-        history.replaceState(null, "", "#" + path);
-      } catch (_) {
-        history.replaceState(null, "", "#" + path);
-      }
-    }, { once: true });
+
+    // prev / next within the ordered local lessons
+    const idx = order.indexOf(path);
+    setNav(prevBtn, idx > 0 ? order[idx - 1] : null, "prev");
+    setNav(nextBtn, idx >= 0 && idx < order.length - 1 ? order[idx + 1] : null, "next");
+
+    viewer.addEventListener("load", () => { try { viewer.contentWindow.focus(); } catch (_) {} }, { once: true });
   }
 
-  render();
-
-  // Deep-link support: open whatever's in the URL hash (local decks only).
-  const initial = decodeURIComponent(location.hash.slice(1));
-  const localPaths = WEEKS.flatMap((w) => w.decks.filter((d) => !d.external).map((d) => d.path));
-  if (initial && localPaths.includes(initial)) {
-    load(initial);
-  } else if (localPaths.length) {
-    load(localPaths[0]);
+  function setNav(btn, path, dir) {
+    if (!path) {
+      btn.disabled = true;
+      btn.innerHTML = `<span class="lbl">${dir === "prev" ? "Previous" : "Next"}</span><span class="tt">—</span>`;
+      btn.onclick = null;
+      return;
+    }
+    btn.disabled = false;
+    const d = deckByPath[path];
+    btn.innerHTML = `<span class="lbl">${dir === "prev" ? "← Previous" : "Next →"}</span><span class="tt">${d.title}</span>`;
+    btn.onclick = () => { location.hash = "#" + encodeURI(path); };
   }
+
+  function showHome() {
+    lessonView.hidden = true;
+    homeView.hidden = false;
+    viewer.src = "about:blank";
+  }
+
+  notesBtn.addEventListener("click", () => notesEl.classList.toggle("open"));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !lessonView.hidden) { e.preventDefault(); location.hash = ""; }
+  });
+
+  // ── Routing (hash = deck path; empty = home). Deep links preserved. ─
+  function route() {
+    const h = decodeURIComponent(location.hash.slice(1));
+    if (h && deckByPath[h] && !deckByPath[h].external) openLesson(h);
+    else showHome();
+  }
+  window.addEventListener("hashchange", route);
+
+  renderHome();
+  route();
 </script>
 </body>
 </html>
