@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Making Things Move — Animations</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="../../deck-stage.js"></script>
+<style>
+  :root{
+    --type-hero:148px; --type-title:82px; --type-section:60px; --type-subtitle:40px;
+    --type-lead:38px; --type-body:30px; --type-small:26px; --type-eyebrow:24px; --type-mono:30px;
+    --pad-top:108px; --pad-bottom:96px; --pad-x:140px; --gap-title:48px;
+    --ink:var(--color-gray-9); --ink-soft:var(--color-gray-8); --muted:var(--color-gray-6);
+    --hairline:var(--color-gray-3); --paper:var(--color-gray-1);
+    --accent:#16d89a; --accent-deep:#0c8f5f;
+    --stage:#0c1118; --stage-line:#1d2735;
+  }
+  html,body{margin:0;background:#000;}
+  deck-stage>section{background:#fff;color:var(--ink);font-family:var(--font-display);line-height:1.4;overflow:hidden;position:relative;}
+  deck-stage>section.dark{background:var(--stage);color:#c2cdd9;}
+
+  .brand-mark{position:absolute;top:60px;right:80px;display:flex;align-items:center;gap:18px;z-index:5;}
+  .brand-mark img{height:26px;width:auto;display:block;}
+  .brand-mark .program{padding-left:18px;border-left:1px solid var(--hairline);font-size:18px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+  .dark .brand-mark .program{color:rgba(255,255,255,.6);border-left-color:rgba(255,255,255,.18);}
+  .slide-num{position:absolute;right:56px;bottom:48px;font-size:var(--type-small);color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.04em;}
+  .dark .slide-num{color:#8b949e;}
+  .slide-eyebrow{font-size:var(--type-eyebrow);font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:30px;}
+  .dark .slide-eyebrow{color:var(--accent);}
+
+  .frame{width:100%;height:100%;padding:var(--pad-top) var(--pad-x) var(--pad-bottom);box-sizing:border-box;display:flex;flex-direction:column;}
+  .frame.center{justify-content:center;}
+  h1.hero{margin:0;font-size:var(--type-hero);line-height:.96;letter-spacing:-.045em;font-weight:600;color:var(--ink);}
+  h2.title{margin:0 0 var(--gap-title);font-size:var(--type-title);line-height:1.02;letter-spacing:-.03em;font-weight:600;color:var(--ink);}
+  .dark h2.title{color:#fff;}
+  .lead{font-size:var(--type-lead);line-height:1.34;color:var(--ink-soft);font-weight:400;letter-spacing:-.005em;margin:0;max-width:1400px;}
+  .dark .lead{color:#c2cdd9;}
+  .body{font-size:var(--type-body);line-height:1.45;color:var(--ink-soft);margin:0;}
+  .ac{color:var(--accent-deep);font-weight:600;}
+  .dark .ac{color:var(--accent);}
+  b{font-weight:600;color:var(--ink);} .dark b{color:#fff;}
+  code{font-family:var(--font-mono);font-size:.84em;background:#eef5f1;color:#0c8f5f;padding:2px 10px;border-radius:6px;}
+  .dark code{background:#11202b;color:#7ee7b8;}
+
+  /* TITLE */
+  .s-title{background:url('assets/cover-gradient.png') center/cover no-repeat,#eafaf3;}
+  .s-title .frame{justify-content:flex-end;padding-bottom:150px;}
+  .s-title .hero-brand{display:inline-flex;align-items:center;gap:22px;padding:14px 26px;background:#fff;border-radius:999px;box-shadow:0 4px 18px -6px rgba(12,143,95,.22);align-self:flex-start;}
+  .s-title .hero-logo{height:30px;width:auto;display:block;}
+  .s-title .hero-program{padding-left:22px;border-left:1px solid var(--hairline);font-size:20px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-deep);}
+  .s-title .spacer{flex:1;}
+  .s-title .kicker{font-size:var(--type-eyebrow);font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:34px;}
+  .s-title .sub{margin-top:38px;font-size:var(--type-subtitle);color:var(--ink-soft);max-width:1240px;font-weight:400;line-height:1.3;}
+  .s-title .byline{position:absolute;bottom:78px;left:140px;right:140px;display:flex;justify-content:space-between;align-items:baseline;font-size:var(--type-small);color:var(--ink-soft);}
+  .s-title .byline b{font-weight:600;}
+  .s-title .pill{display:inline-flex;align-items:center;gap:14px;padding:12px 24px;border-radius:999px;background:rgba(255,255,255,.72);border:1px solid rgba(22,216,154,.4);font-size:var(--type-small);color:var(--accent-deep);font-weight:500;}
+  .s-title .pill .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 5px rgba(22,216,154,.2);}
+
+  /* QUESTION */
+  .s-q .frame{justify-content:center;}
+  .s-q .big{font-size:104px;line-height:1.05;letter-spacing:-.035em;font-weight:600;color:var(--ink);margin:0;}
+  .s-q .big em{font-style:normal;color:var(--accent-deep);}
+  .s-q .two{display:flex;gap:28px;margin-top:64px;}
+  .s-q .qc{flex:1;border:1px solid var(--hairline);border-radius:20px;padding:42px 44px;background:var(--paper);}
+  .s-q .qc .k{font-size:24px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:16px;}
+  .s-q .qc p{margin:0;font-size:var(--type-body);line-height:1.4;color:var(--ink-soft);}
+
+  /* MAP 2x2 */
+  .s-map .grid2{flex:1;display:grid;grid-template-columns:300px 1fr 1fr;grid-template-rows:auto 1fr 1fr;gap:20px;min-height:0;margin-top:8px;}
+  .s-map .axis{display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+  .s-map .axis.left{writing-mode:vertical-rl;transform:rotate(180deg);}
+  .s-map .cell{border:1px solid var(--hairline);border-radius:18px;padding:30px 34px;display:flex;flex-direction:column;gap:10px;background:#fff;}
+  .s-map .cell.empty{background:repeating-linear-gradient(45deg,#fafcfb 0 14px,#f1f6f4 14px 28px);border-style:dashed;}
+  .s-map .cell .tool{font-size:40px;font-weight:600;letter-spacing:-.02em;color:var(--ink);}
+  .s-map .cell .d{font-size:24px;color:var(--muted);line-height:1.35;}
+  .s-map .cell.tealtop{box-shadow:inset 0 5px 0 var(--accent);}
+  .s-map .livedot{display:inline-flex;align-items:center;gap:14px;font-size:24px;color:var(--muted);margin-top:auto;}
+  .s-map .livedot::before{content:"";width:16px;height:16px;border-radius:50%;background:var(--accent);animation:ssLivePulse 1.8s ease-out infinite;}
+
+  /* CONCEPT */
+  .s-c .frame{justify-content:center;}
+  .s-c .cols{display:flex;gap:56px;align-items:flex-start;margin-top:8px;}
+  .s-c .cols .lead{flex:1;}
+  .s-c .defcard{width:560px;flex-shrink:0;border:1px solid var(--hairline);border-radius:20px;background:var(--paper);padding:40px 42px;}
+  .s-c .defcard .dt{font-size:24px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:18px;}
+  .s-c .defcard ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:18px;}
+  .s-c .defcard li{font-size:26px;line-height:1.4;color:var(--ink-soft);padding-left:30px;position:relative;}
+  .s-c .defcard li::before{content:"";position:absolute;left:0;top:13px;width:12px;height:12px;border-radius:50%;background:var(--accent);}
+  .s-c .defcard li b{color:var(--ink);}
+
+  /* DEMO (dark) */
+  .s-demo .frame{display:grid;grid-template-columns:1fr;grid-template-rows:auto 1fr auto;}
+  .s-demo .demo-stage{display:flex;align-items:center;justify-content:center;gap:64px;min-height:0;}
+  .s-demo canvas{display:block;border-radius:14px;}
+  .s-demo .cap{font-size:var(--type-body);line-height:1.4;color:#9fb4c4;max-width:1500px;}
+  .s-demo .cap b{color:#fff;}
+  .s-demo .row2{display:flex;gap:56px;align-items:center;}
+  .code{font-family:var(--font-mono);font-size:var(--type-mono);line-height:1.55;background:#11161d;border:1px solid var(--stage-line);border-radius:16px;padding:30px 34px;color:#cdd9e5;white-space:pre;}
+  .code .k{color:#7ee787;} .code .p{color:#79c0ff;} .code .c{color:#8b949e;} .code .s{color:#ffa657;}
+
+  /* CSS demo bits */
+  @keyframes ssLivePulse{0%{box-shadow:0 0 0 0 rgba(22,216,154,.5);}70%{box-shadow:0 0 0 26px rgba(22,216,154,0);}100%{box-shadow:0 0 0 0 rgba(22,216,154,0);}}
+  @keyframes ssShimmer{0%{left:-60%;}55%{left:140%;}100%{left:140%;}}
+  .ss-live{display:inline-flex;align-items:center;gap:20px;color:#cfe0d8;font:500 40px var(--font-display);}
+  .ss-live::before{content:"";width:24px;height:24px;border-radius:50%;background:#16d89a;animation:ssLivePulse 1.8s ease-out infinite;}
+  .ss-btn{position:relative;overflow:hidden;border:none;border-radius:18px;padding:28px 56px;font:600 40px var(--font-display);color:#06291d;background:#16d89a;cursor:pointer;}
+  .ss-btn::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-18deg);animation:ssShimmer 2.8s ease-in-out infinite;}
+
+  /* heart */
+  @keyframes ssHeartPop{0%{transform:scale(1);}30%{transform:scale(1.35);}55%{transform:scale(.92);}100%{transform:scale(1);}}
+  @keyframes ssRing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.55;}100%{transform:translate(-50%,-50%) scale(2.1);opacity:0;}}
+  .heart-btn{position:relative;width:260px;height:260px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .heart-btn .ring{position:absolute;left:50%;top:50%;width:180px;height:180px;border-radius:50%;border:7px solid #ff4d6d;pointer-events:none;}
+
+  /* RECAP */
+  .s-recap .ladder{display:flex;flex-direction:column;gap:18px;margin-top:8px;}
+  .s-recap .rung{display:grid;grid-template-columns:560px 1fr;gap:36px;align-items:center;border:1px solid var(--hairline);border-radius:16px;padding:26px 36px;background:#fff;}
+  .s-recap .rung .w{font-size:30px;color:var(--muted);}
+  .s-recap .rung .t{font-size:38px;font-weight:600;color:var(--ink);letter-spacing:-.02em;}
+  .s-recap .rung .t span{color:var(--accent-deep);}
+  .s-recap .rive{margin-top:26px;font-size:26px;color:var(--muted);}
+  .s-recap .rive b{color:var(--ink);}
+
+  /* KEEPER */
+  .s-keep .frame{justify-content:center;}
+  .s-keep .q{font-size:88px;line-height:1.12;letter-spacing:-.03em;font-weight:600;color:#fff;margin:0;max-width:1500px;}
+  .s-keep .q span{color:var(--accent);}
+  .s-keep .sub{margin-top:48px;font-size:34px;color:#9fb4c4;max-width:1300px;line-height:1.4;}
+</style>
+
+<script type="application/json" id="speaker-notes">
+[
+  "Cold open. Don't read the title — the demos later carry the room. One line: today is about making things move on the web, and knowing which of a few very different tools to reach for. The whole talk hangs off one question, coming next.",
+  "The reframe. Most confusion about web animation comes from treating these tools as competitors. They aren't. Ask one question first: is this thing a UI ELEMENT that lives in your app, or a VIDEO you export? Everything else falls out of that. Say it slowly; come back to it at the end.",
+  "The map. Two questions sort every tool. Do you DESCRIBE the motion and let an engine fill in the in-between frames (CSS, Lottie), or COMPUTE every frame yourself (Canvas, Remotion)? And does it live in the browser, or render to a file? The pulsing dot in the CSS cell is real — it's running right now. Leave this up a beat; it's the photograph slide.",
+  "Conceptual — know the audience may not write CSS. CSS is the styling language of the web: every element has properties (color, size, position, shadow). An animation is just telling the browser to change a property over time. Two pieces: @keyframes names the steps (0% to 100%), and the animation property attaches it with a duration and a loop. That's the whole idea.",
+  "Live CSS. This dot and button are pure CSS on this slide — no library. Walk the code: @keyframes ssLivePulse animates box-shadow from a solid ring to a faded one; .ss-live::before is the dot; animation: ... 1.8s infinite runs it forever. Point out the named attributes: box-shadow, transform, animation. The shimmer is the same trick on a button.",
+  "The threshold — this answers a real question: couldn't everything be CSS? Mostly, when only one or two things move. CSS is perfect for a hover, a fade, a pulsing dot, a shimmer. It gets unwieldy when the motion is a multi-part designed scene. That's the cue to step up to Lottie.",
+  "Conceptual. A Lottie is a vector animation stored as data (a JSON file), played by a small runtime. A designer builds it once (in After Effects, or now via an AI skill); the same file plays on web, iOS, and Android, stays razor-sharp at any size, and is only a few kilobytes. It's a designed loop that lives inside your app.",
+  "Live Lottie. This heart is the like-button motion — grey pops to red with a ring pulse, looping. Be honest: this exact heart could be CSS. Lottie earns its place when the motion is a designed multi-part scene (a blink, rising bubbles, a flickering flame), needs shape morphing, comes from a designer's file, or must run identically across web + iOS + Android. The heart deliberately sits on that line.",
+  "Conceptual — pop the hood. The other tools hide the same machinery. A canvas is a blank grid you draw on with code. (0,0) is the top-left corner; x grows right, y grows DOWN (flipped from school graphs). To move something you change its x/y a little, redraw, and repeat about sixty times a second. That loop is the foundation under everything else.",
+  "Live easing — the secret ingredient. Both dots travel the same distance in the same time. The top is linear (robotic); the bottom eases (speeds up, slows down) and feels alive. The reveal: easing is just a curve applied to 'how far along am I.' CSS's ease-in-out, Lottie's bezier handles, and Remotion's spring() are all picking this same curve for you — canvas is where you finally see it bare.",
+  "Live physics. Give the ball a velocity, add a little each frame (gravity), and flip-and-shrink it on impact (a bounce that loses energy). Nobody keyframed this — the motion emerges from the rules, frame by frame. That's the thing only computing-every-frame gives you. Scope line, say it out loud: this is a fun illustration, NOT a license to build a game engine.",
+  "Conceptual. Remotion is video written in code — in React. Every pixel is a function of the current frame number: f(frame). A renderer steps through the frames and stitches them into an MP4 file. It's the canvas loop from a minute ago, except run headless and saved to a file you can post.",
+  "Live f(frame). This title card is computed from a frame counter (watch it tick at the bottom). The title springs in, the subtitle fades, the underline sweeps — each is a formula of the frame. Scrub to any frame and you get exactly the same picture: deterministic. That determinism is what lets a renderer turn it into a perfect MP4.",
+  "Why bother with a render step? Because the same composition is a template. Pass it different data and you get a different video — per customer, per pull request, per row in a spreadsheet — and it renders headless in CI, no editor open. A designer's timeline makes one video by hand; Remotion makes ten thousand from one program.",
+  "Recap the decision as a cheat sheet. Small touch → CSS. Designed loop in the app → Lottie. Generative or physical or interactive → Canvas. A video file → Remotion. And the fifth name to know: Rive, for when a vector must REACT to hover/scroll/state — you rig it in an editor, not from a prompt yet.",
+  "The meta-point, since this is really about building with an LLM. The model writes all of these now from a sentence. Your job is the three-step judgment: pick the right tool, point the model at the right skill or docs, and CHECK that it followed them. Lottie is the cautionary tale — it fails silently: bad JSON gives a blank box, no error. Referencing a skill is not the same as using one.",
+  "Close on the one question, plus the verify habit. Is it a UI element or a video? And did the model actually follow the skill? Those two questions are the whole job. End here."
+]
+</script>
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- 01 Title -->
+  <section data-label="01 Title" data-screen-label="Title" class="s-title">
+    <div class="frame">
+      <div class="hero-brand">
+        <img class="hero-logo" src="assets/anduin-full.svg" alt="Anduin">
+        <span class="hero-program">Fast Track</span>
+      </div>
+      <div class="spacer"></div>
+      <div class="kicker">Vibe Coding Workshop · Animations</div>
+      <h1 class="hero">Making things move.</h1>
+      <p class="sub">Four ways to animate the web — CSS, Lottie, Canvas, and Remotion —<br>and the one question that tells you which to reach for.</p>
+    </div>
+    <div class="byline">
+      <span><b>Charles Lee</b> · Anduin</span>
+      <span><span class="pill"><span class="dot"></span>Every animation here is running live</span></span>
+    </div>
+  </section>
+
+  <!-- 02 The question -->
+  <section data-label="02 The one question" data-screen-label="The one question" class="s-q">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Start here</div>
+      <p class="big">Is it a <em>UI element</em>,<br>or a <em>video</em>?</p>
+      <div class="two">
+        <div class="qc"><div class="k">UI element</div><p>Lives inside your app and stays alive — it loops, or reacts to a tap. You want an asset the browser keeps drawing.</p></div>
+        <div class="qc"><div class="k">Video</div><p>A file you export once and embed — an ad, a launch clip, a social cut. You want an MP4.</p></div>
+      </div>
+    </div>
+    <div class="slide-num">02 / 17</div>
+  </section>
+
+  <!-- 03 The map -->
+  <section data-label="03 The map (2x2)" data-screen-label="The map" class="s-map">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Four ways to move a pixel</div>
+      <h2 class="title">Two questions sort every tool.</h2>
+      <div class="grid2">
+        <div class="axis"></div>
+        <div class="axis">Lives in the browser</div>
+        <div class="axis">Rendered to a file</div>
+        <div class="axis left">You describe it</div>
+        <div class="cell tealtop"><div class="tool">CSS · Lottie</div><div class="d">Describe the motion; an engine fills in the frames.</div><div class="livedot">live, right now</div></div>
+        <div class="cell empty"><div class="d">—</div></div>
+        <div class="axis left">You compute it</div>
+        <div class="cell"><div class="tool">Canvas</div><div class="d">You draw every frame yourself, in the browser.</div></div>
+        <div class="cell tealtop"><div class="tool">Remotion</div><div class="d">You compute every frame — then render it to video.</div></div>
+      </div>
+    </div>
+    <div class="slide-num">03 / 17</div>
+  </section>
+
+  <!-- 04 What is CSS -->
+  <section data-label="04 What is CSS" data-screen-label="What is CSS" class="s-c">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The smallest tool</div>
+      <h2 class="title">What even is CSS?</h2>
+      <div class="cols">
+        <p class="lead">CSS is the styling language of the web. Every element on a page has <b>properties</b> — its color, size, position, shadow. An <span class="ac">animation</span> is nothing more than telling the browser to change a property <b>over time</b>. You don't compute the in-between frames; you describe the start and end, and the browser fills the gap.</p>
+        <div class="defcard">
+          <div class="dt">Two pieces</div>
+          <ul>
+            <li><b><code>@keyframes</code></b> — names the steps, from <code>0%</code> to <code>100%</code>.</li>
+            <li><b><code>animation</code></b> — attaches them to an element, with a <b>duration</b> and a loop.</li>
+            <li>The properties you animate: <code>transform</code>, <code>opacity</code>, <code>box-shadow</code>…</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">04 / 17</div>
+  </section>
+
+  <!-- 05 CSS live -->
+  <section data-label="05 CSS live" data-screen-label="CSS live" class="s-demo dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">CSS · running live on this slide</div>
+      <div class="row2" style="justify-content:center;">
+        <div class="demo-stage" style="flex-direction:column;gap:48px;">
+          <span class="ss-live">Live · 3 connected</span>
+          <button class="ss-btn" type="button">Start a session</button>
+        </div>
+        <pre class="code"><span class="c">/* a curve named in steps */</span>
+<span class="k">@keyframes</span> pulse {
+  <span class="p">0%</span>   { <span class="p">box-shadow</span>: 0 0 0 0   rgba(22,216,154,.5); }
+  <span class="p">70%</span>  { <span class="p">box-shadow</span>: 0 0 0 26px rgba(22,216,154,0); }
+}
+<span class="c">/* attach it: name  duration  loop */</span>
+.dot { <span class="p">animation</span>: <span class="s">pulse 1.8s infinite</span>; }</pre>
+      </div>
+      <p class="cap">Two <code style="background:#11202b;color:#7ee7b8;">@keyframes</code> blocks, no library. The dot animates <b>box-shadow</b>; the button sweeps a highlight with <b>transform</b> + <b>animation</b>. That's the whole vocabulary.</p>
+    </div>
+    <div class="slide-num">05 / 17</div>
+  </section>
+
+  <!-- 06 When is CSS enough -->
+  <section data-label="06 When CSS is enough" data-screen-label="When CSS is enough" class="s-c">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The honest threshold</div>
+      <h2 class="title">So… couldn't everything be CSS?</h2>
+      <div class="cols">
+        <p class="lead">Often, yes — when only <b>one or two things</b> move. A hover, a fade, a status dot, a shimmer: that's CSS, a few lines, no library. Reaching for an animation framework there is overkill.<br><br>It gets unwieldy the moment the motion becomes a <span class="ac">designed, multi-part scene</span> — many pieces moving in concert, shapes morphing. That's your cue to step up a tool.</p>
+        <div class="defcard">
+          <div class="dt">Rule of thumb</div>
+          <ul>
+            <li>Describe it in one sentence? <b>CSS.</b></li>
+            <li>One or two properties moving? <b>CSS.</b></li>
+            <li>A whole choreographed scene? <b>Step up → Lottie.</b></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">06 / 17</div>
+  </section>
+
+  <!-- 07 What is Lottie -->
+  <section data-label="07 What is Lottie" data-screen-label="What is Lottie" class="s-c">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The designed loop</div>
+      <h2 class="title">What is Lottie?</h2>
+      <div class="cols">
+        <p class="lead">A <span class="ac">Lottie</span> is a vector animation stored as <b>data</b> — a JSON file — played by a small runtime. A designer builds it once (in After Effects, or now from an AI skill), and the same file plays on web, iOS, and Android. It stays razor-sharp at any size and weighs only a few kilobytes.</p>
+        <div class="defcard">
+          <div class="dt">Why reach for it</div>
+          <ul>
+            <li>A <b>designed loop</b> that lives in your app — spinner, toggle, like button.</li>
+            <li><b>Vector</b>: crisp at any size, recolorable, tiny.</li>
+            <li><b>One file</b> across web + iOS + Android.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">07 / 17</div>
+  </section>
+
+  <!-- 08 Lottie live -->
+  <section data-label="08 Lottie live" data-screen-label="Lottie live" class="s-demo dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">A like-button · running live</div>
+      <div class="demo-stage">
+        <button id="heartBtn" class="heart-btn" type="button" aria-label="Like">
+          <svg id="heartSvg" width="190" height="172" viewBox="0 0 32 29" aria-hidden="true"><path id="heartPath" d="M16 28.5l-2.3-2.1C5.4 18.9 0 14 0 8.9 0 4.8 3.2 1.6 7.3 1.6c2.3 0 4.5 1.1 5.9 2.8L16 7l2.8-2.6c1.4-1.7 3.6-2.8 5.9-2.8C28.8 1.6 32 4.8 32 8.9c0 5.1-5.4 10-13.7 17.5L16 28.5z" fill="#3a4250"></path></svg>
+        </button>
+        <p class="cap" style="max-width:760px;"><b>Be honest — this heart could be CSS.</b> Lottie earns its place when the motion is a <b>designed multi-part scene</b> (a blink, rising bubbles, a flickering flame), needs <b>shape morphing</b>, comes from a designer's file, or must run identically across <b>web + iOS + Android</b>. This one sits right on the line.</p>
+      </div>
+    </div>
+    <div class="slide-num">08 / 17</div>
+  </section>
+
+  <!-- 09 Meet the canvas -->
+  <section data-label="09 Meet the canvas" data-screen-label="Meet the canvas" class="s-c">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Under the hood</div>
+      <h2 class="title">Meet the canvas: x and y.</h2>
+      <div class="cols">
+        <p class="lead">A <span class="ac">canvas</span> is a blank grid you draw on with code. <code>(0,&nbsp;0)</code> is the top-left corner; <code>x</code> grows to the right and <code>y</code> grows <b>down</b> — flipped from the graphs you remember from school. To move something, you change its <code>x</code> and <code>y</code> a little, redraw, and do it again about sixty times a second. That loop — clear, draw, repeat — is the foundation under <b>both</b> canvas and Remotion.</p>
+        <div class="defcard">
+          <div class="dt">The loop</div>
+          <ul>
+            <li>Clear the frame.</li>
+            <li>Nudge each thing's <code>x</code>/<code>y</code>.</li>
+            <li>Draw. Repeat ~60× a second.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">09 / 17</div>
+  </section>
+
+  <!-- 10 Easing live -->
+  <section data-label="10 Easing live" data-screen-label="Easing live" class="s-demo dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Easing · the secret ingredient</div>
+      <div class="demo-stage"><canvas id="cvEasing"></canvas></div>
+      <p class="cap">Same distance, same time. The top dot is <b>linear</b> (robotic); the bottom <b>eases</b> and feels alive. Easing is just a <b>curve applied to time</b> — and CSS's <code style="background:#11202b;color:#7ee7b8;">ease-in-out</code>, Lottie's handles, and Remotion's <code style="background:#11202b;color:#7ee7b8;">spring()</code> all pick one for you.</p>
+    </div>
+    <div class="slide-num">10 / 17</div>
+  </section>
+
+  <!-- 11 Bounce live -->
+  <section data-label="11 Physics live" data-screen-label="Physics live" class="s-demo dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">A little physics</div>
+      <div class="demo-stage"><canvas id="cvBounce"></canvas></div>
+      <p class="cap">Give the ball a velocity, add gravity each frame, flip-and-shrink it on impact. <b>Nobody keyframed this</b> — the motion emerges from the rules. That's what computing every frame unlocks. <b>A fun illustration, not a license to build a game engine.</b></p>
+    </div>
+    <div class="slide-num">11 / 17</div>
+  </section>
+
+  <!-- 12 What is Remotion -->
+  <section data-label="12 What is Remotion" data-screen-label="What is Remotion" class="s-c">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The video tool</div>
+      <h2 class="title">What is Remotion?</h2>
+      <div class="cols">
+        <p class="lead">Remotion is <b>video written in code</b> — in React. Every pixel is a function of the current frame number: <span class="ac">f(frame)</span>. A renderer steps through the frames one by one and stitches them into an <b>MP4</b>. It's the canvas loop from a minute ago — except run headless and <b>saved to a file</b> you can post.</p>
+        <div class="defcard">
+          <div class="dt">The shape</div>
+          <ul>
+            <li><code>useCurrentFrame()</code> → the frame number.</li>
+            <li><code>interpolate()</code> / <code>spring()</code> → turn it into motion.</li>
+            <li>Render → a real <code>.mp4</code> on disk.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">12 / 17</div>
+  </section>
+
+  <!-- 13 f(frame) live -->
+  <section data-label="13 f(frame) live" data-screen-label="f(frame) live" class="s-demo dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">f(frame) · running live</div>
+      <div class="demo-stage"><canvas id="cvFrame"></canvas></div>
+      <p class="cap">Every pixel here is computed from the <b>frame counter</b> ticking at the bottom — the title springs in, the subtitle fades, the underline sweeps. Land on any frame and you get the <b>same picture</b>: deterministic. That's exactly what lets a renderer bake it into a perfect MP4.</p>
+    </div>
+    <div class="slide-num">13 / 17</div>
+  </section>
+
+  <!-- 14 Why Remotion scales -->
+  <section data-label="14 Why Remotion scales" data-screen-label="Why Remotion scales" class="s-c">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The payoff</div>
+      <h2 class="title">One video, or one per row?</h2>
+      <div class="cols">
+        <p class="lead">Because every frame is a <b>function</b> — of the frame, and of whatever data you pass in — the same code is a <span class="ac">template</span>. New data, new MP4: <b>per customer, per pull request, per row</b> in a spreadsheet. And it renders headless from the command line, so it runs in <b>CI</b> — a fresh clip on every release, nobody opening an editor.</p>
+        <div class="defcard">
+          <div class="dt">The split</div>
+          <ul>
+            <li>A designer's timeline → <b>one</b> beautiful video, by hand.</li>
+            <li>Remotion → <b>ten thousand</b>, from one program.</li>
+            <li>Need one video? Any tool works. Need one per row? You need code.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">14 / 17</div>
+  </section>
+
+  <!-- 15 Recap -->
+  <section data-label="15 The decision" data-screen-label="The decision" class="s-recap">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The whole decision, on one slide</div>
+      <h2 class="title">What you want → what you reach for.</h2>
+      <div class="ladder">
+        <div class="rung"><div class="w">A small touch — hover, fade, status dot, shimmer</div><div class="t">→ <span>CSS</span></div></div>
+        <div class="rung"><div class="w">A designed loop in the app — spinner, toggle, like button</div><div class="t">→ <span>Lottie</span></div></div>
+        <div class="rung"><div class="w">Generative, physical, interactive — many parts, emergent</div><div class="t">→ <span>Canvas</span></div></div>
+        <div class="rung"><div class="w">A video file — a title card, a launch clip, one per customer</div><div class="t">→ <span>Remotion</span></div></div>
+      </div>
+      <p class="rive">And one more name to know: <b>Rive</b> — vector like Lottie, but with a state machine, so it <b>reacts</b> to hover, scroll, and app state. Rig it in an editor, not from a prompt (yet).</p>
+    </div>
+    <div class="slide-num">15 / 17</div>
+  </section>
+
+  <!-- 16 Vibecoding it -->
+  <section data-label="16 Vibecoding it" data-screen-label="Vibecoding it" class="s-c dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Doing it with an LLM</div>
+      <h2 class="title">The model writes all four now.</h2>
+      <div class="cols">
+        <p class="lead">So the skill isn't typing the code — it's <b>judgment</b>, in three steps: pick the right tool, point the model at the right <b>skill or docs</b>, and <b>check it followed them</b>.<br><br>Lottie is the cautionary tale: it <span class="ac">fails silently</span>. Bad JSON gives you a blank box — no error, no crash. Referencing a skill is not the same as using one. So you verify by <b>looking at the screen</b>.</p>
+        <div class="defcard" style="background:#11161d;border-color:#1d2735;">
+          <div class="dt" style="color:var(--accent);">Your three jobs</div>
+          <ul>
+            <li style="color:#c2cdd9;">Pick the tool — <b style="color:#fff;">UI element or video?</b></li>
+            <li style="color:#c2cdd9;">Point it at the <b style="color:#fff;">skill / docs</b>.</li>
+            <li style="color:#c2cdd9;">Verify it <b style="color:#fff;">actually followed them</b>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">16 / 17</div>
+  </section>
+
+  <!-- 17 Keeper -->
+  <section data-label="17 The keeper" data-screen-label="The keeper" class="s-keep dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The keeper</div>
+      <p class="q">Is it a <span>UI element</span> or a <span>video</span>?<br>And did the model <span>actually follow the skill</span>?</p>
+      <p class="sub">Those two questions are the whole job. The tools are a prompt away — picking the right one, and checking the work, is yours.</p>
+    </div>
+    <div class="slide-num">17 / 17</div>
+  </section>
+
+</deck-stage>
+
+<script>
+(function(){
+  function fit(c,w,h){var d=Math.min(window.devicePixelRatio||1,2);c.width=w*d;c.height=h*d;c.style.width='100%';c.style.maxWidth=w+'px';c.style.height='auto';var x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);return x;}
+  var lerp=function(a,b,t){return a+(b-a)*t;};
+  var cl=function(t){return t<0?0:t>1?1:t;};
+  var easeInOut=function(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;};
+  var easeOutCubic=function(t){return 1-Math.pow(1-t,3);};
+  var easeOutBack=function(t){var c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};
+
+  // ── Easing demo ──
+  var ce=document.getElementById('cvEasing');
+  if(ce){var W=1240,H=300,x=fit(ce,W,H),x0=150,x1=1090;
+    var rows=[{y:118,label:'linear',e:function(t){return t;},c:'#94a3b8'},{y:212,label:'ease-in-out',e:easeInOut,c:'#16d89a'}];
+    var start=0,run=1600,hold=560;
+    function de(ts){if(!start)start=ts;var el=(ts-start)%(run+hold),t=cl(el/run);
+      x.clearRect(0,0,W,H);x.fillStyle='#0c1118';x.fillRect(0,0,W,H);
+      rows.forEach(function(r){x.strokeStyle='rgba(255,255,255,.12)';x.lineWidth=3;x.beginPath();x.moveTo(x0,r.y);x.lineTo(x1,r.y);x.stroke();
+        x.fillStyle='rgba(255,255,255,.22)';x.fillRect(x0-2,r.y-13,4,26);x.fillRect(x1-2,r.y-13,4,26);
+        x.fillStyle='rgba(255,255,255,.6)';x.font='500 24px Poppins,sans-serif';x.fillText(r.label,x0,r.y-30);
+        var px=lerp(x0,x1,r.e(t));x.beginPath();x.arc(px,r.y,17,0,Math.PI*2);x.fillStyle=r.c;x.fill();});
+      requestAnimationFrame(de);}
+    requestAnimationFrame(de);}
+
+  // ── Bounce demo ──
+  var cb=document.getElementById('cvBounce');
+  if(cb){var W2=920,H2=460,xb=fit(cb,W2,H2),floor=388,rr=22,g=.92,st={y:64,vy:0,rest:false,rt:0};
+    function db(){if(!st.rest){st.vy+=g;st.y+=st.vy;if(st.y>=floor){st.y=floor;st.vy*=-0.72;if(Math.abs(st.vy)<2.2){st.vy=0;st.rest=true;st.rt=performance.now();}}}else if(performance.now()-st.rt>1100){st.y=64;st.vy=0;st.rest=false;}
+      xb.clearRect(0,0,W2,H2);xb.fillStyle='#0c1118';xb.fillRect(0,0,W2,H2);
+      xb.strokeStyle='rgba(255,255,255,.15)';xb.lineWidth=3;xb.beginPath();xb.moveTo(90,floor+rr);xb.lineTo(W2-90,floor+rr);xb.stroke();
+      var hgt=(floor-st.y)/(floor-64),sw=58*(1-hgt)+18;xb.fillStyle='rgba(0,0,0,.35)';xb.beginPath();xb.ellipse(W2/2,floor+rr+7,sw,7,0,0,Math.PI*2);xb.fill();
+      xb.beginPath();xb.arc(W2/2,st.y,rr,0,Math.PI*2);xb.fillStyle='#f3b43a';xb.fill();
+      requestAnimationFrame(db);}
+    requestAnimationFrame(db);}
+
+  // ── f(frame) demo ──
+  var cf=document.getElementById('cvFrame');
+  if(cf){var W3=1240,H3=470,xf=fit(cf,W3,H3),TOTAL=150,f=0,last=0,acc=0;
+    function draw(fr){var cx=W3/2;
+      xf.clearRect(0,0,W3,H3);var gr=xf.createLinearGradient(0,0,W3,H3);gr.addColorStop(0,'#0b1f3a');gr.addColorStop(1,'#0c1118');xf.fillStyle=gr;xf.fillRect(0,0,W3,H3);
+      var ty=lerp(310,212,easeOutBack(cl(fr/26)));
+      xf.globalAlpha=cl(fr/18);xf.fillStyle='#fff';xf.textAlign='center';xf.font='700 96px Poppins,sans-serif';xf.fillText('Ship it',cx,ty);
+      xf.globalAlpha=cl((fr-18)/20);xf.fillStyle='#9fb4d8';xf.font='500 36px Poppins,sans-serif';xf.fillText('shipped with Claude',cx,ty+60);xf.globalAlpha=1;
+      var half=250*easeOutCubic(cl((fr-30)/28));xf.strokeStyle='#16d89a';xf.lineWidth=7;xf.lineCap='round';xf.beginPath();xf.moveTo(cx-half,ty+96);xf.lineTo(cx+half,ty+96);xf.stroke();
+      xf.textAlign='left';xf.fillStyle='rgba(150,178,205,.6)';xf.font='28px "Source Code Pro",monospace';xf.fillText('frame '+String(fr).padStart(3,'0')+' / '+TOTAL,44,H3-38);}
+    function df(ts){if(!last)last=ts;acc+=ts-last;last=ts;var dt=1000/30;while(acc>=dt){f=(f+1)%(TOTAL+1);acc-=dt;}draw(f);requestAnimationFrame(df);}
+    requestAnimationFrame(df);}
+
+  // ── Lottie-style heart ──
+  var hb=document.getElementById('heartBtn'),hp=document.getElementById('heartPath'),hsvg=document.getElementById('heartSvg');
+  if(hb){var liked=false;
+    function tog(){liked=!liked;hp.setAttribute('fill',liked?'#ff4d6d':'#3a4250');
+      hsvg.style.animation='none';void hsvg.offsetWidth;hsvg.style.animation='ssHeartPop .5s ease-out';
+      if(liked){var ring=document.createElement('span');ring.className='ring';ring.style.animation='ssRing .6s ease-out forwards';hb.appendChild(ring);setTimeout(function(){if(ring.parentNode)ring.parentNode.removeChild(ring);},640);}}
+    hb.addEventListener('click',tog);setInterval(tog,2600);}
+})();
+</script>
+</body>
+</html>
