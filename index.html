@@ -505,33 +505,26 @@ box I can copy. read the key from .env.</code></pre>
         {
           title: "Deploying Internal Tools",
           sub: "main deck — 2h hands-on",
-          desc: "Deploy a real app to the team's Dokploy box with Claude Code — Traefik, Zero Trust, deploy keys, and the dokploy-deploy skill.",
+          desc: "Wire your laptop to the team's Dokploy box (WARP + MCP), split into three crews, and every crew customizes and ships a different app shape.",
           path: "wk6/Deploying Internal Tools.html",
           notes: `
             <h2>Deploying Internal Tools</h2>
-            <p class="empty">2-hour hands-on workshop: understand the team's deploy platform end to end, wire your laptop to it, and ship an app by telling Claude to. The full facilitator runbook lives in <code>apps/starters/WORKSHOP.md</code>.</p>
+            <p class="empty">2-hour hands-on workshop, mostly labs: wire your laptop to the team's box (everyone, together), then split into <strong>three crews</strong> — each customizes and ships a different starter, live.</p>
 
             <h3>Why our platform</h3>
-            <p><strong>Own the data, secure everything, control all the things</strong> — team tools touch real client data, so they run on infrastructure we control. (Hosted platforms stay fine for prototypes.) Plain <strong>Docker</strong> underneath, so workers, WebSockets, and cron are trivial.</p>
-
-            <h3>One hard boundary</h3>
-            <p><strong>Internal-facing only.</strong> Customer-facing anything runs on engineering's production stack — different infra, different rigor. Might a customer touch it? Conversation with engineering <em>before</em> it's a deploy. Respect the engs.</p>
+            <p><strong>Own the data, secure everything, control all the things</strong> — team tools touch real client data, so they run on infrastructure we control. (Hosted platforms stay fine for prototypes.) Plain <strong>Docker</strong> underneath. And the one hard boundary: <strong>internal-facing only</strong> — customer-facing is engineering's stack, conversation first.</p>
 
             <h3>The keystone diagram</h3>
             <p>Browser → <strong>Cloudflare</strong> (TLS + Access SSO wall) → plain HTTP → <strong>Traefik</strong> (routes by Host header) → your containers → your Postgres. <strong>Dokploy is the control plane</strong> — not in the request path.</p>
 
-            <h3>The three Zero-Trust consequences</h3>
-            <ol>
-              <li><strong>Deploying needs a token</strong> — cloudflared + the MCP wrapper; stale token → /mcp reconnect</li>
-              <li><strong>Third-party webhooks don't work</strong> — Stripe/GitHub die at the edge; design for polling</li>
-              <li><strong>HTTPS off at the door, https in the env</strong> — Flexible SSL's two halves</li>
-            </ol>
+            <h3>Lab 1 — everyone, together</h3>
+            <p><strong>WARP</strong> is already installed — verify: WARP → Profile → Team name must say <code>anduin</code>, toggle Connected. Your <em>machine</em> now carries your company identity through the Access wall; no tokens to mint. <strong>API key:</strong> everyone generates their own — Dokploy UI → bottom-left Account → Profile → API/CLI Keys → Generate New Key (annotated screenshots in the deck). <strong>MCP:</strong> key in a locked-down file, a 3-line launcher, register, restart. Checkpoint: "list my Dokploy projects" → an <em>empty list is a pass</em>.</p>
 
-            <h3>The labs</h3>
-            <p><strong>Lab 1:</strong> cloudflared login → API key → MCP wrapper → "list my Dokploy projects" (exactly one). <strong>Lab 2:</strong> clone the skeleton, paste the deploy prompt, watch the skill create <em>your</em> Postgres (one per person, shared by all your apps), then verify headlessly through the wall. Finale: sign your own guestbook in production.</p>
+            <h3>Labs 2–3 — three crews, three shapes</h3>
+            <p>💀 <strong>Skeleton</strong> (auth + Postgres, shared OAuth creds on the sheet) · 🧪 <strong>Cauldron</strong> (queue + separate worker, no OAuth) · 🔮 <strong>Séance</strong> (WebSockets + Redis relay, no OAuth). Each crew customizes small-and-visible, pushes a public repo, then deploys by saying so — and answers the database question: <strong>create a new managed Postgres in my project</strong> (yours forever; later apps reuse it). Finale: every crew demos its shape.</p>
 
-            <h3>The database rule</h3>
-            <p><strong>One Postgres per person</strong> — created at your first deploy, reused by every app after (own database inside). Split an app off only when it gets big.</p>
+            <h3>Sharp edges to remember</h3>
+            <p><strong>Webhooks die at the wall</strong> (poll instead — the Cauldron shape) · HTTPS <strong>off</strong> at the domain, https in the env · Dokploy calls returning an HTML sign-in page → <strong>check the WARP toggle</strong>.</p>
           `,
         },
       ],
