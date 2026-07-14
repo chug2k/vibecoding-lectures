@@ -499,6 +499,44 @@ box I can copy. read the key from .env.</code></pre>
       ],
     },
     {
+      label: "Week 6",
+      summary: "Ship to our own infrastructure — deploy your apps to the team's Dokploy box by telling Claude to, and understand every layer.",
+      decks: [
+        {
+          title: "Deploying Internal Tools",
+          sub: "main deck — 2h hands-on",
+          desc: "Deploy a real app to the team's Dokploy box with Claude Code — Traefik, Zero Trust, deploy keys, and the dokploy-deploy skill.",
+          path: "wk6/Deploying Internal Tools.html",
+          notes: `
+            <h2>Deploying Internal Tools</h2>
+            <p class="empty">2-hour hands-on workshop: understand the team's deploy platform end to end, wire your laptop to it, and ship an app by telling Claude to. The full facilitator runbook lives in <code>apps/starters/WORKSHOP.md</code>.</p>
+
+            <h3>Why our platform</h3>
+            <p><strong>Own the data, secure everything, control all the things</strong> — team tools touch real client data, so they run on infrastructure we control. (Hosted platforms stay fine for prototypes.) Plain <strong>Docker</strong> underneath, so workers, WebSockets, and cron are trivial.</p>
+
+            <h3>One hard boundary</h3>
+            <p><strong>Internal-facing only.</strong> Customer-facing anything runs on engineering's production stack — different infra, different rigor. Might a customer touch it? Conversation with engineering <em>before</em> it's a deploy. Respect the engs.</p>
+
+            <h3>The keystone diagram</h3>
+            <p>Browser → <strong>Cloudflare</strong> (TLS + Access SSO wall) → plain HTTP → <strong>Traefik</strong> (routes by Host header) → your containers → your Postgres. <strong>Dokploy is the control plane</strong> — not in the request path.</p>
+
+            <h3>The three Zero-Trust consequences</h3>
+            <ol>
+              <li><strong>Deploying needs a token</strong> — cloudflared + the MCP wrapper; stale token → /mcp reconnect</li>
+              <li><strong>Third-party webhooks don't work</strong> — Stripe/GitHub die at the edge; design for polling</li>
+              <li><strong>HTTPS off at the door, https in the env</strong> — Flexible SSL's two halves</li>
+            </ol>
+
+            <h3>The labs</h3>
+            <p><strong>Lab 1:</strong> cloudflared login → API key → MCP wrapper → "list my Dokploy projects" (exactly one). <strong>Lab 2:</strong> clone the skeleton, paste the deploy prompt, watch the skill create <em>your</em> Postgres (one per person, shared by all your apps), then verify headlessly through the wall. Finale: sign your own guestbook in production.</p>
+
+            <h3>The database rule</h3>
+            <p><strong>One Postgres per person</strong> — created at your first deploy, reused by every app after (own database inside). Split an app off only when it gets big.</p>
+          `,
+        },
+      ],
+    },
+    {
       label: "Bonus · Advanced",
       summary: "Optional deep dives for getting more out of your coding agent.",
       bonus: true,

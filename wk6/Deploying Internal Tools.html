@@ -1,0 +1,1334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Deploying Internal Tools — the team's own platform, hands-on</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="../deck-stage.js"></script>
+<style>
+  :root {
+    /* Type scale — projection-appropriate at 1920×1080 */
+    --type-hero: 140px;
+    --type-title: 76px;
+    --type-section: 64px;
+    --type-subtitle: 40px;
+    --type-lead: 34px;
+    --type-body: 29px;
+    --type-small: 25px;
+    --type-eyebrow: 24px;
+    --type-mono: 28px;
+
+    /* Spacing */
+    --pad-top: 110px;
+    --pad-bottom: 100px;
+    --pad-x: 140px;
+    --gap-title: 44px;
+
+    /* Colors */
+    --ink: var(--color-gray-9);
+    --ink-soft: var(--color-gray-8);
+    --muted: var(--color-gray-6);
+    --hairline: var(--color-gray-3);
+    --paper: var(--color-gray-1);
+    --accent: #48AFF0;
+    --accent-deep: var(--color-primary-4);
+    --danger: var(--color-danger-4);
+    --ok: var(--color-success-4);
+    --warn: var(--color-warning-4);
+    --terminal-bg: #0d1117;
+    --terminal-fg: #e6edf3;
+    --terminal-green: #7ee787;
+    --terminal-blue: #79c0ff;
+    --terminal-purple: #d2a8ff;
+    --terminal-red: #ff7b72;
+    --terminal-dim: #8b949e;
+  }
+
+  html, body { margin: 0; background: #000; }
+  deck-stage:not(:defined) { visibility: hidden; }
+
+  deck-stage > section {
+    background: #fff;
+    color: var(--ink);
+    font-family: var(--font-display);
+    line-height: 1.4;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── persistent Anduin brand mark ─────────────────────────────────── */
+  .brand-mark {
+    position: absolute; top: 64px; right: 80px;
+    display: flex; align-items: center; gap: 18px;
+    z-index: 5;
+  }
+  .brand-mark img { height: 28px; width: auto; display: block; }
+  .brand-mark .program {
+    padding-left: 18px;
+    border-left: 1px solid var(--hairline);
+    font-size: 18px; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .dark .brand-mark .program {
+    color: rgba(255,255,255,0.65);
+    border-left-color: rgba(255,255,255,0.18);
+  }
+
+  /* ── shared slide chrome ──────────────────────────────────────────── */
+  .slide-num {
+    position: absolute; right: 56px; bottom: 48px;
+    font-size: var(--type-small); color: var(--muted);
+    font-variant-numeric: tabular-nums; letter-spacing: 0.04em;
+  }
+  .dark .slide-num { color: #5d6b7a; }
+  .slide-eyebrow {
+    position: absolute; left: var(--pad-x); top: 72px;
+    font-size: var(--type-eyebrow); font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+  .dark .slide-eyebrow { color: var(--accent); }
+
+  .frame {
+    width: 100%; height: 100%;
+    padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
+    box-sizing: border-box;
+    display: flex; flex-direction: column;
+  }
+  .frame.center { justify-content: center; align-items: center; text-align: center; }
+  .frame.cjustify { justify-content: center; }
+
+  h1.hero {
+    margin: 0; font-size: var(--type-hero);
+    line-height: 0.96; letter-spacing: -0.045em;
+    font-weight: 600; color: var(--ink);
+  }
+  h2.title {
+    margin: 0 0 var(--gap-title);
+    font-size: var(--type-title); line-height: 1.02;
+    letter-spacing: -0.03em; font-weight: 600; color: var(--ink);
+  }
+  .lead {
+    font-size: var(--type-lead); line-height: 1.35;
+    color: var(--ink-soft); font-weight: 400;
+    letter-spacing: -0.005em; margin: 0;
+  }
+  .lead b { color: var(--ink); font-weight: 600; }
+  .body { font-size: var(--type-body); line-height: 1.45; color: var(--ink-soft); font-weight: 400; margin: 0; }
+  .body b { color: var(--ink); font-weight: 600; }
+  .lede { font-size: 30px; line-height: 1.4; color: var(--ink-soft); margin: 0; }
+  .lede b { color: var(--ink); font-weight: 600; }
+  .mono { font-family: var(--font-mono); }
+
+  /* ── generic cards grid ───────────────────────────────────────────── */
+  .cards { display: grid; gap: 28px; flex: 1; min-height: 0; }
+  .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+  .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+  .cards.c2x3 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); }
+  .card {
+    background: #fff; border: 1px solid var(--hairline);
+    border-radius: 16px; padding: 36px 34px;
+    display: flex; flex-direction: column; gap: 16px;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+  }
+  .card .mode {
+    font-size: 21px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent-deep);
+  }
+  .card h3 {
+    margin: 0; font-size: 37px; line-height: 1.1;
+    font-weight: 600; letter-spacing: -0.02em; color: var(--ink);
+  }
+  .card p { margin: 0; font-size: 25px; line-height: 1.42; color: var(--ink-soft); }
+  .card p b { color: var(--ink); font-weight: 600; }
+  .card .num {
+    position: absolute; bottom: 26px; right: 32px;
+    font-family: var(--font-mono); font-size: 24px; color: var(--hairline);
+  }
+
+  /* ── keyed step rows (label + text) ───────────────────────────────── */
+  .steps { display: flex; flex-direction: column; gap: 20px; }
+  .steps .row { display: grid; grid-template-columns: 200px 1fr; gap: 26px; align-items: baseline; }
+  .steps .row .k {
+    font-family: var(--font-mono); font-size: 24px; font-weight: 500;
+    color: var(--accent-deep); background: rgba(72,175,240,0.10);
+    border: 1px solid rgba(72,175,240,0.32); border-radius: 9px;
+    padding: 6px 14px; text-align: center; white-space: nowrap;
+  }
+  .steps .row > div { font-size: 27px; line-height: 1.38; color: var(--ink-soft); }
+  .steps .row b { color: var(--ink); font-weight: 600; }
+
+  /* ── terminal block ───────────────────────────────────────────────── */
+  .terminal {
+    background: var(--terminal-bg); color: var(--terminal-fg);
+    border-radius: 14px; padding: 28px 36px 32px;
+    font-family: var(--font-mono); font-size: var(--type-mono); line-height: 1.55;
+    box-shadow: 0 24px 60px -20px rgba(13,17,23,0.4),
+                0 2px 0 rgba(255,255,255,0.04) inset;
+    border: 1px solid #1c232c;
+  }
+  .terminal-bar {
+    display: flex; align-items: center; gap: 8px;
+    margin: -8px -16px 20px; padding-bottom: 16px;
+    border-bottom: 1px solid #1c232c;
+  }
+  .terminal-bar .dot { width: 14px; height: 14px; border-radius: 50%; }
+  .terminal-bar .dot.r { background: #ff5f57; }
+  .terminal-bar .dot.y { background: #febc2e; }
+  .terminal-bar .dot.g { background: #28c840; }
+  .terminal-bar .label { margin-left: 16px; color: var(--terminal-dim); font-size: 22px; letter-spacing: 0.04em; }
+  .terminal .prompt { color: var(--terminal-green); }
+  .terminal .cmd { color: var(--terminal-fg); }
+  .terminal .comment { color: var(--terminal-dim); }
+  .terminal .ok { color: var(--terminal-green); }
+  .terminal .err { color: var(--terminal-red); }
+  .terminal .str { color: var(--terminal-blue); }
+  .terminal .arrow { color: var(--accent); }
+
+  /* ── callout strip ────────────────────────────────────────────────── */
+  .strip {
+    margin-top: 34px; padding: 26px 34px;
+    background: var(--paper); border: 1px solid var(--hairline);
+    border-radius: 14px; display: flex; align-items: center; gap: 28px;
+    font-size: 27px; line-height: 1.4; color: var(--ink-soft);
+  }
+  .strip b { color: var(--ink); font-weight: 600; }
+  .strip .slabel {
+    font-size: 21px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent-deep);
+    white-space: nowrap; padding-right: 28px;
+    border-right: 1px solid var(--hairline); flex-shrink: 0;
+  }
+  .strip.warn .slabel { color: var(--danger); }
+
+  /* ── two-column grid helper ───────────────────────────────────────── */
+  .split { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; min-height: 0; }
+  .split .left h2 { margin: 0 0 30px; font-size: 68px; line-height: 1.05; letter-spacing: -0.03em; font-weight: 600; color: var(--ink); }
+  .split .left p.body { margin-bottom: 26px; }
+
+  /* ═══ ROADMAP & KIT ════════════════════════════════════════════════ */
+  .s-map .grid2 { flex: 1; display: grid; grid-template-columns: 1.15fr 1fr; gap: 60px; align-items: center; min-height: 0; }
+  .s-map .agenda { display: flex; flex-direction: column; }
+  .s-map .arow { display: grid; grid-template-columns: 96px 1fr; gap: 24px; align-items: baseline; padding: 13px 0; border-bottom: 1px solid var(--hairline); }
+  .s-map .arow:last-child { border-bottom: none; }
+  .s-map .arow .t { font-family: var(--font-mono); font-size: 23px; color: var(--muted); }
+  .s-map .arow .w { font-size: 26px; line-height: 1.35; color: var(--ink-soft); }
+  .s-map .arow .w b { color: var(--ink); font-weight: 600; }
+  .s-map .arow.lab .w b { color: var(--accent-deep); }
+  .s-map .kit {
+    border: 2px solid var(--color-primary-2); border-radius: 18px;
+    background: rgba(72,175,240,0.05); padding: 32px 34px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .s-map .kit h3 { margin: 0; font-size: 30px; font-weight: 600; color: var(--ink); }
+  .s-map .kit .krow { display: grid; grid-template-columns: 172px 1fr; gap: 18px; align-items: baseline; }
+  .s-map .kit .krow .k { font-size: 19px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-deep); }
+  .s-map .kit .krow .v { font-size: 23px; line-height: 1.4; color: var(--ink-soft); }
+  .s-map .kit .krow .v b { color: var(--ink); font-weight: 600; }
+
+  /* ═══ REVIEW ═══════════════════════════════════════════════════════ */
+  .s-review .cards.c2x3 .card { padding: 28px 30px; gap: 10px; }
+  .s-review .cards.c2x3 .card h3 { font-size: 29px; }
+  .s-review .cards.c2x3 .card p { font-size: 21.5px; line-height: 1.38; }
+
+  /* ═══ 01 · TITLE ═══════════════════════════════════════════════════ */
+  .s-title { background: url('assets/cover-gradient.png') center/cover no-repeat, #eaf6ff; }
+  .s-title .frame { justify-content: flex-end; padding-bottom: 140px; }
+  .s-title .hero-brand {
+    display: inline-flex; align-items: center; gap: 22px;
+    padding: 14px 26px; background: #fff; border-radius: 999px;
+    box-shadow: 0 4px 18px -6px rgba(31,49,69,0.18), 0 1px 0 rgba(31,49,69,0.06) inset;
+    align-self: flex-start;
+  }
+  .s-title .hero-logo { height: 32px; width: auto; display: block; }
+  .s-title .hero-program {
+    padding-left: 22px; border-left: 1px solid var(--hairline);
+    font-size: 20px; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-deep);
+  }
+  .s-title .kicker {
+    font-size: var(--type-eyebrow); font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 32px;
+  }
+  .s-title .sub {
+    margin-top: 38px; font-size: var(--type-subtitle);
+    color: var(--ink-soft); max-width: 1360px; font-weight: 400;
+    line-height: 1.3; letter-spacing: -0.005em;
+  }
+  .s-title .sub b { color: var(--ink); font-weight: 600; }
+  .s-title .byline {
+    position: absolute; bottom: 80px; left: 140px; right: 140px;
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: var(--type-small); color: var(--ink-soft);
+  }
+  .s-title .byline b { font-weight: 600; color: var(--ink); }
+  .s-title .byline .repo { font-family: var(--font-mono); color: var(--accent-deep); font-size: 24px; }
+
+  /* ═══ 02 · THE PROMISE ═════════════════════════════════════════════ */
+  .s-promise { background: var(--paper); }
+  .s-promise .lede { font-size: 30px; color: var(--ink-soft); margin: 0 0 44px; max-width: 1420px; line-height: 1.4; }
+  .s-promise .lede b { color: var(--ink); font-weight: 600; }
+
+  /* ═══ 03 · VERCEL'S BILL ═══════════════════════════════════════════ */
+  .s-vercel .cards.c4 .card h3 { font-size: 31px; }
+  .s-vercel .cards.c4 .card p { font-size: 23px; }
+
+  /* ═══ 04 · DOCKER 60s ══════════════════════════════════════════════ */
+  .s-docker .filecard {
+    background: var(--terminal-bg); border-radius: 16px; overflow: hidden;
+    box-shadow: 0 24px 60px -24px rgba(13,17,23,0.45);
+    font-family: var(--font-mono); font-size: 25px; line-height: 1.65;
+  }
+  .s-docker .filecard .fbar {
+    display: flex; align-items: center; gap: 14px;
+    padding: 18px 26px; border-bottom: 1px solid #1c232c;
+  }
+  .s-docker .filecard .fbar .dots { display: flex; gap: 8px; }
+  .s-docker .filecard .fbar i { width: 13px; height: 13px; border-radius: 50%; display: block; }
+  .s-docker .filecard .fbar i.r { background: #ff5f57; } .s-docker .filecard .fbar i.y { background: #febc2e; } .s-docker .filecard .fbar i.g { background: #28c840; }
+  .s-docker .filecard .fname { color: var(--terminal-dim); font-size: 22px; }
+  .s-docker .filecard .fbody { padding: 26px 34px 32px; color: var(--terminal-fg); }
+  .s-docker .filecard .kw { color: var(--terminal-purple); }
+  .s-docker .filecard .cm { color: var(--terminal-dim); }
+  .s-docker .flow {
+    margin-top: 30px; display: flex; align-items: center; gap: 18px;
+    font-family: var(--font-mono); font-size: 26px; color: var(--ink);
+  }
+  .s-docker .flow .stage {
+    background: #fff; border: 1px solid var(--hairline); border-radius: 12px;
+    padding: 14px 24px;
+  }
+  .s-docker .flow .arr { color: var(--accent-deep); font-weight: 600; }
+
+  /* ═══ 05 · WHAT DOKPLOY IS ═════════════════════════════════════════ */
+  .s-dokploy .pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 8px; }
+  .s-dokploy .pillar {
+    border: 1px solid var(--hairline); border-radius: 16px;
+    padding: 38px 36px 40px; background: #fff;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .s-dokploy .pillar .ico {
+    width: 62px; height: 62px; border-radius: 14px;
+    background: rgba(72,175,240,0.12); border: 1px solid rgba(72,175,240,0.35);
+    display: grid; place-items: center; margin-bottom: 6px;
+    font-size: 30px;
+  }
+  .s-dokploy .pillar h3 { margin: 0; font-size: 35px; line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
+  .s-dokploy .pillar p { margin: 0; font-size: 25px; line-height: 1.4; color: var(--ink-soft); }
+  .s-dokploy .pillar p b { color: var(--ink); font-weight: 600; }
+
+  /* ═══ 06 · INTERNAL-FACING ONLY (the boundary) ═════════════════════ */
+  .s-boundary .lede { font-size: 30px; color: var(--ink-soft); line-height: 1.4; margin: 0; max-width: 1480px; }
+  .s-boundary .lede b { color: var(--ink); font-weight: 600; }
+  .s-boundary .versus { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1; min-height: 0; }
+  .s-boundary .side { border-radius: 18px; padding: 40px 42px; display: flex; flex-direction: column; gap: 18px; }
+  .s-boundary .side.in { background: var(--color-success-1); border: 1.5px solid var(--color-success-2); }
+  .s-boundary .side.out { background: var(--color-danger-1); border: 1.5px solid var(--color-danger-2); }
+  .s-boundary .side .who { font-size: 22px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+  .s-boundary .side.in .who { color: var(--ok); }
+  .s-boundary .side.out .who { color: var(--danger); }
+  .s-boundary .side h3 { margin: 0; font-size: 42px; line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
+  .s-boundary .side p { margin: 0; font-size: 26px; line-height: 1.42; color: var(--ink-soft); }
+  .s-boundary .side p b { color: var(--ink); font-weight: 600; }
+
+  /* ═══ 07 · ANATOMY OF A REQUEST ════════════════════════════════════ */
+  .s-anatomy .wrap { flex: 1; display: grid; grid-template-columns: 1.5fr 1fr; gap: 56px; min-height: 0; align-items: stretch; }
+  .s-anatomy .stack { display: flex; flex-direction: column; justify-content: center; gap: 0; }
+  .s-anatomy .layer {
+    display: grid; grid-template-columns: 320px 1fr; gap: 28px; align-items: center;
+    background: #fff; border: 1px solid var(--hairline); border-radius: 13px;
+    padding: 18px 28px;
+  }
+  .s-anatomy .layer .lname { font-size: 28px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+  .s-anatomy .layer .lname .em { margin-right: 12px; }
+  .s-anatomy .layer .ldesc { font-size: 22.5px; line-height: 1.3; color: var(--muted); }
+  .s-anatomy .layer .ldesc b { color: var(--ink-soft); font-weight: 600; }
+  .s-anatomy .hop {
+    height: 34px; display: flex; align-items: center; padding-left: 44px; gap: 16px;
+    color: var(--accent-deep); font-size: 21px; font-family: var(--font-mono);
+  }
+  .s-anatomy .hop::before { content: "↓"; font-size: 24px; font-weight: 700; }
+  .s-anatomy .aside {
+    align-self: center;
+    border: 2px dashed var(--color-primary-2); border-radius: 18px;
+    background: rgba(72,175,240,0.06); padding: 40px 38px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .s-anatomy .aside h3 { margin: 0; font-size: 34px; font-weight: 600; color: var(--ink); }
+  .s-anatomy .aside p { margin: 0; font-size: 24px; line-height: 1.42; color: var(--ink-soft); }
+  .s-anatomy .aside p b { color: var(--ink); font-weight: 600; }
+  .s-anatomy .aside .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .s-anatomy .aside .chips span {
+    font-family: var(--font-mono); font-size: 21px; color: var(--accent-deep);
+    background: #fff; border: 1px solid rgba(72,175,240,0.4); border-radius: 999px; padding: 5px 16px;
+  }
+
+  /* ═══ 08 · TRAEFIK ═════════════════════════════════════════════════ */
+  .s-traefik .setcard {
+    background: #fff; border: 1px solid var(--hairline); border-radius: 14px;
+    padding: 24px 32px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .s-traefik .setcard .sc-label { font-size: 20px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-deep); }
+  .s-traefik .setcard .sc-fields { display: flex; flex-direction: column; gap: 8px; font-size: 24px; color: var(--ink-soft); }
+  .s-traefik .setcard .sc-fields .mono { color: var(--ink); font-size: 23px; }
+  .s-traefik .genarrow { padding: 14px 8px; font-family: var(--font-mono); font-size: 21px; color: var(--accent-deep); }
+  .s-traefik .rule { font-size: 23px; line-height: 1.55; }
+  .s-traefik .rule .key { color: var(--terminal-purple); }
+  .s-traefik .rule .val { color: var(--terminal-blue); }
+  .s-traefik .rule .cm { color: var(--terminal-dim); }
+
+  /* ═══ 09 · CONTROL PLANE ═══════════════════════════════════════════ */
+  .s-plane .pipe { display: flex; align-items: stretch; gap: 16px; margin-top: 12px; }
+  .s-plane .pipe .stage {
+    flex: 1; background: #fff; border: 1px solid var(--hairline); border-radius: 14px;
+    padding: 28px 26px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .s-plane .pipe .stage .n {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: rgba(72,175,240,0.13); border: 1px solid rgba(72,175,240,0.4);
+    display: grid; place-items: center; font-size: 22px; font-weight: 600; color: var(--accent-deep);
+  }
+  .s-plane .pipe .stage h4 { margin: 6px 0 0; font-size: 27px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+  .s-plane .pipe .stage p { margin: 0; font-size: 21px; line-height: 1.35; color: var(--muted); }
+  .s-plane .pipe .arr { align-self: center; color: var(--accent-deep); font-size: 30px; font-weight: 700; }
+
+  /* ═══ 10 · YOUR POSTGRES ═══════════════════════════════════════════ */
+  .s-db .dbbox {
+    border: 2px solid var(--color-primary-2); border-radius: 20px;
+    background: rgba(72,175,240,0.05); padding: 34px 36px;
+  }
+  .s-db .dbbox .dbtitle { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+  .s-db .dbbox .dbtitle .em { font-size: 40px; }
+  .s-db .dbbox .dbtitle .t { font-family: var(--font-mono); font-size: 28px; color: var(--ink); font-weight: 500; }
+  .s-db .dbbox .dbtitle .tag { margin-left: auto; font-size: 19px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-deep); }
+  .s-db .dbbox .dbs { display: flex; flex-direction: column; gap: 14px; }
+  .s-db .dbbox .dbs .d {
+    display: flex; align-items: baseline; gap: 18px;
+    background: #fff; border: 1px solid var(--hairline); border-radius: 11px; padding: 16px 24px;
+  }
+  .s-db .dbbox .dbs .d .name { font-family: var(--font-mono); font-size: 25px; color: var(--ink); }
+  .s-db .dbbox .dbs .d .use { font-size: 21px; color: var(--muted); margin-left: auto; }
+
+  /* ═══ 11 · THE WALL (dark) ═════════════════════════════════════════ */
+  .s-wall { background: var(--terminal-bg); color: #fff; }
+  .s-wall h2.title { color: #fff; }
+  .s-wall .lede { font-size: 31px; line-height: 1.4; color: #c2cdd9; margin: 0 0 48px; max-width: 1480px; }
+  .s-wall .lede b { color: var(--accent); font-weight: 600; }
+  .s-wall .versus { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1; min-height: 0; }
+  .s-wall .side { border-radius: 18px; padding: 40px 42px; display: flex; flex-direction: column; gap: 18px; }
+  .s-wall .side.human { background: rgba(126,231,135,0.07); border: 1px solid rgba(126,231,135,0.3); }
+  .s-wall .side.machine { background: rgba(255,123,114,0.07); border: 1px solid rgba(255,123,114,0.3); }
+  .s-wall .side .who { font-size: 22px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+  .s-wall .side.human .who { color: var(--terminal-green); }
+  .s-wall .side.machine .who { color: var(--terminal-red); }
+  .s-wall .side h3 { margin: 0; font-size: 40px; line-height: 1.12; font-weight: 600; color: #fff; letter-spacing: -0.02em; }
+  .s-wall .side p { margin: 0; font-size: 26px; line-height: 1.42; color: #c2cdd9; }
+  .s-wall .side p b { color: #fff; font-weight: 600; }
+  .s-wall .next { margin-top: 36px; display: flex; align-items: center; gap: 20px; font-size: 26px; color: #c2cdd9; }
+  .s-wall .next .pip {
+    font-family: var(--font-mono); font-size: 23px; color: var(--accent);
+    border: 1px solid rgba(72,175,240,0.45); border-radius: 999px; padding: 5px 18px;
+  }
+
+  /* ═══ 12 · CLOUDFLARED ═════════════════════════════════════════════ */
+  .s-cf .grid2 { flex: 1; display: grid; grid-template-columns: 1.15fr 1fr; gap: 64px; align-items: center; min-height: 0; }
+  .s-cf .stale {
+    border-left: 4px solid var(--warn); background: var(--paper);
+    border-radius: 0 14px 14px 0; padding: 28px 32px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .s-cf .stale .t { font-size: 22px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--warn); }
+  .s-cf .stale p { margin: 0; font-size: 25px; line-height: 1.42; color: var(--ink-soft); }
+  .s-cf .stale p b { color: var(--ink); font-weight: 600; }
+
+  /* ═══ 13 · WEBHOOKS ════════════════════════════════════════════════ */
+  .s-hooks .senders { display: flex; gap: 12px; flex-wrap: wrap; margin: 26px 0 30px; }
+  .s-hooks .senders span {
+    font-family: var(--font-mono); font-size: 24px; color: var(--ink-soft);
+    background: var(--paper); border: 1px solid var(--hairline); border-radius: 999px; padding: 8px 22px;
+    text-decoration: line-through; text-decoration-color: var(--danger); text-decoration-thickness: 3px;
+  }
+  .s-hooks .ways { display: flex; flex-direction: column; gap: 18px; }
+  .s-hooks .way { display: grid; grid-template-columns: 64px 1fr; gap: 22px; align-items: start; }
+  .s-hooks .way .n {
+    width: 54px; height: 54px; border-radius: 12px; display: grid; place-items: center;
+    font-size: 25px; font-weight: 600;
+  }
+  .s-hooks .way.a .n { background: rgba(72,175,240,0.13); border: 1px solid rgba(72,175,240,0.4); color: var(--accent-deep); }
+  .s-hooks .way.b .n { background: var(--color-warning-1); border: 1px solid var(--color-warning-2); color: var(--warn); }
+  .s-hooks .way.c .n { background: var(--color-success-1); border: 1px solid var(--color-success-2); color: var(--ok); }
+  .s-hooks .way .txt { font-size: 26px; line-height: 1.38; color: var(--ink-soft); }
+  .s-hooks .way .txt b { color: var(--ink); font-weight: 600; }
+
+  /* ═══ 14 · FLEXIBLE SSL ════════════════════════════════════════════ */
+  .s-ssl .hopline {
+    display: flex; align-items: center; justify-content: center; gap: 26px;
+    margin: 20px 0 40px; font-size: 30px;
+  }
+  .s-ssl .hopline .node {
+    background: #fff; border: 1px solid var(--hairline); border-radius: 14px;
+    padding: 22px 34px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 14px;
+  }
+  .s-ssl .hopline .leg { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .s-ssl .hopline .leg .proto { font-family: var(--font-mono); font-size: 24px; font-weight: 600; }
+  .s-ssl .hopline .leg .wire { font-size: 30px; color: var(--muted); letter-spacing: -2px; }
+  .s-ssl .hopline .leg.https .proto { color: var(--ok); }
+  .s-ssl .hopline .leg.http .proto { color: var(--danger); }
+  .s-ssl .settings { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .s-ssl .setting {
+    background: var(--paper); border: 1px solid var(--hairline); border-radius: 14px;
+    padding: 30px 34px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .s-ssl .setting .where { font-size: 21px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-deep); }
+  .s-ssl .setting .what { font-family: var(--font-mono); font-size: 28px; color: var(--ink); }
+  .s-ssl .setting p { margin: 0; font-size: 23px; line-height: 1.38; color: var(--muted); }
+
+  /* ═══ 15 · DEPLOY KEYS ═════════════════════════════════════════════ */
+  .s-keys .keyfacts { display: flex; flex-direction: column; gap: 20px; }
+  .s-keys .kf { display: grid; grid-template-columns: 240px 1fr; gap: 26px; align-items: baseline; padding-bottom: 16px; border-bottom: 1px solid var(--hairline); }
+  .s-keys .kf:last-child { border-bottom: none; }
+  .s-keys .kf .k { font-family: var(--font-mono); font-size: 24px; color: var(--accent-deep); font-weight: 500; }
+  .s-keys .kf .v { font-size: 26px; line-height: 1.38; color: var(--ink-soft); }
+  .s-keys .kf .v b { color: var(--ink); font-weight: 600; }
+
+  /* ═══ 16 · WAR STORY (dark) ════════════════════════════════════════ */
+  .s-war { background: var(--terminal-bg); color: #fff; }
+  .s-war h2.title { color: #fff; }
+  .s-war .timeline { display: flex; flex-direction: column; gap: 0; margin-top: 10px; }
+  .s-war .beat { display: grid; grid-template-columns: 70px 1fr; gap: 26px; align-items: start; }
+  .s-war .beat .dotcol { display: flex; flex-direction: column; align-items: center; }
+  .s-war .beat .dot { width: 20px; height: 20px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 8px; }
+  .s-war .beat .line { width: 2px; flex: 1; background: rgba(255,255,255,0.15); min-height: 34px; }
+  .s-war .beat:last-child .line { display: none; }
+  .s-war .beat .txt { font-size: 28px; line-height: 1.4; color: #c2cdd9; padding-bottom: 30px; }
+  .s-war .beat .txt b { color: #fff; font-weight: 600; }
+  .s-war .beat .txt code { font-family: var(--font-mono); color: var(--terminal-red); font-size: 26px; }
+  .s-war .lessons {
+    margin-top: 14px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.14);
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
+  }
+  .s-war .lessons .l { font-size: 24px; line-height: 1.4; color: #c2cdd9; }
+  .s-war .lessons .l b { color: var(--accent); font-weight: 600; display: block; margin-bottom: 8px; }
+
+  /* ═══ 17 · THE SKILL ═══════════════════════════════════════════════ */
+  .s-skill .stages { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 64px; flex: 1; min-height: 0; margin-top: 8px; }
+  .s-skill .stage { display: grid; grid-template-columns: 56px 1fr; gap: 22px; align-items: baseline; padding-bottom: 12px; border-bottom: 1px solid var(--hairline); }
+  .s-skill .stage .n {
+    width: 48px; height: 48px; border-radius: 11px;
+    background: rgba(72,175,240,0.13); border: 1px solid rgba(72,175,240,0.4);
+    display: grid; place-items: center; font-size: 24px; font-weight: 600; color: var(--accent-deep);
+    font-variant-numeric: tabular-nums;
+  }
+  .s-skill .stage .what { font-size: 28px; color: var(--ink); font-weight: 600; letter-spacing: -0.01em; display: block; }
+  .s-skill .stage .desc { font-size: 22.5px; color: var(--muted); line-height: 1.32; margin-top: 6px; display: block; }
+  .s-skill .stage .desc b { color: var(--ink-soft); font-weight: 600; }
+
+  /* ═══ LABS ═════════════════════════════════════════════════════════ */
+  .s-lab { background: var(--paper); }
+  .s-lab .labchip {
+    display: inline-flex; align-items: center; gap: 14px; align-self: flex-start;
+    background: var(--accent-deep); color: #fff; border-radius: 999px;
+    font-size: 22px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 10px 26px; margin-bottom: 28px;
+  }
+  .s-lab .grid2 { flex: 1; display: grid; grid-template-columns: 1fr 1.1fr; gap: 60px; align-items: center; min-height: 0; }
+  .s-lab .checkpoint {
+    margin-top: 30px; border: 2px solid var(--ok);
+    background: var(--color-success-1); border-radius: 14px;
+    padding: 24px 32px; display: flex; gap: 22px; align-items: baseline;
+  }
+  .s-lab .checkpoint .c { font-size: 21px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ok); white-space: nowrap; }
+  .s-lab .checkpoint p { margin: 0; font-size: 25px; line-height: 1.38; color: var(--ink); }
+  .s-lab .checkpoint p b { font-weight: 600; }
+  .s-lab ol.labsteps { margin: 0; padding-left: 44px; display: flex; flex-direction: column; gap: 18px; font-size: 27px; line-height: 1.4; color: var(--ink-soft); }
+  .s-lab ol.labsteps b { color: var(--ink); font-weight: 600; }
+  .s-lab ol.labsteps code { font-family: var(--font-mono); font-size: 24px; color: var(--accent-deep); background: #fff; border: 1px solid var(--hairline); border-radius: 7px; padding: 2px 10px; }
+
+  /* ═══ 21 · THE PROOF ═══════════════════════════════════════════════ */
+  .s-proof { background: url('assets/cover-gradient.png') center/cover no-repeat, #eaf6ff; }
+  .s-proof .frame { justify-content: center; }
+  .s-proof h2 { margin: 0 0 40px; font-size: 100px; line-height: 1.0; letter-spacing: -0.04em; font-weight: 600; color: var(--ink); }
+  .s-proof .walk { font-size: 32px; line-height: 1.5; color: var(--ink-soft); max-width: 1480px; margin: 0 0 44px; }
+  .s-proof .walk b { color: var(--ink); font-weight: 600; }
+  .s-proof .layers { display: flex; flex-wrap: wrap; gap: 12px; }
+  .s-proof .layers span {
+    font-family: var(--font-mono); font-size: 23px; color: var(--accent-deep);
+    background: rgba(255,255,255,0.85); border: 1px solid rgba(72,175,240,0.45);
+    border-radius: 999px; padding: 8px 22px;
+  }
+
+  /* ═══ 22 · THE STARTERS ════════════════════════════════════════════ */
+  .s-starters .cards.c3 .card .em { font-size: 52px; line-height: 1; }
+  .s-starters .cards.c3 .card .url { font-family: var(--font-mono); font-size: 20px; color: var(--accent-deep); margin-top: auto; }
+
+  /* ═══ 23 · WRAP ════════════════════════════════════════════════════ */
+  .s-wrap .path { display: flex; flex-direction: column; gap: 16px; margin-top: 6px; }
+  .s-wrap .p { display: grid; grid-template-columns: 56px 1fr; gap: 24px; align-items: baseline; padding-bottom: 14px; border-bottom: 1px solid var(--hairline); }
+  .s-wrap .p:last-child { border-bottom: none; }
+  .s-wrap .p .n {
+    width: 48px; height: 48px; border-radius: 11px;
+    background: rgba(72,175,240,0.13); border: 1px solid rgba(72,175,240,0.4);
+    display: grid; place-items: center; font-size: 24px; font-weight: 600; color: var(--accent-deep);
+  }
+  .s-wrap .p .txt { font-size: 27px; line-height: 1.4; color: var(--ink-soft); }
+  .s-wrap .p .txt b { color: var(--ink); font-weight: 600; }
+  .s-wrap .p .txt code { font-family: var(--font-mono); font-size: 24px; color: var(--accent-deep); }
+  .s-wrap .signoff {
+    position: absolute; bottom: 80px; left: 140px; right: 140px;
+    display: flex; align-items: center; gap: 24px;
+    font-size: var(--type-small); color: var(--ink);
+  }
+  .s-wrap .signoff b { font-weight: 600; }
+  .s-wrap .signoff .repo { font-family: var(--font-mono); color: var(--accent-deep); }
+  .s-wrap .signoff .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+</style>
+
+<script type="application/json" id="speaker-notes">
+[
+  "Different kind of session today. You've spent weeks building apps with Claude Code — running them locally, or shipping them wherever was handy. Today you deploy to OUR infrastructure, the way the team actually does it. Not by clicking around a control panel — by telling Claude to deploy it, and understanding what Claude did.",
+  "Three things you walk out with — this slide is the contract. One: the map. You'll be able to name and locate every layer between a browser and your code on our platform, and know which one to suspect when something breaks. Two: a permanent deploy pipeline on your own laptop — Claude Code wired to our box; after today, shipping is a sentence, not an afternoon. Three: a live app with real sign-in and a real database at your own address, verified end to end. Now let me show you what 'done' looks like — [flip to the browser; this slide can stay up]. Three live apps, all on the box we deploy to today. [skeleton-cl — sign the guestbook live.] Real app, real database, company sign-in. [cauldron-cl — brew a potion.] Pending, active, done — a separate worker process did that, not the web page. [seance-cl in two windows.] Messages crossing instantly. Three different app SHAPES — hold that thought; they come back at the end. By 1:50 you'll have deployed the first one yourself.",
+  "Here's the shape of the next two hours, so nobody wonders when the typing starts. Two blocks of talk, two labs, one break. First I explain why this platform exists and draw you the map — then at minute 35, laptops open and you install the pipeline: Lab one is cloudflared plus the Dokploy MCP server, and Claude writes the fiddly parts for you. Short break, then the rest of the story — webhooks, the padlock, deploy keys — and Lab two, where you deploy a real app by telling Claude to. Now the kit column, and check yourselves RIGHT NOW while I demo: Claude Code opens and answers? Homebrew installed? Signed into your company Google? If any of those is a no, wave at a helper during the next section — not at minute 35. Everything else — logins, the env block, the exact prompts — is printed on your sheet. You never type from memory today.",
+  "So why do we run our own platform? Let me start with what it's NOT about. It's not about cost, and it's not about architecture. Vercel and platforms like it are genuinely good — and they're still fine for prototypes: throwaway demos, experiments, things with nothing sensitive in them. The move is about one thing: team tools touch real company and client data. Three reasons, which are really one reason. Own the data — on our box, it never leaves infrastructure we control, full stop. Secure everything — every app sits behind the company identity wall before a single request lands; the perimeter is ours, not a vendor feature we hope is configured right. Control all the things — server, proxy, databases, policies: ours to inspect and change; when something matters, we don't file a support ticket, we go look. And the strip at the bottom is honest on purpose: this platform is a moving target. The deploy story has evolved before — Dokploy is where it landed — and it may evolve again. That's fine, because what you learn today — containers, proxies, tokens, deploy keys — transfers wherever it goes next.",
+  "Before I can tell you what our platform is, one piece of vocabulary — sixty seconds. Docker packages an app — code, runtime, dependencies, everything — into a container: a sealed unit that runs identically on any machine. The recipe is the Dockerfile in your repo — you've all seen Claude add these to your projects; this is what they were for. The frozen build is called an image; a running copy is a container. Dockerfile, image, container — recipe, frozen meal, dinner on the table. The punchline: 'runs in Docker' means 'runs anywhere' — your laptop, our box, any cloud. It's the standard the entire industry ships on, and it's what makes everything on the next slide possible.",
+  "Dokploy is an open-source deployment platform that WE host, on a server the team runs — its name is taincap. The experience is the familiar one — point at a repo, press deploy, get a URL — but the foundation is plain Docker, and that changes everything. Pillar one: we host it. Data stays on our box, and everything is behind company SSO by default — internal tools are private without writing a line of perimeter auth. Pillar two: anything that runs in a container runs here. Workers, WebSockets, cron, any language — the shapes hosted platforms make hard, trivial. Pillar three: flat cost, no lock-in. One server we already run; databases live on the box next to the apps — it's shared and finite, so be a good neighbor, but there's no per-app bill. And your deployment is just a compose file in your repo — it would run on any Docker host on earth. Dokploy is a control panel, not a cage. The strip at the bottom is the honest part: we are our own ops team. Every gotcha in the next hour is the tuition — already paid by real people losing real afternoons, and written down into a skill so Claude pays it for you. But you should still understand what it bought — that's Parts 2 through 4.",
+  "One hard boundary before we open the hood, and I want everyone to hear it clearly: everything on this platform is INTERNAL-facing. Team tools, dashboards, prototypes graduating off your laptop — if the users are employees, it belongs here. And the security wall we'll meet in Part 3 makes that physical: a customer couldn't reach these apps if you wanted them to. Customer-facing anything is a different world — engineering's production stack, with compliance review, on-call rotations, SLAs, release processes. Much more involved than anything in this workshop, and deliberately so. So here's the rule, and it's the one non-negotiable of the day: if what you're building might EVER face a customer, that's a conversation with engineering before it's a deploy — never something you quietly ship from your laptop. Respect the engineers on this one. The boundary protects customers, the company, and you personally.",
+  "This is the most important slide of the day — everything else hangs off it. A request to your app passes through five layers. Your browser resolves the address — the wildcard means ANY subdomain of anduincapital.dev points at our box, no DNS work ever. Cloudflare's edge holds the TLS padlock and — critical — runs the company SSO wall before our server ever sees the request. Then, and this will look wrong on purpose, PLAIN HTTP down to the box. The box itself is firewalled — only Cloudflare can reach it. Traefik receives everything and routes by hostname to the right container. And your containers talk to your Postgres. Now look at the side: Dokploy is NOT in this path. If Dokploy crashed right now, every app keeps serving. It's the control plane — it's how containers GET here, not how requests flow. We'll walk down these layers one at a time.",
+  "Traefik — the piece nobody's heard of, answering a question you should be asking: the box runs dozens of apps, but a server has ONE IP and ONE port 443. Who decides which app gets the request? Traefik is a reverse proxy — a single doorman process that owns ports 80 and 443 for the whole box. Every request hits it first; it reads the Host header, looks it up in its routing table — there it is on the right — and forwards to the right container's INTERNAL port. Three consequences. You never fight over ports — everyone's app listens on 3000 inside its own container, and nobody publishes ports to the host. You never configure Traefik by hand — and the right side of the slide shows the whole control story. The Domain form is everything you ever fill in: host, service, port, HTTPS off. Dokploy compiles that into the actual Traefik rule — a Host() matcher pointing at your container's internal port — and Traefik picks it up live, no restarts. You never hand-edit that rule, but you can ALWAYS read it: every service in Dokploy has a raw Traefik-config view. Remember 'control all the things' from the start? This is it made concrete — nothing on this platform is a black box. Last consequence: Traefik can only route to containers it can reach — it lives on a Docker network called dokploy-network, and a container that needs Traefik AND a database must be on BOTH networks. Forget one and you get opaque 500s — hold onto that; it's the single most common deploy mistake on this box.",
+  "So what does Dokploy actually do, if it's not serving requests? When you press Deploy — or Claude calls the API — five things: clone your repo on the box; build the images from your Dockerfile; run your compose file; write the Traefik routing config for any domains; stream you the logs. That's the whole machine. Two facts that matter for today: it's multi-tenant — you're scoped to your own project, you literally cannot see or break anyone else's, and the dangerous instance-wide operations are admin-only, which on a shared box is a feature. And you can drive it three ways: the web UI, the REST API, or — the way we actually work — the MCP server, which puts every one of these operations in Claude's hands. That's the back half of today.",
+  "Databases — and note the eyebrow: this slide is a RECOMMENDED PRACTICE, not a rule. The recommendation: ONE managed Postgres per PERSON. It lives in your project, and all your apps share it — each app gets its own database inside your instance. That's exactly how the three starters run: skeleton, cauldron, seance — three databases, one Postgres. Why this default? Two boring, real reasons: every always-on Postgres costs RAM on a shared box, and one instance means one thing to back up and one password to keep straight. Isolation where it matters — separate databases — one footprint where it doesn't. But you decide: the deploy skill literally stops and asks you the database question on every first deploy, and if an app genuinely needs its own instance from day one, take one. The graduation path is deliberate too: when a project gets big — real traffic, real data, its own backup story — it moves to its own instance. One more consequence of the firewall: you can't psql into the box from your laptop — Cloudflare only speaks HTTP. Creating a database means running a short-lived container ON the box. Sounds exotic; you'll watch Claude do it automatically in Lab 2.",
+  "Now the layer that makes our platform unusual — give this your full attention. Everything on our domain sits behind Cloudflare Access — Zero Trust. Every request to every host is checked at Cloudflare's edge, BEFORE our server sees it. No valid company SSO session? Redirected to a Google sign-in wall; the request never arrives. This is the 'private by default' I promised — every app you deploy is instantly company-only, enforced by infrastructure we can't even misconfigure. But here's the corollary the whole rest of this section flows from: great for humans, a WALL for machines. A human has a browser — signs in once, gets a cookie, sails through. A machine — a curl, a CI job, an MCP server, a Slack webhook — has no browser and no company Google account. It gets a 302 to a login page it can never solve, and it fails silently. That one fact points in two directions — our machines going IN, and outside machines trying to come in — and then there's one more Cloudflare edge fact that is NOT about machines versus humans, the padlock, which we'll take while we're here.",
+  "Direction one: OUR machines going in. The Dokploy API is behind the wall like everything else — so when Claude calls it to deploy your app, those calls need proof of identity. That's cloudflared, Cloudflare's CLI. You do the interactive login once in a while — browser opens, company Google, done. How long that login session lasts is a Cloudflare-side setting — don't memorize a number; there's a simple check in a second. From then on, any process can mint a short-lived token and send it as a header. Our MCP setup wraps the Dokploy server in a three-line script that mints a fresh token every time it starts — so Claude's calls just carry it. Two failure modes, and you WILL see the first one. The minted token goes stale — the symptom is Claude's Dokploy calls returning an HTML page titled 'Sign in · Cloudflare Access' instead of data. The fix is ten seconds: /mcp, reconnect — the wrapper mints fresh. It's a rite of passage, not a breakage. The check for the second: if cloudflared access token won't print a long token starting eyJ, your login session itself lapsed; rerun access login and you're back. (If someone hits weirdness on a machine running Cloudflare WARP, don't debug it live — the troubleshooting table has the move: toggle WARP and retry.) And that is exactly enough theory to wire YOUR laptop up. Laptops open — lab one.",
+  "Lab one: install the Dokploy MCP and wire your laptop to the box, permanently. Everything you need is on your sheet. Step one, install cloudflared. Step two, the interactive login — browser opens, company Google — that's your machine identity; it's long-lived, and when it eventually lapses you just run it again. Step three, log into the Dokploy UI — you'll hit TWO doors and that's normal: the company Access wall first, then Dokploy's own login from your sheet. Generate your API key under account settings. Step four — and here's the meta moment — paste the sheet's MCP snippet to Claude and let IT set up the wrapper script and .mcp.json. Then reconnect MCP. Checkpoint, everyone: ask Claude to LIST MY DOKPLOY PROJECTS. You should see exactly one project — guestbook-you — and nothing else. That's the multi-tenancy. If the server doesn't show up in /mcp at all, restart Claude Code — a newly created server needs a one-time approval — and remember the first run downloads the package, so a quiet minute is normal. If you get an HTML login page instead of data, your wrapper isn't injecting the token — usually a path typo. If you get permission errors, it's the API key. Two tokens: front door, badge. When your checkpoint is green, stretch your legs — three minutes — then we finish the story of the wall.",
+  "Welcome back. Before the break you saw direction one — OUR machines getting in, with a token. Direction two is the sharpest edge on the whole platform, so I'll say it plainly: services on the public internet cannot call our apps. And for the internal productivity tools you all build, that means: Slack event subscriptions. Slash commands. ClickUp webhooks. GitHub webhooks. All of them are outside machines POSTing at our domain; none of them can sign into our Google; ALL of them die at the edge with a 302 they'll never follow. And the killer detail: the request never appears in your app's logs — it died before reaching the box. If you don't know to expect this, you will lose an afternoon to it. How to design around it, in order: one — poll instead of listening; a background job asks ClickUp 'anything new?' every minute; that's literally the Cauldron shape, and at internal-tool volume it's almost always enough. And Slack is even nicer: it ships Socket Mode, where your app opens an OUTBOUND connection to Slack — no public URL needed at all; the webhook problem designed away. Two — a scoped hole: Cloudflare supports service tokens and path-scoped bypass policies, but that's a per-path conversation with the box owner, not a default — and a bypassed path is on the open internet, so your app must verify signatures itself. Three — the surprise: Google sign-in is FINE. The OAuth redirect rides the user's browser, which already has the Access cookie. It's only server-to-server that hits the wall.",
+  "Direction three — the padlock. Quick decoder first, because we use these words all day without defining them. HTTP is the language browsers and servers speak — and it's plain text: anything sitting between you and the server could read it. HTTPS is the exact same conversation wrapped in encryption — that's the padlock in your browser — and the thing that unlocks it is a certificate: a cryptographic ID the server presents to prove it really is the domain it claims to be. OK. Our Cloudflare zone runs 'Flexible' SSL: browser to Cloudflare is HTTPS — users always see the padlock — but Cloudflare to our box is PLAIN HTTP. The origin has no certificate at all — Cloudflare holds the padlock on our behalf. Two settings fall out of that, and they LOOK like they contradict each other. In Dokploy, the Domain's HTTPS toggle: OFF, certificate none. If the origin also demands HTTPS you get an infinite redirect loop — Cloudflare sends HTTP, origin bounces to HTTPS, forever — ERR_TOO_MANY_REDIRECTS, the single most common first-deploy failure on this platform. But in your ENV, APP_URL must say https — because your app sees HTTP arrive and would otherwise build its OAuth redirects and cookies wrong. HTTPS off at the door, https in the env. Not a contradiction — the two halves of Flexible SSL. The skill hard-codes both; now you know why. And the sharp question someone should ask: didn't Part 1 say SECURE EVERYTHING — so why is this leg unencrypted? Fair hit. The honest answer: the box only accepts traffic from Cloudflare — that's the firewall — but yes, this leg itself is the trade-off, and there IS a stricter posture: a free Cloudflare origin certificate plus 'Full' mode. That's a box-owner upgrade, on the list — not something you configure per app. For internal tools behind the wall, Flexible is today's accepted posture.",
+  "How does the box get your code at all? It PULLS — and that's a practice worth defending, not just a fact. Pull-based deploys mean what's running is exactly what's in git: no 'works from my laptop' build artifacts, no mystery versions, and anyone on the team can redeploy your app tomorrow without your laptop being open. The repo's history doubles as the deploy history. Can you push by hand? Yes — Dokploy will take a raw compose file pasted straight in, and that's fine for odd cases — but git stays the default for exactly those reasons. So: public repo, clones over plain HTTPS, nothing to set up — the starters are public, which is why today's lab needs none of this. Private repo — which your real apps will be — the box has to authenticate to GitHub, and the mechanism is an SSH deploy key. Keypair; private half stored in Dokploy; public half added to the repo as read-only. Three facts that bite people: GitHub allows one deploy key per repo — you cannot reuse them; new private repo means new key, and the skill automates the whole dance. Read-only is the point — a compromised box could clone your code but never push, and each key opens exactly one repo. And the nicer alternative — a GitHub App on the instance — is admin-only; deploy keys are the thing YOU can do yourself.",
+  "True story — this happened to the starters, the week before this deck was written. The repos got transferred from a personal GitHub account into the org. Routine tidy-up. What nobody knew: GitHub silently drops ALL deploy keys when a repo transfers. Next deploy of every starter: dead in five seconds, at the clone step — ERROR: Repository not found. Which is a lie. The repo existed; the box just no longer had the right to see it, and GitHub deliberately won't tell an unauthenticated caller whether a private repo exists. Re-adding the keys needed repo-admin rights — which the transfer had ALSO reshuffled. Stopgap: swap the clone URL to HTTPS-with-a-personal-token, deploy, then revert so no credential lingers. Three lessons that travel well beyond our box: deploy keys are invisible infrastructure nobody remembers until they break. Repo moves break them SILENTLY. And a deploy that fails instantly at clone is an authorization problem, whatever the error message claims.",
+  "Everything I've just taught you used to live in people's heads, and it cost every new person the same lost afternoons. Now it's a skill — you all know what skills are; this one is the team's deploy playbook, versioned. You say 'deploy this to dokploy,' Claude loads it and runs this exact sequence. Walk it with me, because it's the last four slides turned into steps. Push first — the box pulls from GitHub, and if the repo's private, the deploy key happens now. The database question — the skill makes Claude STOP and ask you; your answer is the pattern from earlier: first deploy creates YOUR Postgres, everything after reuses it. Create and configure the service. Wire the domain — HTTPS off, no domain on workers. Deploy and poll — and then keep going, because 'build succeeded' is not 'app works.' Verify the networks — the app-can't-see-its-database mistake, caught before the 500s. Smoke-test headlessly — Claude mints a Cloudflare token and curls your healthz through the wall; for signed-in routes it goes further and signs a test session with the app's own secret key to prove authenticated requests work, no human, no browser. And before anyone worries: that is only possible because we HOLD that app's signing secret — nobody can do it to an app whose secret they don't have. And the OAuth reminder — the one step no CLI can do: Google's origins and redirect URIs are Console-only, so the skill ends by handing you the exact values and a deep link. Humans decide what to ship; the skill makes Claude do the twenty fiddly steps correctly.",
+  "Lab two — the main event. Clone the starter — it's public, so plain HTTPS, no deploy key; your local copy is so Claude can read the compose file, and so you can make it yours later. Then paste the deploy prompt from your sheet — and here's the moment I want everyone to catch: Claude will STOP and ask you the database question. That's the skill working as designed — it never decides where your data lives without you. Your sheet has the answer: create a new managed Postgres in my project. Answer it, and you've just made the instance that — by the recommended practice — every app you ship after today will share. Now watch two screens at once: Claude narrating its MCP calls on your laptop, and the deployment log in the Dokploy UI. Call-outs as they scroll past: postgres-create — that's YOUR instance being born. compose-create — there's your service. domain-create, HTTPS off — that's the redirect-loop trap from Part 3, dodged. The build takes a few minutes — that's the pop-quiz window; retrieval beats re-explaining. Three questions, and you now know all three answers: Why is the HTTPS toggle off? — Cloudflare holds the padlock; forcing it at the origin makes the redirect loop. Why is the app on two networks? — Traefik routes on one, the database lives on the other; lose either and it breaks. The migrate log says 'retrying' — failure? — No: it's deliberately waiting for the database to wake up; the status field is the truth, not the scariest log line. And when the build goes green, watch what Claude does next: it does NOT stop at 'deployed' — it mints a token and curls your healthz THROUGH the Access wall. Checkpoint: status done, and Claude reports the health check passed. If you're stuck more than two minutes, you get the spare instance and we fix yours after — nobody stalls the room.",
+  "Everyone: open your URL. Two doors, one last time — the company wall, that's the perimeter; then YOUR app's own Sign in with Google, that's identity — the OAuth client we pre-registered for your exact address. Sign your guestbook. [beat] Now look at what that little row of text proves: Cloudflare terminated your TLS and checked your SSO. Traefik read the Host header and routed you. The container Claude built checked who you were with Google and wrote a row into YOUR Postgres. Yesterday those were invisible; today you can name every one. Now sign your neighbors' guestbooks — any company account can, that's the domain gate doing its job — and send your URL to a teammate who isn't in this room.",
+  "Before we close — the three shapes from the demo tour, now that you can see what they really are. And here's WHY it's these three: look at any internal tool you've ever wanted, and it decomposes into these blocks. People sign in and data gets saved — that's every tool's foundation, that's Skeleton Crew, and it's what you just deployed. Something slow or scheduled happens off to the side — reports, imports, and crucially POLLING, your answer to the webhook wall — that's Cauldron. And screens that update live — dashboards, anything collaborative — that's Séance. Each one is the minimal working example of its block, with that block's deploy pitfalls pre-solved on our exact stack — annotated in the compose file, at the exact line. When you hit one of those pitfalls in the wild, the comment IS the documentation. Same DNA underneath — one new idea each. And there's a second skill for the START of a project: dokploy-starter. Tell it what you're building and it either scaffolds the right starter fresh, or — more likely for you — ABSORBS the pattern into the app you already have: lifts just the worker files, or just the WebSocket wiring, adapted to your code. It deliberately stops at 'running locally' — shipping is a separate decision, and when you make it, you know the words: deploy this to dokploy.",
+  "Before the take-home, close the loop — sixty seconds, call and response, and I want to HEAR the answers. The map: what does a request cross to reach your code? [browser, Cloudflare — padlock and SSO wall — Traefik routing by hostname, your containers, your Postgres. And where's Dokploy? Off the path — control plane.] Two tokens: you get an HTML login page instead of data — which one? [Front door — reconnect MCP.] Permission error? [Badge — API key.] The boundary? [Internal only. Customers = engineering, conversation first.] Three practices? [Box pulls from git; one Postgres per person as the default; HTTPS off at the door, https in the env.] The sharp edge? [Webhooks die at the wall and never hit your logs — poll instead.] And the words that start everything? [Deploy this to dokploy.] If you can say those six things, you got everything we came for.",
+  "So here's the whole path for YOUR app — the one you've been building all along. Ask Claude to containerize it — Dockerfile plus a compose file modeled on the starters, or run dokploy-starter in absorb mode to lift the patterns properly. Push it to a private repo — and now you know what happens next: a deploy key. Say the words. Answer the database question with 'reuse my Postgres' — the one you made today. Expect the OAuth reminder if you have Google sign-in — that's the one forever-manual step. And remember the sharp edge: no third-party webhooks through the wall — design for polling, or start the bypass conversation early. Your apps stay up for a week — show someone. Your project, your account, your Postgres, your MCP setup: those are permanent. You now deploy like the team does. Go ship something."
+]
+</script>
+
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- ── 01 · Title ─────────────────────────────────────────────────── -->
+  <section data-screen-label="01 Title" class="s-title">
+    <div class="frame">
+      <div class="hero-brand">
+        <img class="hero-logo" src="assets/anduin-full.svg" alt="Anduin">
+        <span class="hero-program">Fast Track · Deploy</span>
+      </div>
+      <div style="flex:1"></div>
+      <div class="kicker">Hands-on workshop · 2 hours · bring the laptop you build on</div>
+      <h1 class="hero">Deploying internal tools.</h1>
+      <p class="sub">You've spent weeks telling Claude <b>what to build</b>.<br>Today you put it on <b>our own infrastructure</b> — and learn what every layer on the way is doing.</p>
+    </div>
+    <div class="byline">
+      <span><b>Charles Lee</b> · Anduin</span>
+      <span class="repo">github.com/AI-Hivemind-Lab/dokploy-skeleton</span>
+    </div>
+  </section>
+
+  <!-- ── 02 · The promise ───────────────────────────────────────────── -->
+  <section data-screen-label="02 The promise" class="s-promise">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Two hours from now</div>
+      <h2 class="title">Three things you leave with.</h2>
+      <p class="lede">Not a demo you watched — a pipeline you own. Everything today runs from <b>your laptop</b>, driven by <b>your Claude Code</b>.</p>
+      <div class="cards c3">
+        <div class="card">
+          <div class="mode">Understand</div>
+          <h3>The whole platform.</h3>
+          <p>Every layer between a browser and your code: Cloudflare, Traefik, Docker, Dokploy, Postgres — and <b>why</b> each one is there.</p>
+          <div class="num">01</div>
+        </div>
+        <div class="card">
+          <div class="mode">Own</div>
+          <h3>A deploy pipeline.</h3>
+          <p>Claude Code wired to the team's box — <b>permanently</b>. After today, shipping an app is a sentence, not an afternoon.</p>
+          <div class="num">02</div>
+        </div>
+        <div class="card">
+          <div class="mode">Prove</div>
+          <h3>A live app.</h3>
+          <p>Google sign-in, a Postgres database, your own <span class="mono">*.anduincapital.dev</span> address — <b>verified end to end</b>.</p>
+          <div class="num">03</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">02 / 24</div>
+  </section>
+
+  <!-- ── 03 · Roadmap & kit ─────────────────────────────────────────── -->
+  <section data-screen-label="03 Roadmap" class="s-map">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">How today runs</div>
+      <h2 class="title" style="margin-bottom:24px;">The roadmap — and your kit.</h2>
+      <div class="grid2">
+        <div class="agenda">
+          <div class="arow"><span class="t">0:05</span><span class="w"><b>Why our own platform</b> — and the one hard boundary</span></div>
+          <div class="arow"><span class="t">0:16</span><span class="w"><b>The map</b> — every layer between a browser and your code</span></div>
+          <div class="arow"><span class="t">0:28</span><span class="w"><b>The wall</b> — and how our machines get through it</span></div>
+          <div class="arow lab"><span class="t">0:35</span><span class="w">🔧 <b>Lab 1 — install the Dokploy MCP</b> · then a 3-min break</span></div>
+          <div class="arow"><span class="t">1:03</span><span class="w"><b>Webhooks · the padlock · deploy keys</b> — and the skill that knows it all</span></div>
+          <div class="arow lab"><span class="t">1:24</span><span class="w">🚀 <b>Lab 2 — deploy a real app</b>, by telling Claude to</span></div>
+          <div class="arow"><span class="t">1:52</span><span class="w"><b>The proof</b> — sign your guestbook in production → wrap</span></div>
+        </div>
+        <div class="kit">
+          <h3>🎒 Your kit</h3>
+          <div class="krow"><span class="k">You brought</span><span class="v"><b>Claude Code</b>, working · <b>Homebrew</b> · your company Google account</span></div>
+          <div class="krow"><span class="k">You'll install</span><span class="v"><span class="mono">cloudflared</span> (one brew command) · the <b>Dokploy MCP server</b> + its token wrapper — <b>Claude writes those for you</b></span></div>
+          <div class="krow"><span class="k">You'll create</span><span class="v">A Dokploy <b>API key</b> · your own <b>Postgres</b> · a live app</span></div>
+          <div class="krow"><span class="k">On your sheet</span><span class="v">Logins · env block · the deploy prompt · the <b>support channel</b></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">03 / 24</div>
+  </section>
+
+  <!-- ── 04 · Control, not cost ─────────────────────────────────────── -->
+  <section data-screen-label="04 Control, not cost" class="s-vercel">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 1 · Why our own platform</div>
+      <h2 class="title">It's about control, not cost.</h2>
+      <p class="lede" style="margin-bottom:40px;">Vercel is genuinely great — it does a lot, and it's <b>still fine for prototypes</b>. But team tools touch <b>real company and client data</b>, and that changes everything:</p>
+      <div class="cards c3">
+        <div class="card">
+          <div class="mode">Reason 01</div>
+          <h3>Own the data.</h3>
+          <p>On a PaaS, your data lives on <b>someone else's cloud</b>, under someone else's policies. On our box, it never leaves infrastructure we control — <b>full stop</b>.</p>
+        </div>
+        <div class="card">
+          <div class="mode">Reason 02</div>
+          <h3>Secure everything.</h3>
+          <p>Every app sits behind the <b>company identity wall</b> before a single request lands. The perimeter is ours — not a vendor feature we hope is configured right.</p>
+        </div>
+        <div class="card">
+          <div class="mode">Reason 03</div>
+          <h3>Control all the things.</h3>
+          <p>Server, proxy, databases, access policies — <b>ours to inspect, configure, and change</b>. When something matters, we don't file a ticket. We go look.</p>
+        </div>
+      </div>
+      <div class="strip">
+        <span class="slabel">Evolving</span>
+        <span>The deploy story has <b>evolved before</b> — Dokploy is where it landed, and it may evolve again. What you learn today (containers, proxies, tokens, keys) <b>transfers wherever it goes</b>.</span>
+      </div>
+    </div>
+    <div class="slide-num">04 / 24</div>
+  </section>
+
+  <!-- ── 05 · Docker in 60 seconds ──────────────────────────────────── -->
+  <section data-screen-label="05 Docker in 60 seconds" class="s-docker">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 1 · One piece of vocabulary</div>
+      <div class="split">
+        <div class="left">
+          <h2>Docker, in sixty seconds.</h2>
+          <p class="body">Docker packs an app — code, runtime, dependencies, OS libraries — into a <b>container</b>: a sealed unit that behaves <b>identically on any machine</b>.</p>
+          <div class="steps">
+            <div class="row"><span class="k">Dockerfile</span><div>The <b>recipe</b>, in your repo. Claude's been adding these to your projects — this is what they were for.</div></div>
+            <div class="row"><span class="k">image</span><div>The <b>frozen build</b> of that recipe — ready to run, anywhere.</div></div>
+            <div class="row"><span class="k">container</span><div>A <b>running copy</b> of an image. Your app, live.</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="filecard">
+            <div class="fbar"><span class="dots"><i class="r"></i><i class="y"></i><i class="g"></i></span><span class="fname">Dockerfile</span></div>
+            <div class="fbody">
+              <div><span class="kw">FROM</span> node:22-alpine</div>
+              <div><span class="kw">COPY</span> . .</div>
+              <div><span class="kw">RUN</span> npm ci &amp;&amp; npm run build</div>
+              <div><span class="kw">CMD</span> ["node", "dist/index.js"]</div>
+              <div class="cm"># same result on your laptop,</div>
+              <div class="cm"># our box, or any cloud on earth</div>
+            </div>
+          </div>
+          <div class="flow">
+            <span class="stage">Dockerfile</span><span class="arr">→</span>
+            <span class="stage">image</span><span class="arr">→</span>
+            <span class="stage">container</span>
+          </div>
+        </div>
+      </div>
+      <div class="strip">
+        <span class="slabel">The point</span>
+        <span><b>"Runs in Docker" means "runs anywhere."</b> It's the standard the whole industry ships on — and what lets a self-hosted platform promise to run <b>anything</b>.</span>
+      </div>
+    </div>
+    <div class="slide-num">05 / 24</div>
+  </section>
+
+  <!-- ── 06 · What Dokploy is ───────────────────────────────────────── -->
+  <section data-screen-label="06 What Dokploy is" class="s-dokploy">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 1 · The deal</div>
+      <h2 class="title">Dokploy: a PaaS we host ourselves.</h2>
+      <div class="pillars">
+        <div class="pillar">
+          <div class="ico">🏠</div>
+          <h3>We host it.</h3>
+          <p>Open source, running on the team's server (<b>taincap</b>). Data never leaves infrastructure we control — and everything sits behind company SSO, so internal tools are <b>private by default</b>.</p>
+        </div>
+        <div class="pillar">
+          <div class="ico">📦</div>
+          <h3>Plain Docker underneath.</h3>
+          <p>Anything that runs in a container runs here: <b>workers, WebSockets, cron, any language</b>. The three shapes serverless makes hard — trivial.</p>
+        </div>
+        <div class="pillar">
+          <div class="ico">🔓</div>
+          <h3>Flat cost, no lock-in.</h3>
+          <p>One server we already run; databases live next to the apps. Your deployment is a <b>compose file in your repo</b> — portable to any Docker host on earth.</p>
+        </div>
+      </div>
+      <div class="strip">
+        <span class="slabel">Same DX</span>
+        <span>Point it at a repo → press <b>Deploy</b> → get a URL. The trade: <b>we're our own ops team</b> — every gotcha today is tuition already paid, and encoded into a skill.</span>
+      </div>
+    </div>
+    <div class="slide-num">06 / 24</div>
+  </section>
+
+  <!-- ── 07 · Internal-facing only ──────────────────────────────────── -->
+  <section data-screen-label="07 Internal-facing only" class="s-boundary">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 1 · One hard boundary</div>
+      <h2 class="title">Internal-facing only.</h2>
+      <p class="lede" style="margin-bottom:36px;">Everything on this platform is for <b>employees' eyes</b> — and the security wall you'll meet in Part 3 makes that physical: non-employees can't even <i>reach</i> these apps.</p>
+      <div class="versus">
+        <div class="side in">
+          <div class="who">✓ This platform</div>
+          <h3>Tools for the team.</h3>
+          <p>Internal tools, team dashboards, prototypes graduating off your laptop. If its users are <b>employees</b>, it belongs here.</p>
+        </div>
+        <div class="side out">
+          <div class="who">✗ Not this platform</div>
+          <h3>Anything customer-facing.</h3>
+          <p>That's <b>engineering's production stack</b> — different infrastructure, different rigor: compliance review, on-call, SLAs, release processes. <b>Much</b> more involved — deliberately.</p>
+        </div>
+      </div>
+      <div class="strip warn">
+        <span class="slabel">Respect the engs</span>
+        <span>Might a customer ever touch it? Then it's a <b>conversation with engineering</b> before it's a deploy — never something you quietly ship. The boundary protects customers, the company, and you.</span>
+      </div>
+    </div>
+    <div class="slide-num">07 / 24</div>
+  </section>
+
+  <!-- ── 08 · Anatomy of a request ──────────────────────────────────── -->
+  <section data-screen-label="08 Anatomy of a request" class="s-anatomy">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 2 · The keystone</div>
+      <h2 class="title" style="margin-bottom:28px;">Anatomy of a request.</h2>
+      <div class="wrap">
+        <div class="stack">
+          <div class="layer">
+            <span class="lname"><span class="em">🧑‍💻</span>Your browser</span>
+            <span class="ldesc"><span class="mono">guestbook-you.anduincapital.dev</span> — the wildcard means <b>any subdomain just works</b></span>
+          </div>
+          <div class="hop">https — the padlock lives at the edge</div>
+          <div class="layer">
+            <span class="lname"><span class="em">☁️</span>Cloudflare</span>
+            <span class="ldesc">DNS · TLS · <b>Access: the company SSO wall</b> — checked before our server ever sees it</span>
+          </div>
+          <div class="hop">plain http — yes, really (Part 3)</div>
+          <div class="layer">
+            <span class="lname"><span class="em">🚦</span>Traefik <span style="font-weight:400;color:var(--muted);font-size:22px;">on taincap</span></span>
+            <span class="ldesc">One doorman owns ports 80/443 — reads the <b>Host header</b>, routes to the right container. Box is firewalled: <b>only Cloudflare gets in</b></span>
+          </div>
+          <div class="hop">internal port (3000)</div>
+          <div class="layer">
+            <span class="lname"><span class="em">📦</span>Your containers</span>
+            <span class="ldesc"><span class="mono">app</span> · <span class="mono">migrate</span> · <span class="mono">worker</span> · <span class="mono">redis</span> — declared in your compose file</span>
+          </div>
+          <div class="hop">dokploy-network</div>
+          <div class="layer">
+            <span class="lname"><span class="em">🐘</span>Your Postgres</span>
+            <span class="ldesc">One managed instance <b>per person</b> — every app of yours gets its own database inside</span>
+          </div>
+        </div>
+        <div class="aside">
+          <h3>🎛 Dokploy — the control plane</h3>
+          <p><b>Not in the request path.</b> If it crashed right now, every deployed app would keep serving.</p>
+          <p>Dokploy is how containers <b>get</b> here — that's the next slides — driven by the UI, the API, or <b>Claude, over MCP</b>.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">08 / 24</div>
+  </section>
+
+  <!-- ── 09 · Traefik ───────────────────────────────────────────────── -->
+  <section data-screen-label="09 Traefik" class="s-traefik">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 2 · The piece nobody's heard of</div>
+      <div class="split">
+        <div class="left">
+          <h2>Traefik, the doorman.</h2>
+          <p class="body">Dozens of apps, <b>one IP, one port 443</b>. Traefik receives every request, reads the <span class="mono">Host</span> header, and forwards it to the right container's <b>internal</b> port.</p>
+          <div class="steps">
+            <div class="row"><span class="k">ports</span><div>You never fight over them — every app listens on 3000 <b>inside its own container</b>.</div></div>
+            <div class="row"><span class="k">config</span><div>The "Domain" form <b>is</b> the rule — Dokploy writes it, Traefik reloads live. And every service has a raw-config view: <b>you can always look</b>.</div></div>
+            <div class="row"><span class="k">reach</span><div>Traefik only routes to containers on <span class="mono">dokploy-network</span>. Need Traefik <b>and</b> a database? <b>Both networks</b> — or opaque 500s.</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="setcard">
+            <div class="sc-label">You set this — Dokploy's "Domain" form</div>
+            <div class="sc-fields">
+              <span>Host: <span class="mono">guestbook-maria.anduincapital.dev</span></span>
+              <span>Service: <span class="mono">app</span> · Port: <span class="mono">3000</span> · HTTPS: <span class="mono">off</span></span>
+            </div>
+          </div>
+          <div class="genarrow">↓ Dokploy compiles it into the Traefik routing rule — live, no restarts</div>
+          <div class="setcard">
+            <div class="sc-label">…which means, in plain words</div>
+            <div class="sc-fields">
+              <span>&ldquo;Requests naming <span class="mono">guestbook-maria.anduincapital.dev</span></span>
+              <span>&nbsp;&nbsp;→ go to <b>maria's</b> <span class="mono">app</span> container, port <span class="mono">3000</span>.&rdquo;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">09 / 24</div>
+  </section>
+
+  <!-- ── 10 · The control plane ─────────────────────────────────────── -->
+  <section data-screen-label="10 The control plane" class="s-plane">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame cjustify">
+      <div class="slide-eyebrow">Part 2 · What "Deploy" actually does</div>
+      <h2 class="title">Dokploy, the control plane.</h2>
+      <div class="pipe">
+        <div class="stage"><div class="n">1</div><h4>Clone</h4><p>pulls your repo, on the box — your laptop uploads <b>nothing</b></p></div>
+        <span class="arr">→</span>
+        <div class="stage"><div class="n">2</div><h4>Build</h4><p>images from your Dockerfile</p></div>
+        <span class="arr">→</span>
+        <div class="stage"><div class="n">3</div><h4>Run</h4><p>your compose file — the whole container set</p></div>
+        <span class="arr">→</span>
+        <div class="stage"><div class="n">4</div><h4>Wire</h4><p>writes Traefik routes for your domains</p></div>
+        <span class="arr">→</span>
+        <div class="stage"><div class="n">5</div><h4>Stream</h4><p>logs back to you, live</p></div>
+      </div>
+      <div class="strip">
+        <span class="slabel">Multi-tenant</span>
+        <span>You're scoped to <b>your own project</b> — you can't see or break anyone else's. Instance-wide operations are admin-only. On a shared box, that's a <b>feature</b>.</span>
+      </div>
+      <div class="strip">
+        <span class="slabel">Three ways in</span>
+        <span>The web UI · the REST API · <b>the MCP server — every operation in Claude's hands.</b> That's the back half of today.</span>
+      </div>
+    </div>
+    <div class="slide-num">10 / 24</div>
+  </section>
+
+  <!-- ── 11 · Your Postgres ─────────────────────────────────────────── -->
+  <section data-screen-label="11 One Postgres per person" class="s-db">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 2 · A recommended practice — not a rule</div>
+      <div class="split">
+        <div class="left">
+          <h2>One Postgres<br>per person.</h2>
+          <div class="steps">
+            <div class="row"><span class="k">create once</span><div>Your <b>first deploy</b> creates a managed Postgres in <b>your</b> project. (Yours happens in Lab 2.)</div></div>
+            <div class="row"><span class="k">reuse</span><div><b>Every app after that shares it</b> — each app gets its own database inside your instance.</div></div>
+            <div class="row"><span class="k">why</span><div>Every always-on Postgres costs <b>RAM on the shared box</b> — and one instance means one thing to back up, one password to keep straight.</div></div>
+            <div class="row"><span class="k">split off</span><div>It's a <b>default, you decide</b>: when one project gets big — real traffic, real data — it graduates to its own instance. The deploy skill asks; answer differently any time.</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="dbbox">
+            <div class="dbtitle"><span class="em">🐘</span><span class="t">postgres — yours</span><span class="tag">in your project</span></div>
+            <div class="dbs">
+              <div class="d"><span class="name">guestbook</span><span class="use">today's app</span></div>
+              <div class="d"><span class="name">dealtracker</span><span class="use">your next app</span></div>
+              <div class="d"><span class="name">side_project</span><span class="use">…and the one after</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="strip">
+        <span class="slabel">Firewall corollary</span>
+        <span>You can't <span class="mono">psql</span> in from your laptop — only Cloudflare reaches the box, and it only speaks HTTP. Databases get created by a <b>short-lived container on the box</b>. Sounds exotic; <b>Claude does it automatically</b>.</span>
+      </div>
+    </div>
+    <div class="slide-num">11 / 24</div>
+  </section>
+
+  <!-- ── 12 · The wall ──────────────────────────────────────────────── -->
+  <section data-screen-label="12 The Zero Trust wall" class="s-wall dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 3 · Cloudflare Zero Trust</div>
+      <h2 class="title">The wall.</h2>
+      <p class="lede">Every request to every <span class="mono">*.anduincapital.dev</span> host is checked <b>at Cloudflare's edge</b> — before our server ever sees it. No company SSO session? It never arrives. That's "private by default." And it has a corollary:</p>
+      <div class="versus">
+        <div class="side human">
+          <div class="who">Humans</div>
+          <h3>Sail through.</h3>
+          <p>A browser signs in once, gets a cookie, and passes the wall invisibly from then on. <b>Every app you deploy is instantly company-only</b> — zero perimeter code.</p>
+        </div>
+        <div class="side machine">
+          <div class="who">Machines</div>
+          <h3>Hit the wall.</h3>
+          <p>A curl, a CI job, an MCP server, a <b>Slack webhook</b> — no browser, no company account. A <span class="mono">302</span> to a login page it can never solve. <b>Fails silently.</b></p>
+        </div>
+      </div>
+      <div class="next"><span>That fact, pointed both ways:</span><span class="pip">1 · our machines going in</span><span class="pip">2 · webhooks coming in</span><span>…then one separate edge fact:</span><span class="pip">the padlock</span></div>
+    </div>
+    <div class="slide-num">12 / 24</div>
+  </section>
+
+  <!-- ── 13 · cloudflared ───────────────────────────────────────────── -->
+  <section data-screen-label="13 Machines going in" class="s-cf">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 3 · Consequence 1 — deploying needs a token</div>
+      <h2 class="title">Our machines carry a pass: <span class="mono" style="letter-spacing:0;">cloudflared</span></h2>
+      <div class="grid2">
+        <div>
+          <div class="terminal">
+            <div class="terminal-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="label">log in once — everything after is automatic</span></div>
+            <div><span class="prompt">$</span> <span class="cmd">cloudflared access login \</span></div>
+            <div><span class="cmd">    https://taincap.anduin.center</span></div>
+            <div><span class="comment"># browser opens → company Google → done</span></div>
+            <div>&nbsp;</div>
+            <div><span class="prompt">$</span> <span class="cmd">TOKEN=$(cloudflared access token --app …)</span></div>
+            <div><span class="prompt">$</span> <span class="cmd">curl -H <span class="str">"cf-access-token: $TOKEN"</span> …</span></div>
+            <div><span class="ok">✓ our MCP wrapper mints this on every start</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="stale">
+            <span class="t">⚠ The rite of passage</span>
+            <p>The minted token <b>goes stale</b> — don't memorize lifetimes, memorize the symptom: Claude's Dokploy calls return an HTML page — <b>"Sign in · Cloudflare Access"</b> — instead of data.</p>
+            <p>Fix: <b><span class="mono">/mcp</span> → reconnect</b> (the wrapper re-mints). Ten seconds. It will happen to you; it isn't a breakage.</p>
+          </div>
+          <p class="body" style="margin-top:28px;">Two tokens, two doors: the <b>Cloudflare token</b> is the building's front door; your <b>Dokploy API key</b> is your badge inside. HTML login page → front door. Permission errors → badge.</p>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">13 / 24</div>
+  </section>
+
+  <!-- ── 14 · Lab 1 ─────────────────────────────────────────────────── -->
+  <section data-screen-label="14 Lab 1" class="s-lab">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="labchip">🔧 Lab 1 · 25 min — install the Dokploy MCP</div>
+      <h2 class="title" style="margin-bottom:26px;">Wire your laptop to the box.</h2>
+      <div class="grid2">
+        <div>
+          <ol class="labsteps">
+            <li><code>brew install cloudflared</code></li>
+            <li><code>cloudflared access login …</code> — browser → company Google. <b>Your machine identity</b> — a long-lived login; when it ever lapses, just run it again.</li>
+            <li>Dokploy UI — <b>two doors is normal</b>: company wall, then the login on your sheet. Generate your <b>API key</b>.</li>
+            <li>Paste the sheet's MCP snippet <b>to Claude</b> — let it write the wrapper + <code>.mcp.json</code>. Then <code>/mcp</code>.</li>
+            <li><b>If the server doesn't appear:</b> restart Claude Code (new servers need a one-time approval) — and the first run downloads the package, so give it a minute.</li>
+          </ol>
+        </div>
+        <div>
+          <div class="terminal">
+            <div class="terminal-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="label">the wrapper, illustrated — paste from your SHEET, not this slide</span></div>
+            <div><span class="comment"># mints a fresh Access token at every start,</span></div>
+            <div><span class="comment"># injects it into every Dokploy API call</span></div>
+            <div><span class="cmd">TOKEN=$(cloudflared access token --app $APP)</span></div>
+            <div><span class="cmd">export DOKPLOY_CUSTOM_HEADERS=\</span></div>
+            <div><span class="cmd">  {<span class="str">"cf-access-token"</span>: <span class="str">"$TOKEN"</span>}</span></div>
+            <div><span class="cmd">exec npx -y @dokploy/mcp</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="checkpoint">
+        <span class="c">✓ Checkpoint</span>
+        <p>Ask Claude: <b>&ldquo;list my Dokploy projects&rdquo;</b> → exactly <b>one</b> project, <span class="mono">guestbook-you</span>. HTML login page instead? Wrapper path typo. Permission error? API key.</p>
+      </div>
+    </div>
+    <div class="slide-num">14 / 24</div>
+  </section>
+
+  <!-- ── 15 · Webhooks ──────────────────────────────────────────────── -->
+  <section data-screen-label="15 Webhooks don't work" class="s-hooks">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 3 · Consequence 2 — the sharpest edge</div>
+      <div class="split">
+        <div class="left">
+          <h2>Slack can't<br>call you.</h2>
+          <p class="body">Webhooks are <b>outside machines POSTing at our domain</b>. They can't sign into our SSO — so they die at the edge with a <span class="mono">302</span>, and the request <b>never appears in your app's logs</b>. For internal tools, these are the ones that bite:</p>
+          <div class="senders">
+            <span>Slack events</span><span>slash commands</span><span>ClickUp webhooks</span><span>GitHub webhooks</span>
+          </div>
+        </div>
+        <div>
+          <div class="ways">
+            <div class="way a"><div class="n">1</div><div class="txt"><b>Poll instead of listening.</b> A background job asks ClickUp "anything new?" every minute — the <b>Cauldron</b> shape. At internal-tool volume, almost always enough. (Slack even ships this: <b>Socket Mode</b> — your app dials <i>out</i>, no public URL at all.)</div></div>
+            <div class="way b"><div class="n">2</div><div class="txt"><b>Ask for a scoped hole.</b> Service tokens / path-scoped bypass — an <b>admin conversation per path</b>, not a default. A bypassed path is on the open internet: verify signatures yourself.</div></div>
+            <div class="way c"><div class="n">✓</div><div class="txt"><b>Not affected: Google sign-in.</b> The OAuth redirect rides the <b>user's browser</b>, which already has the Access cookie. Only server-to-server hits the wall.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">15 / 24</div>
+  </section>
+
+  <!-- ── 16 · Flexible SSL ──────────────────────────────────────────── -->
+  <section data-screen-label="16 Flexible SSL" class="s-ssl">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame cjustify">
+      <div class="slide-eyebrow">Part 3 · Consequence 3 — the padlock</div>
+      <h2 class="title" style="margin-bottom:20px;">HTTPS off at the door.<br><span class="mono" style="letter-spacing:0;">https</span> in the env.</h2>
+      <p class="lead" style="font-size:26px;margin:0 0 4px;max-width:1580px;">Decoder: <b>HTTP</b> is the language browsers and servers speak — plain text, readable by anything in between. <b>HTTPS</b> is the same conversation, encrypted (the padlock) — unlocked by a <b>certificate</b>: an ID the server shows to prove it really is that domain.</p>
+      <div class="hopline" style="margin:16px 0 30px;">
+        <div class="node">🧑‍💻 Browser</div>
+        <div class="leg https"><span class="proto">HTTPS 🔒</span><span class="wire">──────────→</span></div>
+        <div class="node">☁️ Cloudflare</div>
+        <div class="leg http"><span class="proto">plain HTTP</span><span class="wire">──────────→</span></div>
+        <div class="node">🖥 taincap</div>
+      </div>
+      <div class="settings">
+        <div class="setting">
+          <span class="where">Dokploy domain</span>
+          <span class="what">HTTPS: OFF · cert: none</span>
+          <p><b>Our box holds no certificate</b> — Cloudflare owns the padlock. Force HTTPS at the origin anyway and the two ends bounce forever — <b>ERR_TOO_MANY_REDIRECTS</b>, the #1 first-deploy failure here.</p>
+        </div>
+        <div class="setting">
+          <span class="where">Your env</span>
+          <span class="what">APP_URL=https://…</span>
+          <p>Your app <i>sees</i> HTTP arrive — so OAuth redirects and secure cookies must be <b>told</b> the real public scheme explicitly.</p>
+        </div>
+      </div>
+      <div class="strip">
+        <span class="slabel">Not a contradiction</span>
+        <span>They're the <b>two halves of Flexible SSL</b> — Cloudflare owns the padlock; the origin stays plain. The skill hard-codes both.</span>
+      </div>
+    </div>
+    <div class="slide-num">16 / 24</div>
+  </section>
+
+  <!-- ── 17 · Deploy keys ───────────────────────────────────────────── -->
+  <section data-screen-label="17 Deploy keys" class="s-keys">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 4 · How the box gets your code</div>
+      <div class="split">
+        <div class="left">
+          <h2>The box pulls.<br>You don't upload.</h2>
+          <p class="body">At deploy time, taincap does a <span class="mono">git clone</span> of your repo. A <b>practice with a purpose</b>:</p>
+          <div class="steps">
+            <div class="row"><span class="k">reproducible</span><div>What's running is <b>exactly what's in git</b> — no "works from my laptop" artifacts, and anyone on the team can redeploy it tomorrow.</div></div>
+            <div class="row"><span class="k">auditable</span><div>The repo's history <b>is</b> the deploy history.</div></div>
+            <div class="row"><span class="k">escape hatch</span><div>Need to push by hand? You <b>can</b> — Dokploy takes a raw compose file too. Fine for odd cases; git stays the default.</div></div>
+            <div class="row"><span class="k">repo access</span><div><b>Public repo</b> → plain HTTPS, nothing to set up (today's lab). <b>Private repo</b> → the box must authenticate → a <b>deploy key</b>:</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="keyfacts">
+            <div class="kf"><span class="k">deploy key</span><span class="v">An SSH keypair: <b>private half in Dokploy</b>, public half on the repo — as <b>read-only</b>.</span></div>
+            <div class="kf"><span class="k">one per repo</span><span class="v">GitHub's rule — <b>keys cannot be reused</b> across repos. New private repo → new key. The skill automates the whole dance.</span></div>
+            <div class="kf"><span class="k">read-only</span><span class="v"><b>Least privilege, by design.</b> A compromised box could clone your code — never push — and each key opens exactly one repo.</span></div>
+            <div class="kf"><span class="k">github app</span><span class="v">The nicer alternative is <b>instance-wide and admin-only</b>. Deploy keys are what <i>you</i> can do yourself.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-num">17 / 24</div>
+  </section>
+
+  <!-- ── 18 · War story ─────────────────────────────────────────────── -->
+  <section data-screen-label="18 War story" class="s-war dark">
+    <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 4 · A true story from last week</div>
+      <h2 class="title" style="margin-bottom:34px;">The day every deploy broke.</h2>
+      <div class="timeline">
+        <div class="beat"><div class="dotcol"><div class="dot"></div><div class="line"></div></div><div class="txt">The starter repos get <b>transferred</b> from a personal account into the org. Routine tidy-up.</div></div>
+        <div class="beat"><div class="dotcol"><div class="dot"></div><div class="line"></div></div><div class="txt">What nobody knew: <b>GitHub silently drops every deploy key on transfer.</b></div></div>
+        <div class="beat"><div class="dotcol"><div class="dot"></div><div class="line"></div></div><div class="txt">Next deploy: dead in five seconds at the clone step — <code>ERROR: Repository not found</code>. <b>The error lies.</b> The repo exists; the box just lost the right to see it — and GitHub won't tell an unauthenticated caller the difference.</div></div>
+        <div class="beat"><div class="dotcol"><div class="dot"></div><div class="line"></div></div><div class="txt">Re-adding keys needs <b>repo-admin</b> — which the transfer had <i>also</i> reshuffled. Stopgap: HTTPS-with-token clone, deploy, revert so no credential lingers.</div></div>
+      </div>
+      <div class="lessons">
+        <div class="l"><b>Invisible infrastructure.</b> Nobody remembers deploy keys until they break.</div>
+        <div class="l"><b>Moves break them silently.</b> Transfers and renames give you no warning.</div>
+        <div class="l"><b>Instant clone failure = authorization.</b> Whatever the error message claims.</div>
+      </div>
+    </div>
+    <div class="slide-num">18 / 24</div>
+  </section>
+
+  <!-- ── 19 · The skill ─────────────────────────────────────────────── -->
+  <section data-screen-label="19 The deploy skill" class="s-skill">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 5 · The playbook, executable</div>
+      <h2 class="title" style="margin-bottom:20px;">&ldquo;Deploy this to dokploy.&rdquo;</h2>
+      <p class="lead" style="margin-bottom:36px;">Everything so far, encoded as the <span class="mono">dokploy-deploy</span> skill — <b>the team's deploy playbook, versioned</b>. Say the words; Claude runs this:</p>
+      <div class="stages">
+        <div class="stage"><div class="n">1</div><div><span class="what">Push first</span><span class="desc">the box pulls from GitHub — private repo → <b>deploy key now</b></span></div></div>
+        <div class="stage"><div class="n">2</div><div><span class="what">The database question</span><span class="desc">Claude <b>stops and asks you</b> — first deploy creates <b>your</b> Postgres; later apps reuse it</span></div></div>
+        <div class="stage"><div class="n">3</div><div><span class="what">Create &amp; configure</span><span class="desc">service in your project — repo, branch, compose file, env</span></div></div>
+        <div class="stage"><div class="n">4</div><div><span class="what">Wire the domain</span><span class="desc"><b>HTTPS off</b>, cert none — and no domain on workers</span></div></div>
+        <div class="stage"><div class="n">5</div><div><span class="what">Deploy &amp; poll</span><span class="desc">…then <b>keep going</b> — "build succeeded" ≠ "app works"</span></div></div>
+        <div class="stage"><div class="n">6</div><div><span class="what">Verify the networks</span><span class="desc">the classic <b>app-can't-see-its-database</b> mistake, caught before the 500s</span></div></div>
+        <div class="stage"><div class="n">7</div><div><span class="what">Smoke-test headlessly</span><span class="desc">mints a CF token, curls <span class="mono">/healthz</span> through the wall — even signs a <b>test session</b> to prove signed-in routes (possible only because <b>we hold the app's own secret</b>)</span></div></div>
+        <div class="stage"><div class="n">8</div><div><span class="what">The OAuth reminder</span><span class="desc">Google's origins &amp; redirect URIs are <b>Console-only, forever manual</b> — you get exact values + a deep link</span></div></div>
+      </div>
+    </div>
+    <div class="slide-num">19 / 24</div>
+  </section>
+
+  <!-- ── 20 · Lab 2 ─────────────────────────────────────────────────── -->
+  <section data-screen-label="20 Lab 2" class="s-lab">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="labchip">🚀 Lab 2 · 30 min</div>
+      <h2 class="title" style="margin-bottom:26px;">Deploy it — by saying so.</h2>
+      <div class="grid2">
+        <div>
+          <ol class="labsteps">
+            <li><b>Clone the starter</b> (public — no key): <code>git clone …/dokploy-skeleton.git</code></li>
+            <li><b>Paste the deploy prompt</b> from your sheet into Claude Code.</li>
+            <li><b>Claude will STOP and ask about Postgres.</b> Answer it — your sheet has the answer. That question is the skill working, not a problem.</li>
+            <li><b>Watch two screens:</b> Claude's MCP calls on your laptop, the deployment log in the Dokploy UI.</li>
+            <li>While it builds — <b>pop quiz:</b> Why is HTTPS off? Why is the app on two networks? The log says "retrying…" — failure, or fine?</li>
+          </ol>
+        </div>
+        <div>
+          <div class="terminal">
+            <div class="terminal-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="label">what you'll see claude do</span></div>
+            <div><span class="arrow">→</span> <span class="cmd">postgres-create</span> <span class="comment"># YOURS, permanently</span></div>
+            <div><span class="arrow">→</span> <span class="cmd">compose-create / compose-update</span></div>
+            <div><span class="arrow">→</span> <span class="cmd">domain-create</span> <span class="comment"># https: false — no redirect loop</span></div>
+            <div><span class="arrow">→</span> <span class="cmd">compose-deploy</span> <span class="comment"># …build minutes…</span></div>
+            <div><span class="arrow">→</span> <span class="cmd">curl -H "cf-access-token: …" /healthz</span></div>
+            <div><span class="ok">✓ {"ok":true,"db":"up"} — through the wall</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="checkpoint">
+        <span class="c">✓ Checkpoint</span>
+        <p>Deployment <b>done</b> + Claude reports <b>the health check passed</b>. Stuck &gt;2 min? You get the spare instance; we fix yours after — nobody stalls the room.</p>
+      </div>
+    </div>
+    <div class="slide-num">20 / 24</div>
+  </section>
+
+  <!-- ── 21 · The proof ─────────────────────────────────────────────── -->
+  <section data-screen-label="21 The proof" class="s-proof">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">The whole point</div>
+      <h2>Sign the guestbook.</h2>
+      <p class="walk">Open <b>your URL</b>. Two doors — the company wall, then <b>your app's</b> Sign in with Google. Write a row. Then look at what that row proves — every layer you can now name just shook hands:</p>
+      <div class="layers">
+        <span>Cloudflare: TLS + SSO ✓</span>
+        <span>Traefik: routed by Host ✓</span>
+        <span>your container: built &amp; live ✓</span>
+        <span>Google: identity ✓</span>
+        <span>your Postgres: row written ✓</span>
+      </div>
+      <p class="walk" style="margin-top:44px;">Now go sign your <b>neighbors'</b> guestbooks — any company account can. That's the domain gate doing its job.</p>
+    </div>
+    <div class="slide-num">21 / 24</div>
+  </section>
+
+  <!-- ── 22 · The starters ──────────────────────────────────────────── -->
+  <section data-screen-label="22 The starters" class="s-starters">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Part 6 · Three shapes, pre-debugged</div>
+      <h2 class="title" style="margin-bottom:16px;">The starters — now you can read them.</h2>
+      <p class="lead" style="font-size:27px;margin:0 0 30px;max-width:1580px;">Why these three? Because <b>almost every internal tool is built from these blocks</b> — and each starter pre-solves its block's deploy pitfalls <b>on our exact stack</b>, with a comment at the exact line in the compose file.</p>
+      <div class="cards c3">
+        <div class="card">
+          <span class="em">💀</span>
+          <h3>Skeleton Crew</h3>
+          <p><b>&ldquo;Users sign in, data gets saved.&rdquo;</b> Google SSO + Postgres — the foundation <b>every</b> tool starts from. You just deployed it.</p>
+          <span class="url">skeleton-cl.anduincapital.dev</span>
+        </div>
+        <div class="card">
+          <span class="em">🧪</span>
+          <h3>Cauldron</h3>
+          <p><b>&ldquo;Work happens in the background.&rdquo;</b> Queue + separate worker — slow jobs, scheduled work, and <b>polling</b>: your answer to the webhook wall.</p>
+          <span class="url">cauldron-cl.anduincapital.dev</span>
+        </div>
+        <div class="card">
+          <span class="em">🔮</span>
+          <h3>Séance</h3>
+          <p><b>&ldquo;Screens update live.&rdquo;</b> WebSockets + a Redis relay (so every copy of the app sees every message) — live dashboards and collaboration, pitfalls pre-solved.</p>
+          <span class="url">seance-cl.anduincapital.dev</span>
+        </div>
+      </div>
+      <div class="strip">
+        <span class="slabel">Second skill</span>
+        <span><span class="mono">dokploy-starter</span> — say what you're building; it <b>scaffolds</b> a fresh base or <b>absorbs</b> just the pattern into your existing app. It stops at &ldquo;running locally&rdquo; — shipping is <i>your</i> call, and you know the words.</span>
+      </div>
+    </div>
+    <div class="slide-num">22 / 24</div>
+  </section>
+
+  <!-- ── 23 · Review ────────────────────────────────────────────────── -->
+  <section data-screen-label="23 Review" class="s-review">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Sixty seconds · say them out loud</div>
+      <h2 class="title" style="margin-bottom:28px;">What you now know.</h2>
+      <div class="cards c2x3">
+        <div class="card"><h3>🗺 The map</h3><p>Browser → <b>Cloudflare</b> (padlock + SSO wall) → <b>Traefik</b> (Host → container) → your containers → <b>your Postgres</b>. Dokploy: control plane, off the path.</p></div>
+        <div class="card"><h3>🎫 Two tokens</h3><p><b>Cloudflare token</b> = the front door (HTML login page? <span class="mono">/mcp</span> reconnect). <b>API key</b> = your badge inside (permission error? badge).</p></div>
+        <div class="card"><h3>🚧 One boundary</h3><p><b>Internal-facing only.</b> Customer-facing is engineering's stack — a conversation, never a quiet deploy.</p></div>
+        <div class="card"><h3>📐 Three practices</h3><p>The box <b>pulls from git</b> · <b>one Postgres per person</b> (a default, not a law) · HTTPS <b>off</b> at the door, <span class="mono">https</span> in the env.</p></div>
+        <div class="card"><h3>⚡ The sharp edge</h3><p><b>Webhooks die at the wall</b> — and never reach your logs. Design for <b>polling</b> (Cauldron) or Slack Socket Mode.</p></div>
+        <div class="card"><h3>🗣 The words</h3><p><b>&ldquo;Deploy this to dokploy.&rdquo;</b> Ship v2: push, then <i>&ldquo;redeploy it.&rdquo;</i> Broken? <i>&ldquo;Show me my app's logs.&rdquo;</i></p></div>
+      </div>
+    </div>
+    <div class="slide-num">23 / 24</div>
+  </section>
+
+  <!-- ── 24 · Wrap ──────────────────────────────────────────────────── -->
+  <section data-screen-label="24 Wrap" class="s-wrap">
+    <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
+    <div class="frame">
+      <div class="slide-eyebrow">Take-home · your app, this week</div>
+      <h2 class="title" style="margin-bottom:24px;">Now do it with your app.</h2>
+      <div class="path">
+        <div class="p"><div class="n">1</div><div class="txt"><b>Containerize it</b> — ask Claude for a Dockerfile + compose <i>modeled on the starters</i>, or run <code>dokploy-starter</code> in absorb mode.</div></div>
+        <div class="p"><div class="n">2</div><div class="txt"><b>Push to a private repo</b> — and now you know what happens next: a <b>deploy key</b>.</div></div>
+        <div class="p"><div class="n">3</div><div class="txt"><b>Say the words:</b> <code>deploy this to dokploy</code>. Answer the database question: <b>&ldquo;reuse my Postgres&rdquo;</b> — the one you made today.</div></div>
+        <div class="p"><div class="n">4</div><div class="txt"><b>Expect the OAuth reminder</b> if you have Google sign-in — the one forever-manual, Console-only step.</div></div>
+        <div class="p"><div class="n">5</div><div class="txt"><b>Remember the sharp edge:</b> no third-party webhooks through the wall. <b>Poll</b> (Cauldron), or open the bypass conversation <i>early</i>.</div></div>
+        <div class="p"><div class="n">6</div><div class="txt"><b>Day 2:</b> ship v2 with <i>push, then &ldquo;redeploy it&rdquo;</i> — auto-deploy-on-push is a GitHub webhook, so <b>the wall eats it too</b>. Something's off? <i>&ldquo;show me my app's logs.&rdquo;</i></div></div>
+      </div>
+      <div class="signoff">
+        <span><b>Your project, your Postgres, your pipeline — permanent.</b> The guestbooks live one week; show someone. Stuck later: <b>ask in the deploy channel</b> (it's on your sheet).</span>
+        <span class="dot"></span>
+        <span class="repo">WORKSHOP.md has every detail · apps/starters</span>
+      </div>
+    </div>
+    <div class="slide-num">24 / 24</div>
+  </section>
+
+</deck-stage>
+
+</body>
+</html>
