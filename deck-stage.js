@@ -503,6 +503,36 @@
     }
     .confirm .danger:hover { background: #b5563a; }
 
+    /* Speaker-notes viewer — N toggles; shows the current slide's entry
+       from the deck's #speaker-notes JSON (see _loadNotes). Sits just
+       under the confirm backdrop so the delete dialog still wins. */
+    .notes {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      max-height: 38vh;
+      overflow-y: auto;
+      background: rgba(13,17,23,0.96);
+      color: #e6edf3;
+      border-top: 2px solid #D97757;
+      padding: 18px 36px 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 19px;
+      line-height: 1.55;
+      z-index: 2147483150;
+      display: none;
+    }
+    .notes[data-open] { display: block; }
+    .notes-head {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #D97757;
+      margin-bottom: 8px;
+    }
+
     /* ── Print: one page per slide, no chrome ────────────────────────────
        The screen layout stacks every slide at inset:0 inside a scaled
        canvas; for print we want them in document flow at the authored
@@ -550,7 +580,7 @@
         page-break-after: auto;
       }
       ::slotted([data-deck-skip]) { display: none !important; }
-      .overlay, .rail, .rail-resize, .ctxmenu, .confirm-backdrop { display: none !important; }
+      .overlay, .rail, .rail-resize, .ctxmenu, .confirm-backdrop, .notes { display: none !important; }
     }
   `;
 
@@ -949,7 +979,16 @@
         this._deleteSlide(i);
       });
 
-      this._root.append(style, rail, resize, stage, overlay, menu, confirm);
+      // Speaker-notes viewer — toggled by N in _onKey; content synced by
+      // _syncNotes on every _applyIndex.
+      const notes = document.createElement('div');
+      notes.className = 'notes export-hidden';
+      notes.setAttribute('data-omelette-chrome', '');
+      notes.setAttribute('role', 'complementary');
+      notes.setAttribute('aria-label', 'Speaker notes');
+      notes.innerHTML = '<div class="notes-head"></div><div class="notes-body"></div>';
+
+      this._root.append(style, rail, resize, stage, overlay, menu, confirm, notes);
       this._canvas = canvas;
       this._stage = stage;
       this._slot = slot;
@@ -958,6 +997,7 @@
       this._resize = resize;
       this._menu = menu;
       this._confirm = confirm;
+      this._notesBox = notes;
       this._countEl = overlay.querySelector('.current');
       this._totalEl = overlay.querySelector('.total');
 
@@ -1067,6 +1107,27 @@
       }
     }
 
+    _toggleNotes() {
+      if (!this._notesBox) return;
+      if (this._notesBox.hasAttribute('data-open')) {
+        this._notesBox.removeAttribute('data-open');
+      } else {
+        this._notesBox.setAttribute('data-open', '');
+        this._syncNotes();
+      }
+    }
+
+    /** Refresh the notes viewer for the current slide. No-op while the
+     *  viewer is closed — _applyIndex calls this on every navigation. */
+    _syncNotes() {
+      if (!this._notesBox || !this._notesBox.hasAttribute('data-open')) return;
+      const total = this._slides.length || 1;
+      this._notesBox.querySelector('.notes-head').textContent =
+        'Speaker notes — slide ' + (this._index + 1) + ' / ' + total + ' · N to hide';
+      this._notesBox.querySelector('.notes-body').textContent =
+        this._notes[this._index] || '(no speaker notes for this slide)';
+    }
+
     _restoreIndex() {
       // The host's ?slide= param is delivered as a #<int> hash (1-indexed) on
       // the iframe src. No hash → slide 1; the deck itself keeps no position
@@ -1091,6 +1152,7 @@
         else s.removeAttribute('data-deck-active');
       });
       if (this._countEl) this._countEl.textContent = String(curr + 1);
+      this._syncNotes();
       // Follow-scroll on every navigation (init deep-link, keyboard, click,
       // tap, external goTo) — the only time we *don't* want the rail to
       // track current is after a rail-internal mutation, where _renderRail
@@ -1294,9 +1356,23 @@
         e.preventDefault();
         return;
       }
+      if (e.key === 'Escape' && this._notesBox && this._notesBox.hasAttribute('data-open')) {
+        this._notesBox.removeAttribute('data-open');
+        e.preventDefault();
+        return;
+      }
       if (e.metaKey || e.ctrlKey || e.altKey) return;
 
       const key = e.key;
+
+      // Speaker-notes toggle — skipped in presenter-popup thumbnail iframes
+      // (no-rail), same as the rest of the chrome.
+      if ((key === 'n' || key === 'N') && !this.hasAttribute('no-rail')) {
+        this._toggleNotes();
+        e.preventDefault();
+        return;
+      }
+
       let handled = true;
 
       if (key === 'ArrowRight' || key === 'PageDown' || key === ' ' || key === 'Spacebar') {
