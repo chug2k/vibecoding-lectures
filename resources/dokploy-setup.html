@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dokploy Setup Guide — WARP · API key · MCP</title>
+<style>
+  :root {
+    --ink: #1f3145;
+    --ink-soft: #3d5268;
+    --muted: #7a8ba0;
+    --hairline: #dde5ec;
+    --paper: #f6f9fb;
+    --accent: #48AFF0;
+    --accent-deep: #1e7cc0;
+    --danger: #d64545;
+    --ok: #2e9e5b;
+    --terminal-bg: #0d1117;
+    --terminal-fg: #e6edf3;
+    --terminal-green: #7ee787;
+    --terminal-dim: #8b949e;
+    --terminal-blue: #79c0ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #fff; color: var(--ink);
+    font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .page { max-width: 880px; margin: 0 auto; padding: 56px 28px 96px; }
+  .eyebrow {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-deep); margin-bottom: 10px;
+  }
+  h1 { margin: 0 0 10px; font-size: 40px; line-height: 1.08; letter-spacing: -0.02em; }
+  .lede { font-size: 19px; color: var(--ink-soft); margin: 0 0 8px; }
+  .lede b { color: var(--ink); }
+  .meta { font-size: 14px; color: var(--muted); margin-bottom: 40px; }
+  h2 {
+    margin: 56px 0 6px; font-size: 27px; letter-spacing: -0.01em;
+    padding-top: 24px; border-top: 1px solid var(--hairline);
+  }
+  h2 .stepno {
+    display: inline-grid; place-items: center; width: 34px; height: 34px; margin-right: 12px;
+    background: rgba(72,175,240,0.13); border: 1px solid rgba(72,175,240,0.4);
+    border-radius: 9px; font-size: 17px; font-weight: 700; color: var(--accent-deep);
+    vertical-align: -6px;
+  }
+  .why { font-size: 16px; color: var(--muted); margin: 0 0 22px; }
+  .why b { color: var(--ink-soft); }
+  ol.steps { margin: 0 0 20px; padding-left: 26px; }
+  ol.steps li { margin-bottom: 12px; }
+  ol.steps b { color: var(--ink); }
+  code, .mono {
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+    font-size: 0.92em; color: var(--accent-deep);
+    background: var(--paper); border: 1px solid var(--hairline);
+    border-radius: 6px; padding: 1px 7px;
+  }
+  pre {
+    background: var(--terminal-bg); color: var(--terminal-fg);
+    border-radius: 12px; padding: 20px 24px; overflow-x: auto;
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+    font-size: 14.5px; line-height: 1.6; margin: 18px 0;
+  }
+  pre .c { color: var(--terminal-dim); }
+  pre .g { color: var(--terminal-green); }
+  pre .b { color: var(--terminal-blue); }
+  .shot {
+    position: relative; overflow: hidden; margin: 22px 0 6px;
+    border-radius: 12px; border: 1px solid var(--hairline);
+    box-shadow: 0 18px 44px -20px rgba(31,49,69,0.3);
+    background: #fff;
+  }
+  .shot img { display: block; }
+  .shot .hl {
+    position: absolute; border: 3px solid var(--danger); border-radius: 9px;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.65);
+  }
+  .shot .tag {
+    position: absolute; background: var(--danger); color: #fff;
+    font-size: 13.5px; font-weight: 600; padding: 4px 12px; border-radius: 999px;
+    white-space: nowrap; box-shadow: 0 4px 12px -4px rgba(0,0,0,0.4);
+  }
+  .shotcap { font-size: 14px; color: var(--muted); margin: 0 0 22px; }
+  .check {
+    border: 2px solid var(--ok); background: #edf9f1; border-radius: 12px;
+    padding: 16px 22px; margin: 22px 0; font-size: 16px;
+  }
+  .check .c { font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-size: 13px; color: var(--ok); margin-right: 10px; }
+  .note {
+    border-left: 4px solid var(--accent); background: var(--paper);
+    border-radius: 0 10px 10px 0; padding: 14px 20px; margin: 20px 0; font-size: 15.5px; color: var(--ink-soft);
+  }
+  table { border-collapse: collapse; width: 100%; margin: 20px 0; font-size: 15.5px; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+  th { font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  td b { color: var(--ink); }
+  .footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--hairline); font-size: 14.5px; color: var(--muted); }
+  a { color: var(--accent-deep); }
+  @media print { .shot { box-shadow: none; } body { font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="eyebrow">Resources · Deploying internal tools</div>
+  <h1>Dokploy setup guide</h1>
+  <p class="lede">One-time setup, <b>~15 minutes</b>: wire your laptop to the team's Dokploy box (<span class="mono">taincap</span>) so Claude Code can deploy for you. Three parts: <b>WARP → API key → MCP</b>.</p>
+  <p class="meta">Companion to the "Deploying Internal Tools" workshop deck (Week 6). Everything here is self-paced — no workshop required.</p>
+
+  <h2><span class="stepno">1</span>Cloudflare WARP — verify you're on the team</h2>
+  <p class="why"><b>Why:</b> everything on <span class="mono">*.anduincapital.dev</span> — including the Dokploy panel — sits behind Cloudflare Access, the company SSO wall. With WARP connected, your <b>machine</b> carries your company identity: every process on it passes the wall, Claude's Dokploy calls included. No tokens to mint, nothing that expires.</p>
+  <ol class="steps">
+    <li><b>Find the ☁️ in your menu bar.</b> WARP is already installed on team machines. Truly missing? <code>brew install --cask cloudflare-warp</code>, then open <b>Cloudflare WARP</b> from Applications.</li>
+    <li>Open it → gear → <b>Profile</b>. <b>Team name must say <code>anduin</code></b> — see the screenshot below.</li>
+    <li><b>No team, or logged out?</b> Gear → <b>Preferences → Account → Login with Cloudflare Zero Trust</b> → team <code>anduin</code> → a browser opens → sign in with your <b>company Google account</b> → approve.</li>
+    <li>Back in the main WARP window, flip the toggle to <b>Connected</b>.</li>
+  </ol>
+  <div class="shot" style="width:760px;max-width:100%;height:306px;">
+    <img src="../wk6/assets/warp-profile.png" style="width:760px;" alt="WARP Profile screen — Team name: anduin">
+    <div class="hl" style="left:182px;top:141px;width:260px;height:48px;"></div>
+    <div class="tag" style="left:460px;top:152px;">must say anduin</div>
+  </div>
+  <p class="shotcap">WARP → Profile. Wrong team or logged out? <b>Re-authenticate</b> is right below the team name.</p>
+  <div class="check"><span class="c">✓ Check</span><span class="mono">curl -sI https://taincap.anduin.center | head -1</span> returns <b>HTTP/2 200</b> — Dokploy answered a process with no browser. WARP off → you'd get a <b>302 to a cloudflareaccess.com sign-in page</b> instead.</div>
+
+  <h2><span class="stepno">2</span>Your Dokploy API key</h2>
+  <p class="why"><b>Why:</b> WARP gets your machine through the building's front door; the API key is your badge <b>inside</b> Dokploy — it's what scopes Claude to <b>your</b> projects. Everyone generates their own.</p>
+  <ol class="steps">
+    <li><b>Open <a href="https://taincap.anduin.center" target="_blank" rel="noopener">taincap.anduin.center</a></b> — with WARP on, it just loads; there's no Access login. Sign in with your <b>Dokploy account</b>.</li>
+    <li>Bottom-<b>left</b> corner → your <b>Account</b> → <b>Profile</b>:</li>
+  </ol>
+  <div class="shot" style="width:400px;max-width:100%;height:416px;">
+    <img src="../wk6/assets/dokploy-account-menu.png" style="width:400px;" alt="Dokploy account menu — Profile">
+    <div class="hl" style="left:7px;top:340px;width:365px;height:48px;"></div>
+    <div class="tag" style="left:22px;top:306px;">① your account</div>
+    <div class="hl" style="left:9px;top:130px;width:327px;height:39px;"></div>
+    <div class="tag" style="left:232px;top:97px;">② Profile</div>
+  </div>
+  <p class="shotcap">The account switcher lives at the <b>bottom-left</b> of the Dokploy UI.</p>
+  <ol class="steps" start="3">
+    <li>Scroll down to <b>API/CLI Keys</b> → <b>Generate New Key</b> → <b>copy it</b>:</li>
+  </ol>
+  <div class="shot" style="width:760px;max-width:100%;height:239px;">
+    <img src="../wk6/assets/dokploy-api-keys.png" style="width:760px;" alt="Dokploy API/CLI Keys — Generate New Key">
+    <div class="hl" style="left:617px;top:181px;width:125px;height:42px;"></div>
+    <div class="tag" style="left:480px;top:190px;">③ generate</div>
+  </div>
+  <p class="shotcap">Profile → API/CLI Keys. The key is shown once — copy it now.</p>
+  <div class="note"><b>Treat the key like a password.</b> It never goes in a chat, a repo, or the Claude config — the next section locks it in a file only you can read.</div>
+
+  <h2><span class="stepno">3</span>The Dokploy MCP — put the box in Claude's hands</h2>
+  <p class="why"><b>Why:</b> the MCP server (<a href="https://github.com/Dokploy/mcp" target="_blank" rel="noopener">github.com/Dokploy/mcp</a>) exposes every Dokploy operation — create projects, deploy, read logs — as tools Claude can call. It needs exactly two things: where the box is, and your key.</p>
+  <ol class="steps">
+    <li><b>Lock the key in a file</b> only you can read:
+<pre>echo '&lt;paste-your-key&gt;' &gt; ~/.dokploy-api-key
+chmod 600 ~/.dokploy-api-key</pre></li>
+    <li><b>Write the launcher</b> — three lines; WARP already handles identity, so there's nothing else to it:
+<pre>mkdir -p ~/.claude
+cat &gt; ~/.claude/dokploy-mcp.sh &lt;&lt; 'EOF'
+#!/bin/sh
+export DOKPLOY_URL="https://taincap.anduin.center"
+export DOKPLOY_API_KEY="$(cat ~/.dokploy-api-key)"
+exec npx -y @dokploy/mcp
+EOF
+chmod +x ~/.claude/dokploy-mcp.sh</pre></li>
+    <li><b>Register it with Claude Code</b> (user scope = every project on this machine):
+<pre>claude mcp add dokploy-mcp --scope user -- sh ~/.claude/dokploy-mcp.sh</pre></li>
+    <li><b>Restart Claude Code</b> → approve the new server when prompted → <code>/mcp</code>. The first start downloads the package — a quiet minute is normal, not broken.</li>
+  </ol>
+  <div class="note">Prefer to delegate? Paste this whole section to Claude and say <i>"set this up."</i> Nothing secret ends up in the Claude config either way — the launcher reads the key from the locked-down file at start time.</div>
+  <div class="check"><span class="c">✓ Check</span>Ask Claude: <b>"list my Dokploy projects."</b> You want a <b>real answer</b> — and if you haven't deployed anything yet, the right answer is an <b>empty list</b>. Empty list = the whole pipeline works.</div>
+
+  <h2 style="border-top:none;padding-top:0;">Troubleshooting</h2>
+  <table>
+    <tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr>
+    <tr><td>Dokploy calls return an HTML page titled <b>"Sign in · Cloudflare Access"</b></td><td>WARP is off or logged out of the team</td><td>WARP → toggle <b>Connected</b>; check Profile says team <code>anduin</code>. Then <code>/mcp</code> → reconnect.</td></tr>
+    <tr><td>Permission / "not found" errors on every call</td><td>Bad or missing API key</td><td>Re-check <code>~/.dokploy-api-key</code> (no extra whitespace); regenerate the key in Dokploy → Profile → API/CLI Keys.</td></tr>
+    <tr><td><code>/mcp</code> doesn't list the server</td><td>New servers need a one-time approval</td><td>Restart Claude Code and approve the prompt. First start also downloads the package — give it a minute.</td></tr>
+    <tr><td><code>taincap.anduin.center</code> won't load in the browser</td><td>Not signed into the company Google account, or WARP misbehaving</td><td>Try a normal browser sign-in when prompted; toggle WARP off/on; still stuck → ask in the deploy channel.</td></tr>
+  </table>
+
+  <div class="footer">
+    Part of the <b>Vibe Coding</b> course · Week 6 — Deploying Internal Tools.
+    Deploy details live in each starter's <span class="mono">docs/DEPLOY.md</span>
+    (<a href="https://github.com/AI-Hivemind-Lab/dokploy-skeleton" target="_blank" rel="noopener">dokploy-skeleton</a> ·
+    <a href="https://github.com/AI-Hivemind-Lab/cauldron" target="_blank" rel="noopener">cauldron</a> ·
+    <a href="https://github.com/AI-Hivemind-Lab/seance" target="_blank" rel="noopener">seance</a>).
+  </div>
+
+</div>
+</body>
+</html>

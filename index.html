@@ -527,6 +527,13 @@ box I can copy. read the key from .env.</code></pre>
             <p><strong>Webhooks die at the wall</strong> (poll instead — the Cauldron shape) · HTTPS <strong>off</strong> at the domain, https in the env · Dokploy calls returning an HTML sign-in page → <strong>check the WARP toggle</strong>.</p>
           `,
         },
+        {
+          title: "Dokploy Setup Guide",
+          sub: "resources — WARP · API key · MCP",
+          desc: "Self-paced setup with annotated screenshots: verify WARP is on the anduin team, generate your Dokploy API key, wire the MCP into Claude Code.",
+          path: "resources/dokploy-setup.html",
+          external: true,
+        },
       ],
     },
     {
@@ -609,8 +616,10 @@ box I can copy. read the key from .env.</code></pre>
   };
 
   function kindOf(d) {
+    const s0 = (d.sub || "").toLowerCase();
+    if (s0.includes("resource")) return "Resource";
     if (d.external) return "Demo";
-    const s = (d.sub || "").toLowerCase();
+    const s = s0;
     if (s.includes("recap")) return "Recap";
     if (s.includes("main deck")) return "Lecture";
     if (s.includes("deep dive")) return "Deep dive";
