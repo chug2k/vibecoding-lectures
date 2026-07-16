@@ -105,7 +105,7 @@
 
   <div class="eyebrow">Resources · Deploying internal tools</div>
   <h1>Dokploy setup guide</h1>
-  <p class="lede">One-time setup, <b>~15 minutes</b>: wire your laptop to the team's Dokploy box (<span class="mono">taincap</span>) so Claude Code can deploy for you. Three parts: <b>WARP → API key → MCP</b>.</p>
+  <p class="lede">One-time setup, <b>~15 minutes</b>: wire your laptop to the team's Dokploy box (<span class="mono">taincap</span>) so Claude Code can deploy for you. Four parts: <b>WARP → API key → MCP → skills</b>.</p>
   <p class="meta">Companion to the "Deploying Internal Tools" workshop deck (Week 6). Everything here is self-paced — no workshop required.</p>
 
   <h2><span class="stepno">1</span>Cloudflare WARP — verify you're on the team</h2>
@@ -161,6 +161,17 @@
     <li><b>Restart Claude Code</b> → approve the new server when prompted → <code>/mcp</code>. The first start downloads the package — a quiet minute is normal, not broken.</li>
   </ol>
   <div class="check"><span class="c">✓ Check</span>Ask Claude: <b>"list my Dokploy projects."</b> You want a <b>real answer</b> — and if you haven't deployed anything yet, the right answer is an <b>empty list</b>. Empty list = the whole pipeline works.</div>
+
+  <h2><span class="stepno">4</span>The team's skills — install the playbooks</h2>
+  <p class="why"><b>Why:</b> skills are markdown runbooks Claude loads on demand. The team's two Dokploy skills encode every gotcha this box has ever inflicted — <span class="mono">dokploy-starter</span> picks and scaffolds the right starter for a new app; <span class="mono">dokploy-deploy</span> is the whole deploy playbook, so <i>"deploy this to dokploy"</i> just works. They live in <a href="https://github.com/AI-Hivemind-Lab/claude-code-shareable-skills" target="_blank" rel="noopener">AI-Hivemind-Lab/claude-code-shareable-skills</a>.</p>
+  <ol class="steps">
+    <li><b>Install both, globally</b> (available in every project on your machine):
+<pre>npx skills add AI-Hivemind-Lab/claude-code-shareable-skills \
+  -g -s dokploy-deploy -s dokploy-starter -y</pre>
+    Installs are <b>symlinks</b> into <span class="mono">~/.claude/skills</span> — so a later <code>npx skills update</code> moves you to the repo's latest playbooks with no stale copies.</li>
+    <li><b>Restart Claude Code.</b> Invoke them as <code>/dokploy-starter</code> / <code>/dokploy-deploy</code>, or just say the words — <i>"which starter should I use?"</i>, <i>"deploy this to dokploy"</i> — and they trigger themselves.</li>
+  </ol>
+  <div class="check"><span class="c">✓ Check</span>Ask Claude: <b>"which dokploy skills do you have?"</b> → it names both. Setup done — your laptop now deploys the way the team's laptops do.</div>
 
   <h2 style="border-top:none;padding-top:0;">Troubleshooting</h2>
   <table>
