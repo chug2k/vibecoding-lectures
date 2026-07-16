@@ -644,7 +644,7 @@
       <div style="flex:1"></div>
       <div class="kicker">Hands-on workshop · 2 hours · bring the laptop you build on</div>
       <h1 class="hero">Deploying internal tools.</h1>
-      <p class="sub">You've spent weeks telling Claude <b>what to build</b>. Today: wire your laptop to <b>the team's own box</b>, split into <b>three crews</b> — and every crew ships a different app shape, live.</p>
+      <p class="sub">You've spent weeks telling Claude <b>what to build</b>. Today you'll connect your laptop to <b>the team's own server</b>, join a crew, and ship a real app — <b>live, before we leave</b>.</p>
     </div>
     <div class="byline">
       <span><b>Charles Lee</b> · Anduin</span>
@@ -661,7 +661,7 @@
       <div class="grid2">
         <div class="agenda">
           <div class="arow"><span class="t">0:00</span><span class="w">Three live demos — the three app shapes</span></div>
-          <div class="arow"><span class="t">0:08</span><span class="w">The platform, fast: the map + the wall</span></div>
+          <div class="arow"><span class="t">0:08</span><span class="w">How the platform works — the ten-minute version</span></div>
           <div class="arow lab"><span class="t">0:20</span><span class="w"><b>Lab 1: WARP check → API key → MCP → skills</b> — everyone, together</span></div>
           <div class="arow"><span class="t">0:45</span><span class="w">Meet the starters · split into three crews</span></div>
           <div class="arow lab"><span class="t">0:55</span><span class="w"><b>Lab 2: make it yours</b> — customize your crew's starter</span></div>
@@ -672,9 +672,9 @@
         <div class="kit">
           <h3>What you need</h3>
           <div class="krow"><span class="k">You brought</span><span class="v">Claude Code (working), Homebrew, your company Google account</span></div>
-          <div class="krow"><span class="k">You'll set up</span><span class="v"><b>WARP</b> (verify — it's already installed), <b>your Dokploy API key</b>, the Dokploy MCP + the team’s <b>skills</b> (one <span class="mono">npx skills add</span>)</span></div>
-          <div class="krow"><span class="k">You'll ship</span><span class="v">Your crew's starter — customized, live at your own <span class="mono">*.anduincapital.dev</span></span></div>
-          <div class="krow"><span class="k">On your sheet</span><span class="v">Your Dokploy login, your crew + repo + subdomain, every prompt you'll paste</span></div>
+          <div class="krow"><span class="k">You'll set up</span><span class="v">Four quick things — WARP, an API key, the Dokploy MCP, the team's skills. <b>Claude does most of it.</b></span></div>
+          <div class="krow"><span class="k">You'll ship</span><span class="v">Your crew's app — customized, live at its own web address</span></div>
+          <div class="krow"><span class="k">On your sheet</span><span class="v">Every login, command, and prompt you'll need. <b>You never type from memory.</b></span></div>
         </div>
       </div>
     </div>
@@ -687,27 +687,27 @@
     <div class="frame">
       <div class="slide-eyebrow">Part 1 · Why our own platform</div>
       <h2 class="title">Our box. Our data. Our rules.</h2>
-      <p class="lede" style="margin-bottom:40px;">Vercel stays fine for prototypes. But team tools touch <b>real company and client data</b> — so they run on <b>taincap</b>, a server we operate, with <b>Dokploy</b> (an open-source PaaS) on top and <b>plain Docker</b> underneath: anything that runs in a container runs here.</p>
+      <p class="lede" style="margin-bottom:40px;">Vercel is fine for prototypes. Team tools touch <b>real company and client data</b> — so they run on a server we own, with <b>Dokploy</b>, an open-source &ldquo;press deploy, get a URL&rdquo; platform, on top.</p>
       <div class="cards c3">
         <div class="card">
           <div class="mode">Reason 01</div>
           <h3>Own the data.</h3>
-          <p>On a hosted PaaS, your data lives on <b>someone else's cloud</b>, under someone else's policies. On our box, it never leaves infrastructure we control — <b>full stop</b>.</p>
+          <p>Your data stays on <b>our server, under our rules</b> — never on someone else's cloud.</p>
         </div>
         <div class="card">
           <div class="mode">Reason 02</div>
           <h3>Secure everything.</h3>
-          <p>Every app sits behind the <b>company identity wall</b> before a single request lands. The perimeter is ours — not a vendor feature we hope is configured right.</p>
+          <p>Every app sits behind the <b>company sign-in</b> before a single request reaches it.</p>
         </div>
         <div class="card">
           <div class="mode">Reason 03</div>
           <h3>Control all the things.</h3>
-          <p>Server, proxy, databases, access policies — <b>ours to inspect, configure, and change</b>. When something matters, we don't file a ticket. We go look.</p>
+          <p>Server, databases, access — <b>ours to inspect and change</b>. No support tickets. We go look.</p>
         </div>
       </div>
       <div class="strip warn">
         <span class="slabel">One hard boundary</span>
-        <span><b>Internal-facing only.</b> Might a customer ever touch it? Then it's <b>engineering's stack</b> and a conversation first — never a quiet deploy. The wall (two slides away) makes this physical.</span>
+        <span><b>Internal tools only.</b> If a customer might ever touch it, it belongs on engineering's stack — <b>talk to them first</b>.</span>
       </div>
     </div>
     <div class="slide-num">03 / 15</div>
@@ -717,39 +717,39 @@
   <section data-screen-label="04 Anatomy of a request" class="s-anatomy">
     <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
     <div class="frame">
-      <div class="slide-eyebrow">Part 2 · The keystone — debug down this list, in order</div>
-      <h2 class="title" style="margin-bottom:28px;">Anatomy of a request.</h2>
+      <div class="slide-eyebrow">Part 2 · The map — when something breaks, walk down this list</div>
+      <h2 class="title" style="margin-bottom:28px;">The journey of a click.</h2>
       <div class="wrap">
         <div class="stack">
           <div class="layer">
             <span class="lname"><span class="em">🧑‍💻</span>Your browser</span>
-            <span class="ldesc"><span class="mono">seance-you.anduincapital.dev</span> — the wildcard means <b>any subdomain just works</b></span>
+            <span class="ldesc"><span class="mono">seance-you.anduincapital.dev</span> — any name under our domain <b>just works</b></span>
           </div>
           <div class="hop">https — the padlock lives at the edge</div>
           <div class="layer">
             <span class="lname"><span class="em">☁️</span>Cloudflare</span>
-            <span class="ldesc">DNS · TLS · <b>Access: the company SSO wall</b> — checked before our server ever sees it</span>
+            <span class="ldesc"><b>The front gate</b> — checks your company sign-in before our server even sees the request</span>
           </div>
-          <div class="hop">plain http — yes, really (the skill sets this up right)</div>
+          <div class="hop">plain http — odd but fine; the deploy skill handles it</div>
           <div class="layer">
             <span class="lname"><span class="em">🚦</span>Traefik <span style="font-weight:400;color:var(--muted);font-size:22px;">on taincap</span></span>
-            <span class="ldesc">One doorman owns ports 80/443 — reads the <b>Host header</b>, routes to the right container. Box is firewalled: <b>only Cloudflare gets in</b></span>
+            <span class="ldesc"><b>The doorman</b> — reads the address on each request and hands it to the right app</span>
           </div>
-          <div class="hop">internal port (3000)</div>
+          <div class="hop">straight to your app</div>
           <div class="layer">
             <span class="lname"><span class="em">📦</span>Your containers</span>
-            <span class="ldesc"><span class="mono">app</span> · <span class="mono">migrate</span> · <span class="mono">worker</span> · <span class="mono">redis</span> — declared in your compose file, built on the box</span>
+            <span class="ldesc">Your app and its helpers — <b>packaged to run anywhere</b>, built on the server</span>
           </div>
-          <div class="hop">dokploy-network</div>
+          <div class="hop">private network</div>
           <div class="layer">
             <span class="lname"><span class="em">🐘</span>Your Postgres</span>
-            <span class="ldesc">One managed instance <b>per person</b> — every app of yours gets its own database inside</span>
+            <span class="ldesc">Your database — <b>one per person</b>, shared by every app you'll ever ship here</span>
           </div>
         </div>
         <div class="aside">
           <h3>🎛 Dokploy — the control plane</h3>
-          <p><b>Not in the request path.</b> If it crashed right now, every deployed app would keep serving.</p>
-          <p>Dokploy is how containers <b>get</b> here: clone → build → run → wire Traefik → stream logs. Driven by the UI, the API — or <b>Claude, over MCP</b>. That's Lab 1.</p>
+          <p><b>Not part of this journey.</b> If it crashed right now, every app would keep running.</p>
+          <p>Dokploy is how apps <b>get onto</b> the server: it fetches your code, builds it, and starts it. You'll drive it <b>through Claude</b> — that's Lab 1.</p>
         </div>
       </div>
     </div>
@@ -760,22 +760,22 @@
   <section data-screen-label="05 The wall" class="s-wall dark">
     <div class="brand-mark"><img src="assets/anduin-full-white.svg" alt="Anduin"><span class="program">Fast Track</span></div>
     <div class="frame">
-      <div class="slide-eyebrow">Part 3 · Cloudflare Zero Trust</div>
+      <div class="slide-eyebrow">Part 3 · The front gate</div>
       <h2 class="title">The wall.</h2>
-      <p class="lede">Every request to every <span class="mono">*.anduincapital.dev</span> host is checked <b>at Cloudflare's edge</b> — before our server ever sees it. No company SSO session? It never arrives. That's "private by default" — and it cuts two ways:</p>
+      <p class="lede">Every request to our apps is checked <b>at the front gate</b> — no company sign-in, no entry. Everything you ship today is <b>automatically company-only</b>. But the gate cuts two ways:</p>
       <div class="versus">
         <div class="side human">
           <div class="who">Humans</div>
           <h3>Sail through.</h3>
-          <p>A browser signs in once, gets a cookie, and passes invisibly from then on. <b>Every app you ship today is instantly company-only</b> — zero perimeter code.</p>
+          <p>You sign in once in your browser; after that the gate is invisible. <b>Your apps are private to the company</b> without writing a line of security code.</p>
         </div>
         <div class="side machine">
           <div class="who">Machines</div>
           <h3>Hit the wall.</h3>
-          <p>A curl, a CI job, an MCP server, a <b>Slack webhook</b> — no browser, no company account. A <span class="mono">302</span> to a login page it can never solve. <b>Fails silently.</b></p>
+          <p>Scripts, robots, other services — <b>Slack included</b> — can't sign in with Google. They get bounced, <b>silently</b>.</p>
         </div>
       </div>
-      <div class="next"><span>Two consequences:</span><span class="pip">third-party webhooks die here — design for polling</span><span class="pip">Claude needs through — your machine gets an identity: WARP →</span></div>
+      <div class="next"><span>Two consequences:</span><span class="pip">outside services can never call our apps — we check for news instead</span><span class="pip">Claude needs a pass to deploy — that's WARP →</span></div>
     </div>
     <div class="slide-num">05 / 15</div>
   </section>
@@ -785,15 +785,15 @@
     <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
     <div class="frame">
       <div class="labchip">🔧 Lab 1a · 5 min — Cloudflare WARP</div>
-      <h2 class="title" style="margin-bottom:26px;">Already on your machine. Verify the team.</h2>
+      <h2 class="title" style="margin-bottom:26px;">Check your badge.</h2>
       <div class="grid2">
         <div>
           <ol class="labsteps">
-            <li><b>Find the ☁️ in your menu bar</b> — WARP is already installed on team machines. <i>(Truly missing? <code>brew install --cask cloudflare-warp</code>.)</i></li>
-            <li>Open it → <b>Profile</b> → <b>Team name</b> must say <code>anduin</code> → and flip the toggle to <b>Connected</b>. Your device's traffic now carries <b>your company identity</b> — every process on it, Claude included.</li>
-            <li><b>No team / not signed in?</b> Preferences → Account → <b>Login with Cloudflare Zero Trust</b> → team <code>anduin</code> → company Google → approve.</li>
+            <li><b>Find the ☁️ in your menu bar</b> — WARP is already on team laptops.</li>
+            <li>Open it → <b>Profile</b> → team name says <code>anduin</code> → toggle <b>Connected</b>.</li>
+            <li><b>Not signed in?</b> Preferences → Account → <b>Login with Cloudflare Zero Trust</b> → team <code>anduin</code> → your work Google.</li>
           </ol>
-          <p class="body" style="margin-top:24px;">No tokens to mint, nothing expires mid-demo. <b>One toggle</b> — and it's the <b>first thing to check</b> if Dokploy calls ever return an HTML sign-in page.</p>
+          <p class="body" style="margin-top:24px;">While WARP is on, <b>everything on your laptop carries your company badge</b> — Claude included. If Dokploy ever shows a sign-in page instead of answers, <b>check this toggle first</b>.</p>
         </div>
         <div>
           <div class="shot" style="width:820px;height:330px;">
@@ -806,7 +806,7 @@
       </div>
       <div class="checkpoint">
         <span class="c">✓ Checkpoint</span>
-        <p><span class="mono">curl -sI https://taincap.anduin.center | head -1</span> → <b>HTTP/2 200, not a login redirect</b>. A process with no browser just passed the wall — the thing every deploy today rides on.</p>
+        <p>Paste in a terminal: <span class="mono">curl -sI https://taincap.anduin.center | head -1</span> → <b>HTTP/2 200</b>. That's a program — not a browser — passing the gate. Every deploy today rides on this.</p>
       </div>
     </div>
     <div class="slide-num">06 / 15</div>
@@ -817,13 +817,13 @@
     <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
     <div class="frame">
       <div class="labchip">🔧 Lab 1b · 5 min — your Dokploy API key</div>
-      <h2 class="title" style="margin-bottom:26px;">Get your key to the box.</h2>
+      <h2 class="title" style="margin-bottom:26px;">Get your key.</h2>
       <div class="grid2" style="grid-template-columns:1fr 1fr;">
         <div>
           <ol class="labsteps">
-            <li><b>Open <span class="mono">taincap.anduin.center</span></b> — WARP walks you straight through the wall; it just loads. Sign in with the <b>Dokploy login on your sheet</b>.</li>
+            <li>Open <b><span class="mono">taincap.anduin.center</span></b> — it just loads. <i>(That's WARP.)</i> Sign in with the <b>Dokploy login on your sheet</b>.</li>
             <li>Bottom-left <b>Account → Profile</b> <span style="color:var(--danger);font-weight:600;">①&thinsp;②</span></li>
-            <li>Scroll to <b>API/CLI Keys → Generate New Key</b> <span style="color:var(--danger);font-weight:600;">③</span> → <b>copy it</b>. It's a password to your projects — the next lab hands it straight to Claude's MCP config. Don't paste it anywhere else.</li>
+            <li><b>API/CLI Keys → Generate New Key</b> <span style="color:var(--danger);font-weight:600;">③</span> → <b>copy it</b>. Treat it like a password — the next step is the <b>only</b> place it goes.</li>
           </ol>
           <div class="shot" style="width:680px;height:214px;margin-top:28px;">
             <img src="assets/dokploy-api-keys.png" style="width:680px;" alt="Dokploy API/CLI Keys section">
@@ -851,14 +851,14 @@
     <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
     <div class="frame">
       <div class="labchip">🔧 Lab 1c · 10 min — the Dokploy MCP</div>
-      <h2 class="title" style="margin-bottom:26px;">Put the box in Claude's hands.</h2>
+      <h2 class="title" style="margin-bottom:26px;">Hand Claude the keys.</h2>
       <div class="grid2">
         <div>
           <ol class="labsteps">
-            <li><b>Paste the sheet's snippet to Claude</b> (→) and say <i>&ldquo;add this MCP server.&rdquo;</i> One command — Claude runs it and your config is updated. Dogfooding the whole point of today.</li>
-            <li><b>Restart Claude Code</b> → approve the new server → <code>/mcp</code>. First start downloads the package — a quiet minute is normal, not broken.</li>
+            <li><b>Paste the sheet's snippet to Claude</b> (→) and say <i>&ldquo;add this MCP server.&rdquo;</i> Claude sets itself up.</li>
+            <li><b>Restart Claude Code</b> → approve the new server. <i>(The first start takes a quiet minute — normal, not broken.)</i></li>
           </ol>
-          <p class="body" style="margin-top:24px;">Catching up later? All of Lab 1, screenshots included, is a self-paced page: <b>course home → Resources → Dokploy Setup Guide</b>.</p>
+          <p class="body" style="margin-top:24px;">Miss a step? All of Lab 1 is a self-paced page: <b>Resources → Dokploy Setup Guide</b> on the course home.</p>
         </div>
         <div>
           <div class="terminal" style="font-size:22px;">
@@ -868,14 +868,13 @@
             <div><span class="cmd">  --env DOKPLOY_API_KEY=<span class="str">&lt;the-key-you-just-copied&gt;</span> \</span></div>
             <div><span class="cmd">  -- npx -y @dokploy/mcp</span></div>
             <div>&nbsp;</div>
-            <div><span class="ok"># that's it — WARP already carries identity</span></div>
-            <div><span class="comment"># (this used to need a token-minting wrapper)</span></div>
+            <div><span class="ok"># that's the whole setup — WARP handles the rest</span></div>
           </div>
         </div>
       </div>
       <div class="checkpoint">
         <span class="c">✓ Checkpoint</span>
-        <p>Ask Claude: <b>&ldquo;list my Dokploy projects&rdquo;</b> → a real answer. <b>An empty list is a pass</b> — you haven't built anything yet. HTML login page? WARP toggle. Permission error? The API key.</p>
+        <p>Ask Claude: <b>&ldquo;list my Dokploy projects&rdquo;</b>. Any real answer is a pass — <b>even an empty list</b>. A sign-in page instead? Check WARP.</p>
       </div>
     </div>
     <div class="slide-num">08 / 15</div>
@@ -891,9 +890,9 @@
       <div class="grid2">
         <div>
           <ol class="labsteps">
-            <li><b>One command</b> (→) installs the team's two Dokploy skills from GitHub — <b>symlinked</b>, so <code>npx skills update</code> later moves you to the latest playbook. No stale private copies.</li>
-            <li><span class="mono">dokploy-starter</span> — <b>Lab 2 uses it</b>: picks and scaffolds the right starter shape.</li>
-            <li><span class="mono">dokploy-deploy</span> — <b>Lab 3 uses it</b>: the team's whole deploy playbook, versioned. Every gotcha in it cost someone an hour once — it's why <i>&ldquo;deploy this to dokploy&rdquo;</i> just works.</li>
+            <li><b>One command</b> (→) installs the team's two playbooks. They stay <b>linked to GitHub</b> — <code>npx skills update</code> always gets you the latest.</li>
+            <li><span class="mono">dokploy-starter</span> — sets up a new app the right way. <b>Lab 2.</b></li>
+            <li><span class="mono">dokploy-deploy</span> — ships it and proves it works. Every hard-won lesson baked in. <b>Lab 3.</b></li>
           </ol>
         </div>
         <div>
@@ -910,7 +909,7 @@
       </div>
       <div class="checkpoint">
         <span class="c">✓ Checkpoint</span>
-        <p><b>Restart Claude Code</b>, then ask: <b>&ldquo;which dokploy skills do you have?&rdquo;</b> → it names both. Setup done — your laptop now deploys like the team does.</p>
+        <p><b>Restart Claude Code</b>, then ask: <b>&ldquo;which dokploy skills do you have?&rdquo;</b> → it names both. <b>Setup done.</b></p>
       </div>
     </div>
     <div class="slide-num">09 / 15</div>
@@ -920,32 +919,32 @@
   <section data-screen-label="10 The three shapes" class="s-starters">
     <div class="brand-mark"><img src="assets/anduin-full.svg" alt="Anduin"><span class="program">Fast Track</span></div>
     <div class="frame">
-      <div class="slide-eyebrow">Part 4 · Three shapes, pre-debugged</div>
+      <div class="slide-eyebrow">Part 4 · Three kinds of app</div>
       <h2 class="title" style="margin-bottom:16px;">The starters.</h2>
-      <p class="lead" style="font-size:27px;margin:0 0 30px;max-width:1580px;">Almost every internal tool decomposes into <b>these three blocks</b> — and each starter pre-solves its block's deploy pitfalls <b>on our exact stack</b>, with a comment at the exact line in the compose file.</p>
+      <p class="lead" style="font-size:27px;margin:0 0 30px;max-width:1580px;">Nearly every internal tool is built from <b>three blocks</b>. Each starter is a tiny working app with its block's deploy headaches <b>already solved</b>.</p>
       <div class="cards c3">
         <div class="card">
           <span class="em">💀</span>
           <h3>Skeleton Crew</h3>
-          <p><b>&ldquo;Users sign in, data gets saved.&rdquo;</b> Google SSO + Postgres — the foundation <b>every</b> tool starts from. A guestbook proves the app reaches its database.</p>
+          <p><b>&ldquo;People sign in, data gets saved.&rdquo;</b> Google sign-in + a database — the foundation every tool starts from.</p>
           <span class="url">skeleton-cl.anduincapital.dev</span>
         </div>
         <div class="card">
           <span class="em">🧪</span>
           <h3>Cauldron</h3>
-          <p><b>&ldquo;Work happens in the background.&rdquo;</b> Queue + a <b>separate worker process</b> — slow jobs, scheduled work, and <b>polling</b>: your answer to the webhook wall.</p>
+          <p><b>&ldquo;Work happens in the background.&rdquo;</b> Slow jobs run off to the side — reports, imports, checking other tools for news.</p>
           <span class="url">cauldron-cl.anduincapital.dev</span>
         </div>
         <div class="card">
           <span class="em">🔮</span>
           <h3>Séance</h3>
-          <p><b>&ldquo;Screens update live.&rdquo;</b> WebSockets + a Redis relay, so every copy of the app sees every message — chat, presence, dashboards that tick.</p>
+          <p><b>&ldquo;Screens update live.&rdquo;</b> Chat, presence, dashboards that tick — everyone sees changes instantly.</p>
           <span class="url">seance-cl.anduincapital.dev</span>
         </div>
       </div>
       <div class="strip">
         <span class="slabel">Same DNA</span>
-        <span>Hono + Drizzle/Postgres + Docker + a pre-disarmed compose file. Read one and the other two are diffs. <b>In a minute, each crew takes one.</b></span>
+        <span>Same skeleton underneath — learn one and you've mostly learned all three. <b>Each crew takes one.</b></span>
       </div>
     </div>
     <div class="slide-num">10 / 15</div>
@@ -957,33 +956,33 @@
     <div class="frame">
       <div class="slide-eyebrow">The split · your sheet names your crew</div>
       <h2 class="title" style="margin-bottom:16px;">Three crews. One hour. Everyone ships.</h2>
-      <p class="lead" style="font-size:27px;margin:0 0 30px;max-width:1580px;">The crew shares ideas and unblocks each other — but <b>everyone deploys their own copy</b> at their own subdomain. Every person leaves with a working pipeline.</p>
+      <p class="lead" style="font-size:27px;margin:0 0 30px;max-width:1580px;">Crews share ideas and unblock each other — but <b>everyone ships their own copy</b>, at their own address.</p>
       <div class="cards c3">
         <div class="card">
           <div class="mode">Crew 01</div>
           <span class="em">💀</span>
           <h3>Skeleton</h3>
-          <p>Make the guestbook <b>yours</b> — then ship it with Google sign-in working. <b>Your sheet has shared OAuth creds</b>, pre-registered for your exact address. Use them verbatim.</p>
+          <p>Make the guestbook <b>yours</b>, then ship it with Google sign-in working. <b>Your sheet has the sign-in credentials</b> — use them exactly as printed.</p>
           <span class="url">AI-Hivemind-Lab/dokploy-skeleton</span>
         </div>
         <div class="card">
           <div class="mode">Crew 02</div>
           <span class="em">🧪</span>
           <h3>Cauldron</h3>
-          <p>Rebrand the brewery — <b>your jobs, your theme</b> — and ship a <b>two-process app</b>: web + worker. Demo: watch a job go pending → active → done. <b>No OAuth needed.</b></p>
+          <p>Rebrand the brewery — <b>your jobs, your theme</b>. Demo: watch a job go pending → active → done.</p>
           <span class="url">AI-Hivemind-Lab/cauldron</span>
         </div>
         <div class="card">
           <div class="mode">Crew 03</div>
           <span class="em">🔮</span>
           <h3>Séance</h3>
-          <p>Retheme the chat room — then ship it and open it on <b>every crew member's screen at once</b>. Demo: messages crossing the room live. <b>No OAuth needed.</b></p>
+          <p>Retheme the chat room — then open it on <b>every crew member's screen at once</b>.</p>
           <span class="url">AI-Hivemind-Lab/seance</span>
         </div>
       </div>
       <div class="strip">
         <span class="slabel">On your sheet</span>
-        <span>Your crew · your repo · your subdomain <span class="mono">&lt;starter&gt;-&lt;you&gt;.anduincapital.dev</span> · customization ideas · the deploy prompt.</span>
+        <span>Your crew · your repo · your app's address · customization ideas · the deploy prompt.</span>
       </div>
     </div>
     <div class="slide-num">11 / 15</div>
@@ -998,9 +997,9 @@
       <div class="grid2">
         <div>
           <ol class="labsteps">
-            <li><b>Scaffold fresh</b> — tell Claude: <code>use the dokploy-starter skill to set up &lt;your starter&gt;</code>. It clones history-free and gets it running.</li>
-            <li><b>Make it yours with Claude</b> — new name + title, your crew's theme, <b>one</b> visible tweak (ideas on your sheet). <b>Working beats clever</b> — you demo this in 40 minutes.</li>
-            <li><b>Push where the box can pull:</b> <code>gh repo create &lt;starter&gt;-&lt;you&gt; --public --source=. --push</code> — <b>public = no deploy key today</b>. (Real apps go private + deploy key — take-home.)</li>
+            <li><b>Start fresh</b> — tell Claude: <code>use the dokploy-starter skill to set up &lt;your starter&gt;</code>.</li>
+            <li><b>Make it yours</b> — a new name, your crew's look, <b>one</b> visible change. <b>Small and finished beats big and broken</b> — you demo in 40 minutes.</li>
+            <li><b>Put it on GitHub:</b> <code>gh repo create &lt;starter&gt;-&lt;you&gt; --public --source=. --push</code> — the server pulls your code from there.</li>
           </ol>
         </div>
         <div>
@@ -1020,7 +1019,7 @@
       </div>
       <div class="checkpoint">
         <span class="c">✓ Checkpoint</span>
-        <p>Your repo is <b>on GitHub</b> and the compose file is intact. Local run (<span class="mono">docker compose up -d && npm run dev</span>) is a bonus, not a gate — <b>the box builds from your repo</b>.</p>
+        <p>Your repo is <b>on GitHub</b> — that's the only gate. The server builds from GitHub, so running it locally is a bonus, not a requirement.</p>
       </div>
     </div>
     <div class="slide-num">12 / 15</div>
@@ -1036,9 +1035,9 @@
         <div>
           <ol class="labsteps">
             <li><b>Paste the deploy prompt</b> from your sheet — it names your project, repo, and subdomain.</li>
-            <li><b>Claude will STOP and ask where your database lives.</b> Answer: <b>&ldquo;create a new managed Postgres in my project.&rdquo;</b> That's not workshop debris — it's <b>your</b> instance, shared by every app you ship after today.</li>
-            <li><b>Watch two screens:</b> Claude's MCP calls on your laptop, the deployment log in the Dokploy UI.</li>
-            <li>Build minutes = quiz minutes: why is HTTPS <b>off</b> at the domain? why is the app on <b>two networks</b>? migrate says &ldquo;retrying&rdquo; — failure? <i>(No — it's waiting for the DB.)</i></li>
+            <li><b>Claude will stop and ask where your database should live.</b> Say: <b>&ldquo;create a new managed Postgres in my project.&rdquo;</b> That database is <b>yours for good</b> — every app you ship after today shares it.</li>
+            <li><b>Watch two screens:</b> Claude working on your laptop, the build log on the Dokploy site.</li>
+            <li>While it builds — <b>quiz:</b> why is HTTPS off? why two networks? is &ldquo;retrying&hellip;&rdquo; a failure? <i>(No — it's waiting for the database.)</i></li>
           </ol>
         </div>
         <div>
@@ -1056,7 +1055,7 @@
       </div>
       <div class="checkpoint">
         <span class="c">✓ Checkpoint</span>
-        <p>Deployment <b>done</b> + Claude reports <b>the health check passed</b>. Stuck &gt;2 min? Helper + spare instance; we fix yours after — nobody stalls the room.</p>
+        <p>Deployment <b>done</b>, and Claude says <b>the health check passed</b>. Stuck more than 2 minutes? Wave — we'll hand you a spare and fix yours after.</p>
       </div>
     </div>
     <div class="slide-num">13 / 15</div>
@@ -1067,15 +1066,15 @@
     <div class="frame">
       <div class="slide-eyebrow">The whole point</div>
       <h2>Show your shape.</h2>
-      <p class="walk">One demo per crew, big screen: <b>💀 sign the guestbook</b> — two doors: the company wall, then <i>your</i> app's Google sign-in. <b>🧪 brew a job</b> — pending → active → done; a <i>separate worker</i> did that, not the page. <b>🔮 one chat, every laptop</b> — messages crossing the room live.</p>
+      <p class="walk">One demo per crew, on the big screen: <b>💀 sign the guestbook</b>. <b>🧪 brew a job</b> and watch it go pending → active → done. <b>🔮 one chat room, every laptop</b> — messages crossing the room live.</p>
       <div class="layers">
-        <span>Cloudflare: TLS + SSO ✓</span>
-        <span>Traefik: routed by Host ✓</span>
-        <span>your container: built &amp; live ✓</span>
-        <span>your Postgres: rows written ✓</span>
-        <span>WARP: your machine passed the wall ✓</span>
+        <span>the gate: checked you in ✓</span>
+        <span>the doorman: found your app ✓</span>
+        <span>your app: built &amp; live ✓</span>
+        <span>your database: saving rows ✓</span>
+        <span>WARP: your laptop passed the gate ✓</span>
       </div>
-      <p class="walk" style="margin-top:44px;">Then go visit the <b>other crews' apps</b> — any company account passes the wall. Three shapes, all live on our box, all shipped <b>by telling Claude to</b>.</p>
+      <p class="walk" style="margin-top:44px;">Then visit the <b>other crews' apps</b> — anyone at the company can. Three shapes, all live, all shipped <b>by telling Claude to</b>.</p>
     </div>
     <div class="slide-num">14 / 15</div>
   </section>
@@ -1087,15 +1086,15 @@
       <div class="slide-eyebrow">Take-home · your app, this week</div>
       <h2 class="title" style="margin-bottom:24px;">Now do it with your app.</h2>
       <div class="path">
-        <div class="p"><div class="n">1</div><div class="txt"><b>Containerize it</b> — run <code>dokploy-starter</code> in <b>absorb mode</b>: it lifts the patterns (compose file, networks, migrate one-shot) into <i>your</i> code.</div></div>
-        <div class="p"><div class="n">2</div><div class="txt"><b>Push to a private repo</b> this time — which means a <b>deploy key</b>. The skill automates it; just know GitHub <b>silently drops keys</b> if a repo is ever transferred — first suspect when a deploy dies at clone.</div></div>
-        <div class="p"><div class="n">3</div><div class="txt"><b>Say the words:</b> <code>deploy this to dokploy</code>. Answer the database question differently now: <b>&ldquo;reuse my Postgres&rdquo;</b> — the one you made today.</div></div>
-        <div class="p"><div class="n">4</div><div class="txt"><b>Expect the OAuth reminder</b> if you have Google sign-in — origins &amp; redirect URIs are <b>Console-only, forever manual</b>. Claude hands you the exact values.</div></div>
-        <div class="p"><div class="n">5</div><div class="txt"><b>The sharp edge:</b> no third-party webhooks through the wall. <b>Poll</b> (the Cauldron shape), or open the scoped-bypass conversation with the box owner <i>early</i>.</div></div>
-        <div class="p"><div class="n">6</div><div class="txt"><b>Day 2:</b> ship v2 with <i>push, then &ldquo;redeploy it&rdquo;</i>. Something's weird? <i>&ldquo;show me my app's logs&rdquo;</i> — Claude reads them over MCP. WARP toggle first if calls bounce.</div></div>
+        <div class="p"><div class="n">1</div><div class="txt"><b>Package it</b> — ask Claude to run <code>dokploy-starter</code> in <b>absorb mode</b>: it fits the starter patterns into <i>your</i> code.</div></div>
+        <div class="p"><div class="n">2</div><div class="txt"><b>Push to a private repo</b> this time — the skill sets up the <b>deploy key</b> that lets the server read it.</div></div>
+        <div class="p"><div class="n">3</div><div class="txt"><b>Say the words:</b> <code>deploy this to dokploy</code>. This time answer the database question with <b>&ldquo;reuse my Postgres&rdquo;</b> — the one you made today.</div></div>
+        <div class="p"><div class="n">4</div><div class="txt"><b>Google sign-in?</b> One manual step remains — Claude hands you the exact values to paste into Google's console.</div></div>
+        <div class="p"><div class="n">5</div><div class="txt"><b>Remember the gate:</b> outside services (Slack, GitHub) can't call your app. <b>Check for news on a schedule instead</b> — the Cauldron shape.</div></div>
+        <div class="p"><div class="n">6</div><div class="txt"><b>Day 2:</b> push, then say <i>&ldquo;redeploy it&rdquo;</i>. Something weird? <i>&ldquo;Show me my app's logs.&rdquo;</i> Sign-in page instead of answers? <b>Check WARP.</b></div></div>
       </div>
       <div class="signoff">
-        <span><b>Your project, your Postgres, your pipeline — permanent.</b> The workshop apps live one week; show a teammate. Stuck later: <b>ask in the deploy channel</b> (on your sheet).</span>
+        <span><b>Your project, your database, your pipeline — permanent.</b> Workshop apps live one week; show a teammate. Stuck later: <b>the deploy channel</b> (on your sheet).</span>
         <span class="dot"></span>
         <span class="repo">docs/DEPLOY.md in every starter has the details</span>
       </div>
