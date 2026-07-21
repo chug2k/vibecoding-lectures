@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vibe Coding — Week 4 · Google Sign-In</title>
 <link rel="stylesheet" href="colors_and_type.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="../deck-stage.js?v=notes1"></script>
 <style>
   deck-stage:not(:defined){visibility:hidden;}
@@ -28,14 +31,18 @@
     --gap-title: 52px;
     --gap-item: 32px;
 
+    /* Fonts — ADS 2026 (overrides colors_and_type.css for this deck) */
+    --font-display: "Manrope", -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
     /* Colors (workshop accent — design-system tokens) */
     --ink: var(--color-gray-9);
     --ink-soft: var(--color-gray-8);
     --muted: var(--color-gray-6);
     --hairline: var(--color-gray-3);
     --paper: var(--color-gray-1);
-    --accent: #48AFF0;
-    --accent-deep: var(--color-primary-4);
+    --accent: #1075DC;
+    --accent-deep: #0158AE;
     --terminal-bg: #0d1117;
     --terminal-fg: #e6edf3;
     --terminal-green: #7ee787;

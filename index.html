@@ -5,31 +5,39 @@
 <title>Vibe Coding — Anduin Fast Track</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f4f6fa;
+    --bg: #EDEFF2;
     --surface: #ffffff;
-    --surface-2: #f8fafc;
-    --border: #e5e9f0;
-    --border-strong: #d3dae6;
-    --ink: #1b2430;
-    --ink-soft: #3f4a59;
-    --muted: #6b7686;
-    --faint: #9aa4b2;
-    --accent: #1f7fc4;
-    --accent-deep: #18689f;
-    --accent-soft: #e8f3fb;
-    --accent-ring: rgba(31,127,196,0.35);
-    --shadow-sm: 0 1px 2px rgba(20,33,51,0.04), 0 1px 3px rgba(20,33,51,0.06);
-    --shadow-md: 0 6px 22px -10px rgba(20,33,51,0.18);
+    --surface-2: #F7F8FA;
+    --border: #E7E9ED;
+    --border-strong: #CCD2DB;
+    --ink: #141414;
+    --ink-soft: #323C4D;
+    --muted: #646E82;
+    --faint: #98A1B2;
+    --navy: #162950;
+    --accent: #1075DC;
+    --accent-deep: #0158AE;
+    --accent-soft: #DCF2FA;
+    --accent-ring: rgba(16,117,220,0.35);
+    --coral: #EF6445;
+    --coral-soft: rgba(239,100,69,0.12);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.10);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
     --radius: 14px;
     --wrap: 1080px;
+    --font-primary: "Manrope", -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
   html { scroll-behavior: smooth; }
   body {
-    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    font: 15px/1.55 var(--font-primary);
     background: var(--bg);
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
@@ -37,6 +45,17 @@
   a { color: inherit; }
   .wrap { width: 100%; max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
   .view[hidden] { display: none !important; }
+
+  /* ───────────────────────── Shared site tab bar ───────────────────────── */
+  .sitetabs { border-bottom: 1px solid var(--border); background: var(--surface); }
+  .sitetabs .st-wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; display: flex; align-items: stretch; gap: 32px; height: 60px; min-width: 0; }
+  .st-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 16px; color: var(--navy); text-decoration: none; white-space: nowrap; font-family: var(--font-primary); }
+  .st-brand .mark { width: 26px; height: 26px; border-radius: 6px; background: var(--navy); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; }
+  .st-brand span.ai { color: var(--accent); }
+  .st-tabs { display: flex; gap: 4px; flex: 1; min-width: 0; overflow-x: auto; }
+  .st-tabs a { display: inline-flex; align-items: center; padding: 0 16px; font-family: var(--font-mono); font-size: 14px; font-weight: 500; color: var(--faint); text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .st-tabs a:hover { color: var(--navy); }
+  .st-tabs a[aria-current="page"] { color: var(--navy); border-bottom-color: var(--accent); }
 
   /* ───────────────────────── Home: header ───────────────────────── */
   .site-header {
@@ -52,7 +71,8 @@
   .brand img { height: 24px; width: auto; display: block; }
   .brand .divider { width: 1px; height: 22px; background: var(--border-strong); }
   .brand .program {
-    font-size: 12px; font-weight: 700; letter-spacing: 0.16em;
+    font-family: var(--font-mono);
+    font-size: 12px; font-weight: 500; letter-spacing: 0.16em;
     text-transform: uppercase; color: var(--accent-deep);
   }
   .header-spacer { flex: 1; }
@@ -61,7 +81,8 @@
   /* ───────────────────────── Home: hero ───────────────────────── */
   .hero { padding: 52px 0 30px; }
   .hero .eyebrow {
-    font-size: 12px; font-weight: 700; letter-spacing: 0.16em;
+    font-family: var(--font-mono);
+    font-size: 12px; font-weight: 500; letter-spacing: 0.16em;
     text-transform: uppercase; color: var(--accent-deep); margin-bottom: 14px;
   }
   .hero h1 {
@@ -96,10 +117,11 @@
     background: var(--accent-soft); color: var(--accent-deep);
     display: grid; place-items: center; font-weight: 700; font-size: 16px;
   }
-  .module-num.bonus { background: #f1edfb; color: #6b4bc9; }
+  .module-num.bonus { background: var(--coral-soft); color: var(--coral); }
   .module-head .mh-text { min-width: 0; }
   .module-eyebrow {
-    font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
+    font-family: var(--font-mono);
+    font-size: 12px; font-weight: 500; letter-spacing: 0.12em;
     text-transform: uppercase; color: var(--muted);
   }
   .module-title { margin: 3px 0 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
@@ -127,7 +149,8 @@
   .lesson .title { font-weight: 600; font-size: 15.5px; color: var(--ink); }
   .lesson:hover .title { color: var(--accent-deep); }
   .lesson .kind {
-    font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+    font-family: var(--font-mono);
+    font-size: 10.5px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
     color: var(--muted); background: var(--surface-2);
     border: 1px solid var(--border); border-radius: 999px; padding: 2px 9px;
   }
@@ -151,7 +174,7 @@
   .home-main { min-width: 0; }
   .module { scroll-margin-top: 84px; }
   .toc { position: sticky; top: 84px; align-self: start; }
-  .toc-title { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding: 4px 12px 10px; }
+  .toc-title { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding: 4px 12px 10px; }
   .toc a { display: flex; align-items: center; gap: 11px; padding: 8px 12px; border-radius: 9px; text-decoration: none; color: var(--ink-soft); font-size: 13.5px; font-weight: 600; }
   .toc a:hover { background: var(--surface); color: var(--ink); }
   .toc a.active { background: var(--accent-soft); color: var(--accent-deep); }
@@ -246,6 +269,18 @@
 
   <!-- ════════════════════════ HOME ════════════════════════ -->
   <div id="home" class="view">
+    <nav class="sitetabs" aria-label="Programs">
+      <div class="st-wrap">
+        <a class="st-brand" href="/"><span class="mark">A</span>Anduin <span class="ai">AI Learning</span></a>
+        <div class="st-tabs">
+          <a href="/">HOME</a>
+          <a href="/vibecoding/" aria-current="page">VIBE CODING</a>
+          <a href="/skills/">SKILLS SERIES</a>
+          <a href="/agents/">AGENTS</a>
+          <a href="https://academy.anduincapital.dev">ACADEMY</a>
+        </div>
+      </div>
+    </nav>
     <header class="site-header">
       <div class="wrap header-inner">
         <a class="brand" href="#" aria-label="Vibe Coding home">
