@@ -115,7 +115,10 @@
   const stylesheet = `
     :host {
       position: fixed;
-      inset: 0;
+      top: var(--stage-top-offset, 0px);
+      right: 0;
+      bottom: 0;
+      left: 0;
       display: block;
       background: #000;
       color: #fff;
@@ -273,7 +276,7 @@
     .rail {
       position: fixed;
       left: 0;
-      top: 0;
+      top: var(--stage-top-offset, 0px);
       bottom: 0;
       width: var(--deck-rail-w, 188px);
       background: #141414;
@@ -427,7 +430,7 @@
     .rail-resize {
       position: fixed;
       left: calc(var(--deck-rail-w, 188px) - 3px);
-      top: 0;
+      top: var(--stage-top-offset, 0px);
       bottom: 0;
       width: 6px;
       cursor: col-resize;
@@ -619,12 +622,29 @@
     get designHeight() {
       return parseInt(this.getAttribute('height'), 10) || DESIGN_H_DEFAULT;
     }
+    /** Pixels to inset the stage from the top of the viewport, for pages
+     *  that render a fixed site header above <deck-stage> (see `top-offset`
+     *  attribute). Defaults to 0 (full-viewport stage, original behaviour).
+     *  Forced back to 0 when the deck is loaded inside another page's
+     *  iframe (host's lesson-viewer, presenter popup, etc.) — that embed
+     *  already supplies its own chrome, and the page-level inline script
+     *  that sets `data-deck-embedded` on <html> runs before this element
+     *  connects, so the check below sees it in time. */
+    get topOffset() {
+      if (document.documentElement.hasAttribute('data-deck-embedded')) return 0;
+      return parseInt(this.getAttribute('top-offset'), 10) || 0;
+    }
 
     connectedCallback() {
       // Presenter-view popup loads deckUrl?_snthumb=...#N for its prev/cur/
       // next thumbnails — the rail has no business rendering inside those
       // (wrong scale, and it offsets the stage so the thumb shows a gutter).
       if (/[?&]_snthumb=/.test(location.search)) this.setAttribute('no-rail', '');
+      // Read once at connect time — set as an inline custom property so the
+      // shadow stylesheet's `var(--stage-top-offset, 0px)` picks it up for
+      // both :host (the stage) and the rail/rail-resize, which are
+      // position:fixed and therefore don't inherit :host's own offset.
+      this.style.setProperty('--stage-top-offset', this.topOffset + 'px');
       this._render();
       this._loadNotes();
       this._syncPrintPageRule();
@@ -1230,7 +1250,10 @@
       // the [rw, innerWidth] stage region.
       if (this._overlay) this._overlay.style.marginLeft = (rw / 2) + 'px';
       const vw = window.innerWidth - rw;
-      const vh = window.innerHeight;
+      // The host's own rendered height (not window.innerHeight) — self-
+      // corrects for --stage-top-offset shrinking :host from the top,
+      // without needing this computation to know the offset itself.
+      const vh = this.getBoundingClientRect().height;
       const s = Math.min(vw / this.designWidth, vh / this.designHeight);
       this._canvas.style.transform = `scale(${s})`;
     }
